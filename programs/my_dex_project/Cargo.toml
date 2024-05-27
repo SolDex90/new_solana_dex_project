@@ -1,0 +1,19 @@
+[package]
+name = "my_dex_project"
+version = "0.1.0"
+edition = "2018"
+
+[dependencies]
+anchor-lang = "0.27.0"
+anchor-spl = "0.27.0"
+rand = "0.8" # Ensure this is present
+solana-program = "=1.14.17"
+winnow = "=0.4.1"
+toml_datetime = "=0.6.1"
+getrandom = { version = "0.2.9", features = ["custom"] }
+
+[lib]
+crate-type = ["cdylib", "lib"]
+
+[patch.crates-io]
+spl-token-2022 = { git = "https://github.com/solana-labs/solana-program-library", branch = "v1.14" }

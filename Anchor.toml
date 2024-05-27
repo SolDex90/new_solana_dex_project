@@ -1,0 +1,15 @@
+[programs.localnet]
+my_dex_project = "2MTDZGGZ7kU8tnscXjZ8LTAiE1F8hmxmhiNEnff6i3kh"
+
+[registry]
+url = "https://anchor.projectserum.com"
+
+[provider]
+cluster = "localnet"
+wallet = "~/.config/solana/id.json"
+
+[scripts]
+test = "cargo test-bpf"
+
+[toolchain]
+anchor_version = "0.24.2"

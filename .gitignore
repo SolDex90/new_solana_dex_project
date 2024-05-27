@@ -1,7 +1,11 @@
-
 .anchor
 .DS_Store
 target
 **/*.rs.bk
 node_modules
 test-ledger
+FlameGraph/
+WSL2-Linux-Kernel/
+perf.data
+perf.data.old
+flamegraph.svg

@@ -13,3 +13,7 @@ test = "cargo test-bpf"
 
 [toolchain]
 anchor_version = "0.24.2"
+
+[test]
+rpc-port = 8901
+faucet-port = 9901

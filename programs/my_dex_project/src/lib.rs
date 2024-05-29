@@ -51,18 +51,32 @@ pub mod my_dex_project {
         let mut rng = rand::thread_rng();
         market.orders.shuffle(&mut rng);
 
-        for i in 0..market.orders.len() {
-            for j in (i + 1)..market.orders.len() {
-                let order_a = &market.orders[i];
-                let order_b = &market.orders[j];
+        let mut i = 0;
+        while i < market.orders.len() {
+            let mut j = i + 1;
+            while j < market.orders.len() {
+                if market.orders[i].order_type != market.orders[j].order_type && market.orders[i].price == market.orders[j].price {
+                    let match_amount = std::cmp::min(market.orders[i].amount, market.orders[j].amount);
 
-                if order_a.order_type != order_b.order_type && order_a.price == order_b.price {
-                    // Match orders
-                    market.orders.remove(j);
-                    market.orders.remove(i);
-                    break;
+                    // Update order amounts
+                    market.orders[i].amount -= match_amount;
+                    market.orders[j].amount -= match_amount;
+
+                    // Remove orders if fully matched
+                    if market.orders[i].amount == 0 {
+                        market.orders.remove(i);
+                        // After removing an element at i, the current i is now pointing to the next element, so we need to avoid incrementing i
+                        continue;
+                    }
+                    if market.orders[j].amount == 0 {
+                        market.orders.remove(j);
+                        // After removing an element at j, the current j is now pointing to the next element, so we need to avoid incrementing j
+                        continue;
+                    }
                 }
+                j += 1;
             }
+            i += 1;
         }
 
         msg!("Order Book: {:?}", market.orders);
@@ -79,6 +93,31 @@ pub mod my_dex_project {
         } else {
             Err(ProgramError::InvalidArgument.into())
         }
+    }
+
+    // Add Liquidity Pool functionality
+    pub fn add_liquidity(ctx: Context<AddLiquidity>, amount: u64) -> ProgramResult {
+        let pool = &mut ctx.accounts.pool;
+        pool.total_liquidity += amount;
+        pool.liquidity_providers.push(LiquidityProvider {
+            user: *ctx.accounts.user.key,
+            amount,
+        });
+        Ok(())
+    }
+
+    // Staking functionality
+    pub fn stake_tokens(ctx: Context<StakeTokens>, amount: u64) -> ProgramResult {
+        let staking_account = &mut ctx.accounts.staking_account;
+        staking_account.amount += amount;
+        Ok(())
+    }
+
+    pub fn claim_rewards(ctx: Context<ClaimRewards>) -> ProgramResult {
+        let staking_account = &mut ctx.accounts.staking_account;
+        let rewards = staking_account.calculate_rewards();
+        staking_account.rewards_claimed += rewards;
+        Ok(())
     }
 }
 
@@ -98,6 +137,32 @@ pub struct Order {
 #[account]
 pub struct Market {
     pub orders: Vec<Order>,
+}
+
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, Debug)]
+pub struct LiquidityProvider {
+    pub user: Pubkey,
+    pub amount: u64,
+}
+
+#[account]
+pub struct LiquidityPool {
+    pub total_liquidity: u64,
+    pub liquidity_providers: Vec<LiquidityProvider>,
+}
+
+#[account]
+#[derive(Default)]
+pub struct StakingAccount {
+    pub amount: u64,
+    pub rewards_claimed: u64,
+}
+
+impl StakingAccount {
+    fn calculate_rewards(&self) -> u64 {
+        // Implement your reward calculation logic here
+        0
+    }
 }
 
 #[derive(Accounts)]
@@ -164,6 +229,35 @@ pub struct MatchOrders<'info> {
 pub struct CancelOrder<'info> {
     #[account(mut)]
     pub market: Account<'info, Market>,
+    #[account(mut)]
+    pub user: Signer<'info>,
+    pub system_program: Program<'info, System>,
+}
+
+// Contexts for new functionalities
+
+#[derive(Accounts)]
+pub struct AddLiquidity<'info> {
+    #[account(mut)]
+    pub pool: Account<'info, LiquidityPool>,
+    #[account(mut)]
+    pub user: Signer<'info>,
+    pub system_program: Program<'info, System>,
+}
+
+#[derive(Accounts)]
+pub struct StakeTokens<'info> {
+    #[account(mut)]
+    pub staking_account: Account<'info, StakingAccount>,
+    #[account(mut)]
+    pub user: Signer<'info>,
+    pub system_program: Program<'info, System>,
+}
+
+#[derive(Accounts)]
+pub struct ClaimRewards<'info> {
+    #[account(mut)]
+    pub staking_account: Account<'info, StakingAccount>,
     #[account(mut)]
     pub user: Signer<'info>,
     pub system_program: Program<'info, System>,

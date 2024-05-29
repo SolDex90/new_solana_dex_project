@@ -96,9 +96,17 @@ pub mod my_dex_project {
     }
 
     // Add Liquidity Pool functionality
+    pub fn initialize_liquidity_pool(ctx: Context<InitializeLiquidityPool>, initial_liquidity: u64) -> ProgramResult {
+        let pool = &mut ctx.accounts.pool;
+        pool.total_liquidity = initial_liquidity;
+        pool.reserves = initial_liquidity;
+        Ok(())
+    }
+
     pub fn add_liquidity(ctx: Context<AddLiquidity>, amount: u64) -> ProgramResult {
         let pool = &mut ctx.accounts.pool;
         pool.total_liquidity += amount;
+        pool.reserves += amount;
         pool.liquidity_providers.push(LiquidityProvider {
             user: *ctx.accounts.user.key,
             amount,
@@ -117,6 +125,25 @@ pub mod my_dex_project {
         let staking_account = &mut ctx.accounts.staking_account;
         let rewards = staking_account.calculate_rewards();
         staking_account.rewards_claimed += rewards;
+        Ok(())
+    }
+
+    // Governance functionality
+    pub fn create_proposal(ctx: Context<CreateProposal>, description: String) -> ProgramResult {
+        let proposal = &mut ctx.accounts.proposal;
+        proposal.description = description;
+        proposal.votes_for = 0;
+        proposal.votes_against = 0;
+        Ok(())
+    }
+
+    pub fn vote(ctx: Context<Vote>, vote: bool) -> ProgramResult {
+        let proposal = &mut ctx.accounts.proposal;
+        if vote {
+            proposal.votes_for += 1;
+        } else {
+            proposal.votes_against += 1;
+        }
         Ok(())
     }
 }
@@ -148,6 +175,7 @@ pub struct LiquidityProvider {
 #[account]
 pub struct LiquidityPool {
     pub total_liquidity: u64,
+    pub reserves: u64,
     pub liquidity_providers: Vec<LiquidityProvider>,
 }
 
@@ -163,6 +191,13 @@ impl StakingAccount {
         // Implement your reward calculation logic here
         0
     }
+}
+
+#[account]
+pub struct Proposal {
+    pub description: String,
+    pub votes_for: u64,
+    pub votes_against: u64,
 }
 
 #[derive(Accounts)]
@@ -237,6 +272,15 @@ pub struct CancelOrder<'info> {
 // Contexts for new functionalities
 
 #[derive(Accounts)]
+pub struct InitializeLiquidityPool<'info> {
+    #[account(init, payer = user, space = 8 + 64)]
+    pub pool: Account<'info, LiquidityPool>,
+    #[account(mut)]
+    pub user: Signer<'info>,
+    pub system_program: Program<'info, System>,
+}
+
+#[derive(Accounts)]
 pub struct AddLiquidity<'info> {
     #[account(mut)]
     pub pool: Account<'info, LiquidityPool>,
@@ -258,6 +302,24 @@ pub struct StakeTokens<'info> {
 pub struct ClaimRewards<'info> {
     #[account(mut)]
     pub staking_account: Account<'info, StakingAccount>,
+    #[account(mut)]
+    pub user: Signer<'info>,
+    pub system_program: Program<'info, System>,
+}
+
+#[derive(Accounts)]
+pub struct CreateProposal<'info> {
+    #[account(init, payer = user, space = 8 + 64)]
+    pub proposal: Account<'info, Proposal>,
+    #[account(mut)]
+    pub user: Signer<'info>,
+    pub system_program: Program<'info, System>,
+}
+
+#[derive(Accounts)]
+pub struct Vote<'info> {
+    #[account(mut)]
+    pub proposal: Account<'info, Proposal>,
     #[account(mut)]
     pub user: Signer<'info>,
     pub system_program: Program<'info, System>,

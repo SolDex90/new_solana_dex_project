@@ -4,7 +4,7 @@ import { Connection, PublicKey, SystemProgram, Transaction } from "@solana/web3.
 import * as splToken from "@solana/spl-token"; // Make sure to import spl-token
 import { assert } from "chai";
 
-// Define the types for MyAccount, CustomTokenAccount, Market, and Order
+// Define the types for MyAccount, CustomTokenAccount, Market, Order, LiquidityPool, and StakingAccount
 interface MyAccount {
   data: anchor.BN;
 }
@@ -21,6 +21,16 @@ interface Order {
   order_type: OrderType;
   amount: anchor.BN;
   price: anchor.BN;
+}
+
+interface LiquidityPool {
+  total_liquidity: anchor.BN;
+  reserves: anchor.BN;
+}
+
+interface StakingAccount {
+  amount: anchor.BN;
+  rewards_claimed: anchor.BN;
 }
 
 enum OrderType {
@@ -42,6 +52,9 @@ describe('my_dex_project', function () {
   let dataAccount: anchor.web3.Keypair;
   let tokenAccount: anchor.web3.Keypair;
   let marketAccount: anchor.web3.Keypair;
+  let poolAccount: anchor.web3.Keypair;
+  let stakingAccount: anchor.web3.Keypair;
+  let proposalAccount: anchor.web3.Keypair;
 
   before(async function () {
     try {
@@ -49,9 +62,9 @@ describe('my_dex_project', function () {
       dataAccount = anchor.web3.Keypair.generate();
       tokenAccount = anchor.web3.Keypair.generate();
       marketAccount = anchor.web3.Keypair.generate();
-      console.log("Data Account Public Key:", dataAccount.publicKey.toString());
-      console.log("Token Account Public Key:", tokenAccount.publicKey.toString());
-      console.log("Market Account Public Key:", marketAccount.publicKey.toString());
+      poolAccount = anchor.web3.Keypair.generate();
+      stakingAccount = anchor.web3.Keypair.generate();
+      proposalAccount = anchor.web3.Keypair.generate();
 
       console.log("Requesting airdrop...");
       const airdropSignature = await provider.connection.requestAirdrop(provider.wallet.publicKey, anchor.web3.LAMPORTS_PER_SOL);
@@ -82,8 +95,6 @@ describe('my_dex_project', function () {
       const createSignature = await provider.sendAndConfirm(createDataAccountTx, [dataAccount]);
       console.log("Create account transaction signature:", createSignature);
 
-      console.log("Data account created");
-
       console.log("Creating token account...");
       const createTokenAccountTx = new Transaction().add(
         SystemProgram.createAccount({
@@ -103,8 +114,6 @@ describe('my_dex_project', function () {
 
       const tokenSignature = await provider.sendAndConfirm(createTokenAccountTx, [tokenAccount]);
       console.log("Token account transaction signature:", tokenSignature);
-
-      console.log("Token account created");
 
       console.log("Creating market account...");
       const createMarketAccountTx = new Transaction().add(
@@ -126,7 +135,66 @@ describe('my_dex_project', function () {
       const marketSignature = await provider.sendAndConfirm(createMarketAccountTx, [marketAccount]);
       console.log("Market account transaction signature:", marketSignature);
 
-      console.log("Market account created");
+      console.log("Creating liquidity pool account...");
+      const createPoolAccountTx = new Transaction().add(
+        SystemProgram.createAccount({
+          fromPubkey: provider.wallet.publicKey,
+          newAccountPubkey: poolAccount.publicKey,
+          lamports: await provider.connection.getMinimumBalanceForRentExemption(8 + 64),
+          space: 8 + 64,
+          programId: program.programId,
+        })
+      );
+
+      createPoolAccountTx.recentBlockhash = (await provider.connection.getRecentBlockhash()).blockhash;
+      createPoolAccountTx.feePayer = provider.wallet.publicKey;
+
+      createPoolAccountTx.partialSign(poolAccount);
+      await provider.wallet.signTransaction(createPoolAccountTx);
+
+      const poolSignature = await provider.sendAndConfirm(createPoolAccountTx, [poolAccount]);
+      console.log("Liquidity pool account transaction signature:", poolSignature);
+
+      console.log("Creating staking account...");
+      const createStakingAccountTx = new Transaction().add(
+        SystemProgram.createAccount({
+          fromPubkey: provider.wallet.publicKey,
+          newAccountPubkey: stakingAccount.publicKey,
+          lamports: await provider.connection.getMinimumBalanceForRentExemption(8 + 64),
+          space: 8 + 64,
+          programId: program.programId,
+        })
+      );
+
+      createStakingAccountTx.recentBlockhash = (await provider.connection.getRecentBlockhash()).blockhash;
+      createStakingAccountTx.feePayer = provider.wallet.publicKey;
+
+      createStakingAccountTx.partialSign(stakingAccount);
+      await provider.wallet.signTransaction(createStakingAccountTx);
+
+      const stakingSignature = await provider.sendAndConfirm(createStakingAccountTx, [stakingAccount]);
+      console.log("Staking account transaction signature:", stakingSignature);
+
+      console.log("Creating proposal account...");
+      const createProposalAccountTx = new Transaction().add(
+        SystemProgram.createAccount({
+          fromPubkey: provider.wallet.publicKey,
+          newAccountPubkey: proposalAccount.publicKey,
+          lamports: await provider.connection.getMinimumBalanceForRentExemption(8 + 64),
+          space: 8 + 64,
+          programId: program.programId,
+        })
+      );
+
+      createProposalAccountTx.recentBlockhash = (await provider.connection.getRecentBlockhash()).blockhash;
+      createProposalAccountTx.feePayer = provider.wallet.publicKey;
+
+      createProposalAccountTx.partialSign(proposalAccount);
+      await provider.wallet.signTransaction(createProposalAccountTx);
+
+      const proposalSignature = await provider.sendAndConfirm(createProposalAccountTx, [proposalAccount]);
+      console.log("Proposal account transaction signature:", proposalSignature);
+
     } catch (error) {
       console.error("Error during setup: ", error);
       throw error;
@@ -305,6 +373,190 @@ describe('my_dex_project', function () {
       assert.ok(market.orders.length === 0);
     } catch (err) {
       console.error("Failed to match orders:", err);
+      if (err.logs) {
+        console.error("Transaction logs:", err.logs);
+      }
+    }
+  });
+
+  // Test for Liquidity Pool Initialization
+  it('Initializes a liquidity pool', async () => {
+    const initialLiquidity = new anchor.BN(1000);
+    try {
+      const { blockhash } = await provider.connection.getRecentBlockhash();
+      let tx = await program.methods.initializeLiquidityPool(initialLiquidity).accounts({
+        pool: poolAccount.publicKey,
+        user: provider.wallet.publicKey,
+        systemProgram: SystemProgram.programId,
+      }).transaction();
+
+      tx.recentBlockhash = blockhash;
+      tx.feePayer = provider.wallet.publicKey;
+
+      tx.partialSign(poolAccount);
+      await provider.wallet.signTransaction(tx);
+
+      const signature = await provider.sendAndConfirm(tx, [poolAccount]);
+      console.log("Transaction signature:", signature);
+
+      const pool = await program.account.liquidityPool.fetch(poolAccount.publicKey) as LiquidityPool;
+      assert.ok(pool.total_liquidity.eq(initialLiquidity));
+    } catch (err) {
+      console.error("Failed to initialize liquidity pool:", err);
+      if (err.logs) {
+        console.error("Transaction logs:", err.logs);
+      }
+    }
+  });
+
+  // Test for Adding Liquidity
+  it('Adds liquidity to the pool', async () => {
+    const addAmount = new anchor.BN(500);
+    try {
+      const { blockhash } = await provider.connection.getRecentBlockhash();
+      let tx = await program.methods.addLiquidity(addAmount).accounts({
+        pool: poolAccount.publicKey,
+        user: provider.wallet.publicKey,
+        systemProgram: SystemProgram.programId,
+      }).transaction();
+
+      tx.recentBlockhash = blockhash;
+      tx.feePayer = provider.wallet.publicKey;
+
+      tx.partialSign(poolAccount);
+      await provider.wallet.signTransaction(tx);
+
+      const signature = await provider.sendAndConfirm(tx, [poolAccount]);
+      console.log("Transaction signature:", signature);
+
+      const pool = await program.account.liquidityPool.fetch(poolAccount.publicKey) as LiquidityPool;
+      assert.ok(pool.total_liquidity.eq(new anchor.BN(1500))); // Initial liquidity was 1000
+      assert.ok(pool.reserves.eq(new anchor.BN(1500))); // Initial liquidity was 1000
+    } catch (err) {
+      console.error("Failed to add liquidity:", err);
+      if (err.logs) {
+        console.error("Transaction logs:", err.logs);
+      }
+    }
+  });
+
+  // Test for Staking Tokens
+  it('Stakes tokens', async () => {
+    const stakeAmount = new anchor.BN(100);
+    try {
+      const { blockhash } = await provider.connection.getRecentBlockhash();
+      let tx = await program.methods.stakeTokens(stakeAmount).accounts({
+        stakingAccount: stakingAccount.publicKey,
+        user: provider.wallet.publicKey,
+        systemProgram: SystemProgram.programId,
+      }).transaction();
+
+      tx.recentBlockhash = blockhash;
+      tx.feePayer = provider.wallet.publicKey;
+
+      tx.partialSign(stakingAccount);
+      await provider.wallet.signTransaction(tx);
+
+      const signature = await provider.sendAndConfirm(tx, [stakingAccount]);
+      console.log("Transaction signature:", signature);
+
+      const staking = await program.account.stakingAccount.fetch(stakingAccount.publicKey) as StakingAccount;
+      assert.ok(staking.amount.eq(stakeAmount));
+    } catch (err) {
+      console.error("Failed to stake tokens:", err);
+      if (err.logs) {
+        console.error("Transaction logs:", err.logs);
+      }
+    }
+  });
+
+  // Test for Claiming Rewards
+  it('Claims rewards', async () => {
+    try {
+      const { blockhash } = await provider.connection.getRecentBlockhash();
+      let tx = await program.methods.claimRewards().accounts({
+        stakingAccount: stakingAccount.publicKey,
+        user: provider.wallet.publicKey,
+        systemProgram: SystemProgram.programId,
+      }).transaction();
+
+      tx.recentBlockhash = blockhash;
+      tx.feePayer = provider.wallet.publicKey;
+
+      tx.partialSign(stakingAccount);
+      await provider.wallet.signTransaction(tx);
+
+      const signature = await provider.sendAndConfirm(tx, [stakingAccount]);
+      console.log("Transaction signature:", signature);
+
+      const staking = await program.account.stakingAccount.fetch(stakingAccount.publicKey) as StakingAccount;
+      // Check if rewards claimed have increased (assuming calculate_rewards adds some value)
+      assert.ok(staking.rewards_claimed.gt(new anchor.BN(0)));
+    } catch (err) {
+      console.error("Failed to claim rewards:", err);
+      if (err.logs) {
+        console.error("Transaction logs:", err.logs);
+      }
+    }
+  });
+
+  // Test for Creating Proposal
+  it('Creates a proposal', async () => {
+    const description = "Test proposal";
+    try {
+      const { blockhash } = await provider.connection.getRecentBlockhash();
+      let tx = await program.methods.createProposal(description).accounts({
+        proposal: proposalAccount.publicKey,
+        user: provider.wallet.publicKey,
+        systemProgram: SystemProgram.programId,
+      }).transaction();
+
+      tx.recentBlockhash = blockhash;
+      tx.feePayer = provider.wallet.publicKey;
+
+      tx.partialSign(proposalAccount);
+      await provider.wallet.signTransaction(tx);
+
+      const signature = await provider.sendAndConfirm(tx, [proposalAccount]);
+      console.log("Transaction signature:", signature);
+
+      const proposal = await program.account.proposal.fetch(proposalAccount.publicKey) as any;
+      assert.equal(proposal.description, description);
+      assert.ok(proposal.votes_for.eq(new anchor.BN(0)));
+      assert.ok(proposal.votes_against.eq(new anchor.BN(0)));
+    } catch (err) {
+      console.error("Failed to create proposal:", err);
+      if (err.logs) {
+        console.error("Transaction logs:", err.logs);
+      }
+    }
+  });
+
+  // Test for Voting on Proposal
+  it('Votes on a proposal', async () => {
+    const voteFor = true;
+    try {
+      const { blockhash } = await provider.connection.getRecentBlockhash();
+      let tx = await program.methods.vote(voteFor).accounts({
+        proposal: proposalAccount.publicKey,
+        user: provider.wallet.publicKey,
+        systemProgram: SystemProgram.programId,
+      }).transaction();
+
+      tx.recentBlockhash = blockhash;
+      tx.feePayer = provider.wallet.publicKey;
+
+      tx.partialSign(proposalAccount);
+      await provider.wallet.signTransaction(tx);
+
+      const signature = await provider.sendAndConfirm(tx, [proposalAccount]);
+      console.log("Transaction signature:", signature);
+
+      const proposal = await program.account.proposal.fetch(proposalAccount.publicKey) as any;
+      assert.ok(proposal.votes_for.eq(new anchor.BN(1))); // Assuming the first vote is for the proposal
+      assert.ok(proposal.votes_against.eq(new anchor.BN(0))); // Assuming no votes against yet
+    } catch (err) {
+      console.error("Failed to vote on proposal:", err);
       if (err.logs) {
         console.error("Transaction logs:", err.logs);
       }

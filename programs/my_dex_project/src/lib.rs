@@ -65,17 +65,30 @@ pub mod my_dex_project {
             }
         }
 
+        msg!("Order Book: {:?}", market.orders);
+
         Ok(())
+    }
+
+    pub fn cancel_order(ctx: Context<CancelOrder>, order_index: u64) -> ProgramResult {
+        let market = &mut ctx.accounts.market;
+
+        if order_index < market.orders.len() as u64 {
+            market.orders.remove(order_index as usize);
+            Ok(())
+        } else {
+            Err(ProgramError::InvalidArgument.into())
+        }
     }
 }
 
-#[derive(AnchorSerialize, AnchorDeserialize, Clone, PartialEq)]
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, PartialEq, Debug)]
 pub enum OrderType {
     Buy,
     Sell,
 }
 
-#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, Debug)]
 pub struct Order {
     pub order_type: OrderType,
     pub amount: u64,
@@ -145,4 +158,13 @@ pub struct PlaceOrder<'info> {
 pub struct MatchOrders<'info> {
     #[account(mut)]
     pub market: Account<'info, Market>,
+}
+
+#[derive(Accounts)]
+pub struct CancelOrder<'info> {
+    #[account(mut)]
+    pub market: Account<'info, Market>,
+    #[account(mut)]
+    pub user: Signer<'info>,
+    pub system_program: Program<'info, System>,
 }

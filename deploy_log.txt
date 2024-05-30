@@ -1,0 +1,6 @@
+Deploying workspace: http://localhost:8899
+Upgrade authority: /home/gator/.config/solana/id.json
+Deploying program "my_dex_project"...
+Program path: /home/gator/new_solana_dex_project/my_dex_project/target/deploy/my_dex_project.so...
+Error: ELF error: ELF error: Failed to parse ELF file: Section or symbol name `.data._ZN4rand4r` is longer than `16` bytes
+There was a problem deploying: Output { status: ExitStatus(unix_wait_status(256)), stdout: "", stderr: "" }.

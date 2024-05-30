@@ -1,0 +1,4 @@
+warning: profiles for the non root package will be ignored, specify profiles at the workspace root:
+package:   /home/gator/new_solana_dex_project/my_dex_project/programs/my_dex_project/Cargo.toml
+workspace: /home/gator/new_solana_dex_project/my_dex_project/Cargo.toml
+    Finished release [optimized + debuginfo] target(s) in 0.15s

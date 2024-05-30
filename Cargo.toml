@@ -7,4 +7,5 @@ members = [
 overflow-checks = true
 debug = true
 
-
+[patch.crates-io]
+spl-token-2022 = { git = "https://github.com/solana-labs/solana-program-library", branch = "master" }

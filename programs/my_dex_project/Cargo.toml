@@ -14,3 +14,7 @@ getrandom = { version = "0.2.15", features = ["custom"] }
 
 [lib]
 crate-type = ["cdylib", "lib"]
+
+[profile.release]
+lto = true
+codegen-units = 1

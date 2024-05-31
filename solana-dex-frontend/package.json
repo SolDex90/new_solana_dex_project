@@ -1,0 +1,68 @@
+{
+  "name": "solana-dex-frontend",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@ledgerhq/devices": "6.27.1",
+    "@ledgerhq/errors": "^6.16.4",
+    "@ledgerhq/hw-transport": "^6.30.6",
+    "@ledgerhq/hw-transport-webhid": "6.27.1",
+    "@ledgerhq/logs": "6.12.0",
+    "@project-serum/anchor": "^0.26.0",
+    "@project-serum/serum": "^0.13.65",
+    "@solana/wallet-adapter-ledger": "^0.9.25",
+    "@solana/wallet-adapter-react": "^0.15.35",
+    "@solana/wallet-adapter-react-ui": "^0.9.35",
+    "@solana/wallet-adapter-wallets": "^0.19.32",
+    "@solana/web3.js": "^1.91.8",
+    "browserify-zlib": "^0.2.0",
+    "crypto-browserify": "^3.12.0",
+    "https-browserify": "^1.0.0",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "react-router-dom": "^6.23.1",
+    "react-scripts": "^5.0.1",
+    "stream-browserify": "^3.0.0",
+    "stream-http": "^3.2.0",
+    "url": "^0.11.3",
+    "web-vitals": "^2.1.4"
+  },
+  "scripts": {
+    "start": "react-app-rewired start",
+    "build": "react-app-rewired build",
+    "test": "react-app-rewired test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "resolutions": {
+    "@ledgerhq/errors": "6.16.4",
+    "@ledgerhq/hw-transport": "6.27.1",
+    "@ledgerhq/devices": "6.27.1",
+    "@ledgerhq/logs": "6.12.0",
+    "@ledgerhq/hw-transport-webhid": "6.27.1"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.14.6",
+    "@babel/plugin-proposal-private-property-in-object": "^7.14.5",
+    "@babel/preset-env": "^7.14.5",
+    "@babel/preset-react": "^7.14.5",
+    "react-app-rewired": "^2.2.1"
+  }
+}

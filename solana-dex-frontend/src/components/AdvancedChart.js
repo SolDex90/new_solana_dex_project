@@ -1,16 +1,15 @@
 import React from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+import { Line } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
 
-const AdvancedChart = ({ data, dataKey }) => {
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
+
+const AdvancedChart = ({ data, options }) => {
   return (
-    <LineChart width={600} height={300} data={data}>
-      <XAxis dataKey="date" />
-      <YAxis />
-      <CartesianGrid stroke="#eee" strokeDasharray="5 5" />
-      <Tooltip />
-      <Legend />
-      <Line type="monotone" dataKey={dataKey} stroke="#8884d8" />
-    </LineChart>
+    <div>
+      <h2>Advanced Chart</h2>
+      <Line data={data} options={options} />
+    </div>
   );
 };
 

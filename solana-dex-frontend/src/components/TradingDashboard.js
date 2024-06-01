@@ -4,15 +4,18 @@ import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement
 import Backtest from './Backtest';
 import LivePrices from './LivePrices';
 import LimitOrder from './LimitOrder';
+import Staking from './Staking';
 import PortfolioAnalytics from './PortfolioAnalytics';
+import LiquidityPools from './LiquidityPools';
+import PaperTrading from './PaperTrading'; // Import PaperTrading
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
 const TradingDashboard = () => {
   const [data, setData] = useState([]);
   const [portfolio, setPortfolio] = useState([
-    { name: 'BTC', value: 1000, gain: 100 },
-    { name: 'ETH', value: 500, gain: 50 }
+    { name: 'BTC', value: 1000, gain: 100, amount: 0.02 },
+    { name: 'ETH', value: 500, gain: 50, amount: 0.5 }
   ]);
 
   useEffect(() => {
@@ -86,7 +89,10 @@ const TradingDashboard = () => {
       <LivePrices tokenIds={['bitcoin', 'ethereum', 'solana']} />
       <Backtest />
       <LimitOrder />
-      <PortfolioAnalytics portfolio={portfolio} /> {/* Pass portfolio prop */}
+      <Staking />
+      <PortfolioAnalytics portfolio={portfolio} />
+      <LiquidityPools />
+      <PaperTrading /> {/* Add PaperTrading component */}
     </div>
   );
 };

@@ -4,17 +4,28 @@ import TradingHistory from '../components/TradingHistory';
 
 const Trade = () => {
   const [tokens, setTokens] = useState([
-    // Example tokens
     { name: 'Token 1', symbol: 'TK1' },
     { name: 'Token 2', symbol: 'TK2' },
   ]);
   const [filteredTokens, setFilteredTokens] = useState(tokens);
+  const [orderType, setOrderType] = useState('market');
+  const [price, setPrice] = useState('');
+  const [amount, setAmount] = useState('');
 
   const handleSearch = (query, filter) => {
     setFilteredTokens(tokens.filter(token =>
       token.name.toLowerCase().includes(query.toLowerCase()) ||
       token.symbol.toLowerCase().includes(query.toLowerCase())
     ));
+  };
+
+  const handleOrderTypeChange = (e) => {
+    setOrderType(e.target.value);
+  };
+
+  const handleOrderSubmit = () => {
+    // Implement order submission logic here
+    console.log(`Order Type: ${orderType}, Price: ${price}, Amount: ${amount}`);
   };
 
   return (
@@ -26,6 +37,28 @@ const Trade = () => {
           <li key={token.symbol}>{token.name} ({token.symbol})</li>
         ))}
       </ul>
+      <div>
+        <h3>Place Order</h3>
+        <label>
+          Order Type:
+          <select value={orderType} onChange={handleOrderTypeChange}>
+            <option value="market">Market Order</option>
+            <option value="limit">Limit Order</option>
+            <option value="stop-loss">Stop-Loss Order</option>
+          </select>
+        </label>
+        {orderType !== 'market' && (
+          <label>
+            Price:
+            <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} />
+          </label>
+        )}
+        <label>
+          Amount:
+          <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} />
+        </label>
+        <button onClick={handleOrderSubmit}>Submit Order</button>
+      </div>
       <TradingHistory />
     </main>
   );

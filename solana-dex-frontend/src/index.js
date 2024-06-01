@@ -1,13 +1,17 @@
-// src/index.js
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import App from './App';
-import WalletProvider from './WalletProvider';
-import '@solana/wallet-adapter-react-ui/styles.css'; // Import wallet adapter styles
+import './styles/styles.css';
+import '@solana/wallet-adapter-react-ui/styles.css';
+import ErrorBoundary from './components/ErrorBoundary'; // Ensure this import is correct
 
-ReactDOM.render(
-  <WalletProvider>
-    <App />
-  </WalletProvider>,
-  document.getElementById('root')
+const container = document.getElementById('root');
+const root = createRoot(container);
+
+root.render(
+  <React.StrictMode>
+    <ErrorBoundary>
+      <App />
+    </ErrorBoundary>
+  </React.StrictMode>
 );

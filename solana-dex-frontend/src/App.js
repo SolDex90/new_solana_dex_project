@@ -6,12 +6,16 @@ import Trade from './pages/Trade';
 import Wallet from './pages/Wallet';
 import WalletProvider from './WalletProvider';
 import Footer from './components/Footer';
+import Auth from './components/Auth'; // Add Authentication Component
+import Notifications from './components/Notifications';
 
 const App = () => {
   return (
     <WalletProvider>
       <Router>
         <Header />
+        <Auth /> {/* Add Authentication Component */}
+        <Notifications />
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/trade" element={<Trade />} />

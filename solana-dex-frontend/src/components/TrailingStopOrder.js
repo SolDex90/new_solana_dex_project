@@ -6,8 +6,20 @@ const TrailingStopOrder = () => {
   const [statusMessage, setStatusMessage] = useState('');
 
   const handleTrailingStopOrder = () => {
+    if (!amount || !trailPercentage) {
+      setStatusMessage('Please enter a valid amount and trail percentage.');
+      return;
+    }
+    
+    if (amount <= 0 || trailPercentage <= 0) {
+      setStatusMessage('Amount and trail percentage must be greater than zero.');
+      return;
+    }
+
     // Implement trailing stop order logic here
     setStatusMessage(`Placed trailing stop order for ${amount} tokens with a trail of ${trailPercentage}%`);
+    setAmount('');
+    setTrailPercentage('');
   };
 
   return (

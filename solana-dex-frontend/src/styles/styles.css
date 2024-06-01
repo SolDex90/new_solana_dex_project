@@ -50,3 +50,13 @@ button {
   border: none;
   cursor: pointer;
 }
+
+/* Styles for draggable widgets */
+.widget {
+  background: #f0f0f0;
+  border: 1px solid #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: move; /* Change cursor to indicate draggable */
+}

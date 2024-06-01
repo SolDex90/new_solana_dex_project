@@ -1,21 +1,12 @@
 import React, { useState } from 'react';
-import { useWallet } from '@solana/wallet-adapter-react';
 
 const Staking = () => {
-  const { publicKey, connected } = useWallet();
   const [amount, setAmount] = useState('');
-  const [stakeStatus, setStakeStatus] = useState('');
+  const [statusMessage, setStatusMessage] = useState('');
 
-  const handleStake = async () => {
-    if (!connected) {
-      setStakeStatus('Please connect your wallet.');
-      return;
-    }
-
+  const handleStake = () => {
     // Implement staking logic here
-    // For example, call your staking smart contract with the amount
-
-    setStakeStatus(`Staked ${amount} tokens successfully.`);
+    setStatusMessage(`Staked ${amount} tokens`);
   };
 
   return (
@@ -23,12 +14,12 @@ const Staking = () => {
       <h2>Staking</h2>
       <input
         type="number"
-        placeholder="Amount to stake"
+        placeholder="Amount"
         value={amount}
         onChange={(e) => setAmount(e.target.value)}
       />
-      <button onClick={handleStake}>Stake</button>
-      <p>{stakeStatus}</p>
+      <button onClick={handleStake}>Stake Tokens</button>
+      <p>{statusMessage}</p>
     </div>
   );
 };

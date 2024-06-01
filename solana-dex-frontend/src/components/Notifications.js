@@ -1,17 +1,20 @@
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import React, { useState } from 'react';
 
 const Notifications = () => {
-  const notify = (message, type) => {
-    toast(message, { type });
-  };
+  const [notifications, setNotifications] = useState([
+    // Example notifications
+    { id: 1, message: 'Order executed at $50' },
+    { id: 2, message: 'Price reached $55' },
+  ]);
 
   return (
     <div>
-      <button onClick={() => notify('This is a notification!', 'info')}>
-        Show Notification
-      </button>
-      <ToastContainer />
+      <h2>Notifications</h2>
+      <ul>
+        {notifications.map((notification) => (
+          <li key={notification.id}>{notification.message}</li>
+        ))}
+      </ul>
     </div>
   );
 };

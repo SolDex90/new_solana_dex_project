@@ -1,46 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import { firestore, auth } from '../firebase';
-import { collection, getDocs, query, where } from 'firebase/firestore';
+import React from 'react';
 
-const PortfolioAnalytics = () => {
-  const [portfolio, setPortfolio] = useState([]);
-  const [analytics, setAnalytics] = useState({ totalValue: 0, gainsLosses: 0 });
-
-  useEffect(() => {
-    const fetchPortfolio = async () => {
-      const user = auth.currentUser;
-      if (user) {
-        const portfolioRef = collection(firestore, 'portfolios');
-        const q = query(portfolioRef, where('userId', '==', user.uid));
-        const querySnapshot = await getDocs(q);
-        const assets = [];
-        querySnapshot.forEach((doc) => {
-          assets.push(doc.data());
-        });
-        setPortfolio(assets);
-
-        // Calculate analytics
-        const totalValue = assets.reduce((acc, asset) => acc + asset.amount * asset.currentPrice, 0);
-        const gainsLosses = assets.reduce((acc, asset) => acc + asset.amount * (asset.currentPrice - asset.purchasePrice), 0);
-        setAnalytics({ totalValue, gainsLosses });
-      }
-    };
-
-    fetchPortfolio();
-  }, []);
+const PortfolioAnalytics = ({ portfolio = [] }) => {  // Set default value to an empty array
+  const totalValue = portfolio.reduce((sum, asset) => sum + asset.value, 0);
+  const gains = portfolio.reduce((sum, asset) => sum + asset.gain, 0);
 
   return (
     <div>
       <h2>Portfolio Analytics</h2>
-      <p>Total Value: ${analytics.totalValue.toFixed(2)}</p>
-      <p>Gains/Losses: ${analytics.gainsLosses.toFixed(2)}</p>
-      <ul>
-        {portfolio.map((asset, index) => (
-          <li key={index}>
-            {asset.name}: {asset.amount} @ ${asset.currentPrice.toFixed(2)} (Purchased @ ${asset.purchasePrice.toFixed(2)})
-          </li>
-        ))}
-      </ul>
+      <p>Total Value: ${totalValue.toFixed(2)}</p>
+      <p>Total Gains: ${gains.toFixed(2)}</p>
+      {/* Add more analytics as needed */}
     </div>
   );
 };

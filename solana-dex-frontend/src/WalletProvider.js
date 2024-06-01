@@ -4,20 +4,17 @@ import {
   WalletProvider as SolanaWalletProvider,
 } from '@solana/wallet-adapter-react';
 import {
-  PhantomWalletAdapter,
   SolflareWalletAdapter,
   LedgerWalletAdapter,
 } from '@solana/wallet-adapter-wallets';
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
-// Removed the unused import
-// import { TransportPendingOperation } from "@ledgerhq/errors";
 
 const WalletProvider = ({ children }) => {
   const endpoint = useMemo(() => 'https://api.mainnet-beta.solana.com', []);
 
   const wallets = useMemo(
     () => [
-      new PhantomWalletAdapter(),
+      // Remove PhantomWalletAdapter if it's registered automatically
       new SolflareWalletAdapter(),
       new LedgerWalletAdapter(),
     ],

@@ -4,20 +4,21 @@ const RealTimeData = () => {
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    const ws = new WebSocket('wss://example.com/realtime'); // Replace with your WebSocket URL
+    // Comment out the WebSocket code if not needed
+    // const ws = new WebSocket('wss://example.com/realtime');
 
-    ws.onmessage = (event) => {
-      const newData = JSON.parse(event.data);
-      setData((prevData) => [...prevData, newData]);
-    };
+    // ws.onmessage = (event) => {
+    //   const newData = JSON.parse(event.data);
+    //   setData((prevData) => [...prevData, newData]);
+    // };
 
-    ws.onerror = (error) => {
-      console.error('WebSocket error:', error);
-    };
+    // ws.onerror = (error) => {
+    //   console.error('WebSocket error:', error);
+    // };
 
-    return () => {
-      ws.close();
-    };
+    // return () => {
+    //   ws.close();
+    // };
   }, []);
 
   return (

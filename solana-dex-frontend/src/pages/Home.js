@@ -2,10 +2,11 @@ import React, { useState, useEffect } from 'react';
 import RealTimeData from '../components/RealTimeData';
 import Portfolio from '../components/Portfolio';
 import TokenChart from '../components/TokenChart';
-import { useTranslation } from 'react-i18next';
+import PortfolioAnalytics from '../components/PortfolioAnalytics';
+import Staking from '../components/Staking';
+import LiquidityPools from '../components/LiquidityPools';
 
 const Home = () => {
-  const { t } = useTranslation();
   const [chartData, setChartData] = useState([]);
 
   useEffect(() => {
@@ -23,9 +24,13 @@ const Home = () => {
 
   return (
     <main>
-      <h2>{t('welcome')}</h2>
+      <h2>Home Page</h2>
+      <p>Welcome to the Solana DEX!</p>
       <RealTimeData />
       <Portfolio />
+      <PortfolioAnalytics />
+      <Staking />
+      <LiquidityPools />
       <TokenChart data={chartData} />
     </main>
   );

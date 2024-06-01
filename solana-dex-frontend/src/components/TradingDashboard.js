@@ -7,7 +7,12 @@ import LimitOrder from './LimitOrder';
 import Staking from './Staking';
 import PortfolioAnalytics from './PortfolioAnalytics';
 import LiquidityPools from './LiquidityPools';
-import PaperTrading from './PaperTrading'; // Import PaperTrading
+import PaperTrading from './PaperTrading';
+import OrderBook from './OrderBook'; // Import OrderBook
+import MarketOverview from './MarketOverview'; // Import MarketOverview
+import Alerts from './Alerts'; // Import Alerts
+import Chat from './Chat'; // Import Chat
+import Tutorials from './Tutorials'; // Import Tutorials
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
@@ -92,7 +97,12 @@ const TradingDashboard = () => {
       <Staking />
       <PortfolioAnalytics portfolio={portfolio} />
       <LiquidityPools />
-      <PaperTrading /> {/* Add PaperTrading component */}
+      <PaperTrading />
+      <OrderBook pair="BTC/USD" /> {/* Add OrderBook component */}
+      <MarketOverview /> {/* Add MarketOverview component */}
+      <Alerts /> {/* Add Alerts component */}
+      <Chat /> {/* Add Chat component */}
+      <Tutorials /> {/* Add Tutorials component */}
     </div>
   );
 };

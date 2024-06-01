@@ -2,12 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
 import Backtest from './Backtest';
-import LivePrices from './LivePrices'; // Import LivePrices
+import LivePrices from './LivePrices';
+import LimitOrder from './LimitOrder';
+import PortfolioAnalytics from './PortfolioAnalytics';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
 const TradingDashboard = () => {
   const [data, setData] = useState([]);
+  const [portfolio, setPortfolio] = useState([
+    { name: 'BTC', value: 1000, gain: 100 },
+    { name: 'ETH', value: 500, gain: 50 }
+  ]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -77,8 +83,10 @@ const TradingDashboard = () => {
     <div>
       <h2>Trading Dashboard</h2>
       <Line data={chartData} options={options} />
-      <LivePrices tokenIds={['bitcoin', 'ethereum', 'solana']} /> {/* Add LivePrices component */}
+      <LivePrices tokenIds={['bitcoin', 'ethereum', 'solana']} />
       <Backtest />
+      <LimitOrder />
+      <PortfolioAnalytics portfolio={portfolio} /> {/* Pass portfolio prop */}
     </div>
   );
 };

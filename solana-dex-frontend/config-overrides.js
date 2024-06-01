@@ -10,7 +10,10 @@ module.exports = function override(config) {
     url: require.resolve('url/'),
     crypto: require.resolve('crypto-browserify'),
     stream: require.resolve('stream-browserify'),
-    vm: require.resolve('vm-browserify'),  // Add fallback for 'vm'
+    vm: require.resolve('vm-browserify'),
+    os: require.resolve('os-browserify/browser'),
+    path: require.resolve('path-browserify'),  // Add fallback for 'path'
+    fs: false,  // Disable fs module for browser
   };
 
   // Provide global variables

@@ -30,6 +30,7 @@
     "path-browserify": "^1.0.1",
     "process": "^0.11.10",
     "react": "^18.0.0",
+    "react-beautiful-dnd": "^13.1.1",
     "react-chartjs-2": "^5.2.0",
     "react-dom": "^18.0.0",
     "react-i18next": "^14.1.2",

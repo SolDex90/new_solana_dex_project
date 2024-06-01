@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { getCryptoPrices } from '../services/coinMarketCapService'; // Update to use CoinMarketCap service
+import { getCryptoPrices } from '../services/coinMarketCapService';
 
-const LivePrices = () => {
+const CryptoPrices = () => {
   const [prices, setPrices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -32,7 +32,7 @@ const LivePrices = () => {
 
   return (
     <div>
-      <h2>Live Token Prices</h2>
+      <h2>Cryptocurrency Prices</h2>
       <ul>
         {Object.keys(prices).map((symbol) => (
           <li key={symbol}>
@@ -44,4 +44,4 @@ const LivePrices = () => {
   );
 };
 
-export default LivePrices;
+export default CryptoPrices;

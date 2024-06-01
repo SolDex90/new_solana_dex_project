@@ -15,23 +15,19 @@ import TransactionHistory from './components/TransactionHistory';
 import AnalyticsDashboard from './components/AnalyticsDashboard';
 import TradingDashboard from './components/TradingDashboard';
 import SignIn from './components/SignIn';
-import Alerts from './components/Alerts';
-import APIIntegration from './components/APIIntegration';
-import Backtest from './components/Backtest';
-import Chat from './components/Chat';
-import CustomizableDashboard from './components/CustomizableDashboard';
-import HelpCenter from './components/HelpCenter';
-import LanguageSelector from './components/LanguageSelector';
-import OrderBook from './components/OrderBook';
-import Portfolio from './components/Portfolio';
-import ReferralProgram from './components/ReferralProgram';
-import Staking from './components/Staking';
-import StopLossOrder from './components/StopLossOrder';
-import TokenSwap from './components/TokenSwap';
-import TradingHistory from './components/TradingHistory';
-import UserActivity from './components/UserActivity';
-import UserSettings from './components/UserSettings';
-import { ThemeProvider } from './contexts/ThemeContext'; // Import ThemeProvider
+import TrailingStopOrder from './components/TrailingStopOrder';
+import ConditionalOrder from './components/ConditionalOrder';
+import TradingBot from './components/TradingBot';
+import AdvancedAnalytics from './components/AdvancedAnalytics';
+import OrderNotifications from './components/OrderNotifications';
+import PriceAlerts from './components/PriceAlerts';
+import InteractiveTutorials from './components/InteractiveTutorials';
+import SocialTrading from './components/SocialTrading';
+import PortfolioManagement from './components/PortfolioManagement';
+import DraggableDashboard from './components/DraggableDashboard';
+import ExampleChart from './components/ExampleChart';
+import CryptoPrices from './components/CryptoPrices'; // Import CryptoPrices
+import { ThemeProvider } from './contexts/ThemeContext';
 
 const App = () => {
   return (
@@ -39,7 +35,7 @@ const App = () => {
       <ThemeProvider>
         <Router>
           <Header />
-          <ThemeToggle /> {/* ThemeToggle should be inside the ThemeProvider */}
+          <ThemeToggle />
           <Notifications />
           <Routes>
             <Route path="/" element={<Home />} />
@@ -52,22 +48,18 @@ const App = () => {
             <Route path="/analytics" element={<AnalyticsDashboard />} />
             <Route path="/trading-dashboard" element={<TradingDashboard />} />
             <Route path="/signin" element={<SignIn />} />
-            <Route path="/alerts" element={<Alerts />} />
-            <Route path="/api-integration" element={<APIIntegration />} />
-            <Route path="/backtest" element={<Backtest />} />
-            <Route path="/chat" element={<Chat />} />
-            <Route path="/custom-dashboard" element={<CustomizableDashboard />} />
-            <Route path="/help" element={<HelpCenter />} />
-            <Route path="/language-selector" element={<LanguageSelector />} />
-            <Route path="/order-book" element={<OrderBook />} />
-            <Route path="/portfolio" element={<Portfolio />} />
-            <Route path="/referral" element={<ReferralProgram />} />
-            <Route path="/staking" element={<Staking />} />
-            <Route path="/stop-loss-order" element={<StopLossOrder />} />
-            <Route path="/token-swap" element={<TokenSwap />} />
-            <Route path="/trading-history" element={<TradingHistory />} />
-            <Route path="/activity" element={<UserActivity />} />
-            <Route path="/settings" element={<UserSettings />} />
+            <Route path="/trailing-stop-order" element={<TrailingStopOrder />} />
+            <Route path="/conditional-order" element={<ConditionalOrder />} />
+            <Route path="/trading-bot" element={<TradingBot />} />
+            <Route path="/advanced-analytics" element={<AdvancedAnalytics />} />
+            <Route path="/order-notifications" element={<OrderNotifications />} />
+            <Route path="/price-alerts" element={<PriceAlerts />} />
+            <Route path="/interactive-tutorials" element={<InteractiveTutorials />} />
+            <Route path="/social-trading" element={<SocialTrading />} />
+            <Route path="/portfolio-management" element={<PortfolioManagement />} />
+            <Route path="/draggable-dashboard" element={<DraggableDashboard />} />
+            <Route path="/example-chart" element={<ExampleChart />} />
+            <Route path="/crypto-prices" element={<CryptoPrices />} /> {/* Add CryptoPrices route */}
           </Routes>
           <Footer />
         </Router>

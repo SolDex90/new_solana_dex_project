@@ -1,34 +1,33 @@
 import React, { useEffect, useState } from 'react';
 
 const RealTimeData = () => {
-  const [price, setPrice] = useState(null);
+  const [data, setData] = useState([]);
 
   useEffect(() => {
-    const ws = new WebSocket('wss://example.com/realtime'); // Replace with actual WebSocket URL
-
-    ws.onopen = () => {
-      console.log('WebSocket connection opened');
-    };
+    const ws = new WebSocket('wss://example.com/realtime'); // Replace with your WebSocket URL
 
     ws.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      setPrice(data.price);
+      const newData = JSON.parse(event.data);
+      setData((prevData) => [...prevData, newData]);
     };
 
     ws.onerror = (error) => {
       console.error('WebSocket error:', error);
     };
 
-    ws.onclose = () => {
-      console.log('WebSocket connection closed');
+    return () => {
+      ws.close();
     };
-
-    return () => ws.close();
   }, []);
 
   return (
     <div>
-      <h2>Real-Time Price: {price ? `$${price}` : 'Loading...'}</h2>
+      <h2>Real-Time Data</h2>
+      <ul>
+        {data.map((item, index) => (
+          <li key={index}>{item.value}</li>
+        ))}
+      </ul>
     </div>
   );
 };

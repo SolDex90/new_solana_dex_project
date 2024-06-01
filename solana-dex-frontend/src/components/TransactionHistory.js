@@ -29,7 +29,7 @@ const TransactionHistory = () => {
       <ul>
         {transactions.map((transaction, index) => (
           <li key={index}>
-            {transaction.date}: {transaction.type} {transaction.amount} {transaction.token}
+            {transaction.date}: {transaction.type} {transaction.amount} {transaction.token} (Fee: {transaction.fee}) - Status: {transaction.status}
           </li>
         ))}
       </ul>

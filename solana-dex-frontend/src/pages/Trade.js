@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import Search from '../components/Search';
 import TradingHistory from '../components/TradingHistory';
+import Swap from '../components/Swap';
+import '../styles/styles.css'; // Corrected path
 
 const Trade = () => {
-  const [tokens, setTokens] = useState([
+  const [tokens] = useState([
     { name: 'Token 1', symbol: 'TK1' },
     { name: 'Token 2', symbol: 'TK2' },
   ]);
@@ -11,8 +13,9 @@ const Trade = () => {
   const [orderType, setOrderType] = useState('market');
   const [price, setPrice] = useState('');
   const [amount, setAmount] = useState('');
+  const [selectedComponent, setSelectedComponent] = useState('swap');
 
-  const handleSearch = (query, filter) => {
+  const handleSearch = (query) => {
     setFilteredTokens(tokens.filter(token =>
       token.name.toLowerCase().includes(query.toLowerCase()) ||
       token.symbol.toLowerCase().includes(query.toLowerCase())
@@ -24,12 +27,15 @@ const Trade = () => {
   };
 
   const handleOrderSubmit = () => {
-    // Implement order submission logic here
     console.log(`Order Type: ${orderType}, Price: ${price}, Amount: ${amount}`);
   };
 
+  const handleComponentChange = (e) => {
+    setSelectedComponent(e.target.value);
+  };
+
   return (
-    <main>
+    <main className="trade-page">
       <h2>Trade Page</h2>
       <Search onSearch={handleSearch} />
       <ul>
@@ -59,6 +65,32 @@ const Trade = () => {
         </label>
         <button onClick={handleOrderSubmit}>Submit Order</button>
       </div>
+
+      <div>
+        <label>
+          Select Component:
+          <select value={selectedComponent} onChange={handleComponentChange}>
+            <option value="swap">Swap</option>
+            <option value="limit-order">Limit Order</option>
+            <option value="stop-loss">Stop-Loss</option>
+          </select>
+        </label>
+      </div>
+
+      {selectedComponent === 'swap' && <Swap />}
+      {selectedComponent === 'limit-order' && (
+        <div className="limit-order">
+          <h3>Limit Order</h3>
+          <p>Limit Order Component</p>
+        </div>
+      )}
+      {selectedComponent === 'stop-loss' && (
+        <div className="stop-loss">
+          <h3>Stop-Loss</h3>
+          <p>Stop-Loss Component</p>
+        </div>
+      )}
+
       <TradingHistory />
     </main>
   );

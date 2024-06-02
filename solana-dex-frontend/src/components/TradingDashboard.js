@@ -1,18 +1,18 @@
-import React, { useState, useEffect } from 'react';
+// src/components/TradingDashboard.js
+import React, { useEffect, useState } from 'react';
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
 import Backtest from './Backtest';
-import LivePrices from './LivePrices';
 import LimitOrder from './LimitOrder';
 import Staking from './Staking';
 import PortfolioAnalytics from './PortfolioAnalytics';
 import LiquidityPools from './LiquidityPools';
 import PaperTrading from './PaperTrading';
-import OrderBook from './OrderBook'; // Import OrderBook
-import MarketOverview from './MarketOverview'; // Import MarketOverview
-import Alerts from './Alerts'; // Import Alerts
-import Chat from './Chat'; // Import Chat
-import Tutorials from './Tutorials'; // Import Tutorials
+import OrderBook from './OrderBook';
+import MarketOverview from './MarketOverview';
+import Alerts from './Alerts';
+import Chat from './Chat';
+import Tutorials from './Tutorials';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
@@ -88,21 +88,44 @@ const TradingDashboard = () => {
   };
 
   return (
-    <div>
-      <h2>Trading Dashboard</h2>
-      <Line data={chartData} options={options} />
-      <LivePrices tokenIds={['bitcoin', 'ethereum', 'solana']} />
-      <Backtest />
-      <LimitOrder />
-      <Staking />
-      <PortfolioAnalytics portfolio={portfolio} />
-      <LiquidityPools />
-      <PaperTrading />
-      <OrderBook pair="BTC/USD" /> {/* Add OrderBook component */}
-      <MarketOverview /> {/* Add MarketOverview component */}
-      <Alerts /> {/* Add Alerts component */}
-      <Chat /> {/* Add Chat component */}
-      <Tutorials /> {/* Add Tutorials component */}
+    <div style={{ padding: '20px' }}>
+      <h2 style={{ marginBottom: '20px' }}>Trading Dashboard</h2>
+      <div style={{ marginBottom: '20px' }}>
+        <Line data={chartData} options={options} />
+      </div>
+      <div style={{ marginBottom: '20px' }}>
+        <Backtest />
+      </div>
+      <div style={{ marginBottom: '20px' }}>
+        <LimitOrder />
+      </div>
+      <div style={{ marginBottom: '20px' }}>
+        <Staking />
+      </div>
+      <div style={{ marginBottom: '20px' }}>
+        <PortfolioAnalytics portfolio={portfolio} />
+      </div>
+      <div style={{ marginBottom: '20px' }}>
+        <LiquidityPools />
+      </div>
+      <div style={{ marginBottom: '20px' }}>
+        <PaperTrading />
+      </div>
+      <div style={{ marginBottom: '20px' }}>
+        <OrderBook pair="BTC/USD" />
+      </div>
+      <div style={{ marginBottom: '20px' }}>
+        <MarketOverview />
+      </div>
+      <div style={{ marginBottom: '20px' }}>
+        <Alerts />
+      </div>
+      <div style={{ marginBottom: '20px' }}>
+        <Chat />
+      </div>
+      <div style={{ marginBottom: '20px' }}>
+        <Tutorials />
+      </div>
     </div>
   );
 };

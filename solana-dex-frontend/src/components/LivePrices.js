@@ -1,5 +1,6 @@
+// src/components/LivePrices.js
 import React, { useEffect, useState } from 'react';
-import { getCryptoPrices } from '../services/coinMarketCapService'; // Update to use CoinMarketCap service
+import { getCryptoPrices } from '../services/coinMarketCapService'; // Import the service
 
 const LivePrices = () => {
   const [prices, setPrices] = useState([]);

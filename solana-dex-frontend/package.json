@@ -83,8 +83,6 @@
     ]
   },
   "resolutions": {
-    "@ledgerhq/devices": "8.3.0",
-    "@ledgerhq/hw-transport": "6.30.6",
     "rpc-websockets": "7.11.1"
   },
   "devDependencies": {

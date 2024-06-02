@@ -9,10 +9,17 @@ const Header = () => {
       <nav>
         <ul>
           <li><Link to="/">Home</Link></li>
-          <li><Link to="/trade">Trade</Link></li>
+          <li className="dropdown">
+            <Link to="/trade" className="dropbtn">Trade</Link>
+            <div className="dropdown-content">
+              <Link to="/swap">Swap</Link>
+              <Link to="/limit-order">Limit Order</Link>
+              <Link to="/stop-loss">Stop-Loss</Link>
+            </div>
+          </li>
           <li><Link to="/wallet">Wallet</Link></li>
           <li><Link to="/dashboard">Dashboard</Link></li>
-          <li><Link to="/trading-dashboard">Trading Dashboard</Link></li> {/* Add Trading Dashboard link */}
+          <li><Link to="/trading-dashboard">Trading Dashboard</Link></li>
         </ul>
       </nav>
       <WalletMultiButton />

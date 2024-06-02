@@ -7,13 +7,23 @@ import TradingHistory from '../components/TradingHistory';
 
 const Dashboard = () => {
   return (
-    <main>
-      <h2>User Dashboard</h2>
-      <Portfolio />
-      <PortfolioAnalytics />
-      <Staking />
-      <LiquidityPools />
-      <TradingHistory />
+    <main style={{ padding: '20px' }}>
+      <h2 style={{ marginBottom: '20px' }}>User Dashboard</h2>
+      <div style={{ marginBottom: '20px' }}>
+        <Portfolio />
+      </div>
+      <div style={{ marginBottom: '20px' }}>
+        <PortfolioAnalytics />
+      </div>
+      <div style={{ marginBottom: '20px' }}>
+        <Staking />
+      </div>
+      <div style={{ marginBottom: '20px' }}>
+        <LiquidityPools />
+      </div>
+      <div style={{ marginBottom: '20px' }}>
+        <TradingHistory />
+      </div>
     </main>
   );
 };

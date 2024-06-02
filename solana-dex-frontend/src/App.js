@@ -1,5 +1,5 @@
 import React, { Suspense, lazy } from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom'; // Import Navigate
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Notifications from './components/Notifications';
@@ -13,7 +13,7 @@ import ProtectedRoute from './components/ProtectedRoute'; // Import ProtectedRou
 
 // Lazy load components
 const Home = lazy(() => import('./pages/Home'));
-const Trade = lazy(() => import('./pages/Trade'));
+// const Trade = lazy(() => import('./pages/Trade')); // Remove this line
 const Wallet = lazy(() => import('./pages/Wallet'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const UserProfile = lazy(() => import('./components/UserProfile'));
@@ -33,6 +33,9 @@ const SocialTrading = lazy(() => import('./components/SocialTrading'));
 const PortfolioManagement = lazy(() => import('./components/PortfolioManagement'));
 const ExampleChart = lazy(() => import('./components/ExampleChart'));
 const CryptoPrices = lazy(() => import('./components/CryptoPrices'));
+const Swap = lazy(() => import('./components/Swap')); // Add Swap component
+const LimitOrder = lazy(() => import('./components/LimitOrder')); // Add LimitOrder component
+const StopLoss = lazy(() => import('./components/StopLoss')); // Add StopLoss component
 
 const App = () => {
   return (
@@ -47,14 +50,17 @@ const App = () => {
               <Suspense fallback={<div>Loading...</div>}>
                 <Routes>
                   <Route path="/" element={<Home />} />
-                  <Route path="/trade" element={<Trade />} />
+                  <Route path="/trade" element={<Navigate to="/swap" />} /> {/* Redirect Trade to Swap */}
+                  <Route path="/swap" element={<Swap />} />
+                  <Route path="/limit-order" element={<LimitOrder />} />
+                  <Route path="/stop-loss" element={<StopLoss />} />
                   <Route path="/wallet" element={<Wallet />} />
-                  <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+                  <Route path="/dashboard" element={<Dashboard />} />
                   <Route path="/profile" element={<ProtectedRoute><UserProfile /></ProtectedRoute>} />
                   <Route path="/news" element={<News />} />
                   <Route path="/transactions" element={<ProtectedRoute><TransactionHistory /></ProtectedRoute>} />
                   <Route path="/analytics" element={<ProtectedRoute><AnalyticsDashboard /></ProtectedRoute>} />
-                  <Route path="/trading-dashboard" element={<ProtectedRoute><TradingDashboard /></ProtectedRoute>} />
+                  <Route path="/trading-dashboard" element={<TradingDashboard />} />
                   <Route path="/signin" element={<SignIn />} />
                   <Route path="/trailing-stop-order" element={<ProtectedRoute><TrailingStopOrder /></ProtectedRoute>} />
                   <Route path="/conditional-order" element={<ProtectedRoute><ConditionalOrder /></ProtectedRoute>} />

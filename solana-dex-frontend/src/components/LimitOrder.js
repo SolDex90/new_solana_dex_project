@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
-import { Connection, PublicKey, Transaction, SystemProgram } from '@solana/web3.js';
+import { Connection, PublicKey, Transaction } from '@solana/web3.js'; // Removed SystemProgram
 import { SERUM_PROGRAM_ID, Market } from '@project-serum/serum';
 
 const LimitOrder = () => {

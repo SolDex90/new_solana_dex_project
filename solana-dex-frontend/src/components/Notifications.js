@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 const Notifications = () => {
-  const [notifications, setNotifications] = useState([
+  const [notifications] = useState([
     // Example notifications
     { id: 1, message: 'Order executed at $50' },
     { id: 2, message: 'Price reached $55' },

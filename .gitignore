@@ -9,3 +9,4 @@ WSL2-Linux-Kernel/
 perf.data
 perf.data.old
 flamegraph.svg
+.env

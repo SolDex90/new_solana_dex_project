@@ -2,6 +2,10 @@
   "name": "solana-dex-frontend",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=16.0.0",
+    "yarn": ">=1.22.0"
+  },
   "dependencies": {
     "@babel/plugin-syntax-flow": "^7.24.6",
     "@babel/plugin-transform-react-jsx": "^7.24.6",

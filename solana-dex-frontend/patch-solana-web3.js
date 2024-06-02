@@ -3,6 +3,8 @@ const path = require('path');
 
 const filePath = path.resolve(__dirname, 'node_modules/@solana/web3.js/lib/index.js');
 
+console.log(`Checking for file: ${filePath}`);
+
 if (fs.existsSync(filePath)) {
   const fileContent = fs.readFileSync(filePath, 'utf8');
 

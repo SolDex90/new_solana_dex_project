@@ -1,2 +1,0 @@
-"use strict";(self.webpackChunksolana_dex_frontend=self.webpackChunksolana_dex_frontend||[]).push([[706],{8706:(e,n,s)=>{s.r(n),s.d(n,{default:()=>d});s(5043);var a=s(579);const d=()=>(0,a.jsx)("div",{children:(0,a.jsx)("h2",{children:"Swap"})})}}]);
-//# sourceMappingURL=706.2fa03dfe.chunk.js.map

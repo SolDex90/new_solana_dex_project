@@ -63,7 +63,8 @@
     "build": "react-app-rewired build",
     "test": "react-app-rewired test",
     "eject": "react-scripts eject",
-    "vercel-build": "react-app-rewired build"
+    "vercel-build": "react-app-rewired build",
+    "postinstall": "node patch-solana-web3.js"
   },
   "eslintConfig": {
     "extends": [

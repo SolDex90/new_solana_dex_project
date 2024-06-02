@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
 const RealTimeData = () => {
-  const [data, setData] = useState([]);
+  const [data] = useState([]); // Remove setData since it's not being used
 
   useEffect(() => {
     // Comment out the WebSocket code if not needed

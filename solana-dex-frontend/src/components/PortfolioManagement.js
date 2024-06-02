@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 const PortfolioManagement = () => {
-  const [portfolio, setPortfolio] = useState([
+  const [portfolio] = useState([
     { token: 'BTC', amount: 1 },
     { token: 'ETH', amount: 10 },
   ]);

@@ -14,7 +14,6 @@ const Staking = () => {
     }
 
     const connection = new Connection('https://api.mainnet-beta.solana.com');
-    const stakingProgramId = new PublicKey('YOUR_STAKING_PROGRAM_ID'); // Replace with your staking program ID
     const stakingAccount = new PublicKey('YOUR_STAKING_ACCOUNT'); // Replace with your staking account
 
     const transaction = new Transaction().add(

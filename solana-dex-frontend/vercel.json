@@ -5,12 +5,20 @@
       "src": "solana-dex-frontend/package.json",
       "use": "@vercel/static-build",
       "config": {
-        "buildCommand": "npm run build",
+        "buildCommand": "npm run vercel-build",
         "distDir": "build"
       }
+    },
+    {
+      "src": "solana-dex-frontend/api/**/*.js",
+      "use": "@vercel/node"
     }
   ],
   "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
+    },
     {
       "src": "/(.*)",
       "dest": "/index.html"

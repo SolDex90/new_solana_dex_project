@@ -48,6 +48,7 @@
     "react-scripts": "^5.0.1",
     "react-toastify": "^10.0.5",
     "recharts": "^2.12.7",
+    "rpc-websockets": "^7.11.1",
     "stream-browserify": "^3.0.0",
     "stream-http": "^3.2.0",
     "tslib": "^2.6.2",

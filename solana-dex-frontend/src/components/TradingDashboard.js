@@ -18,7 +18,7 @@ ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, T
 
 const TradingDashboard = () => {
   const [data, setData] = useState([]);
-  const [portfolio, setPortfolio] = useState([
+  const [portfolio] = useState([
     { name: 'BTC', value: 1000, gain: 100, amount: 0.02 },
     { name: 'ETH', value: 500, gain: 50, amount: 0.5 }
   ]);

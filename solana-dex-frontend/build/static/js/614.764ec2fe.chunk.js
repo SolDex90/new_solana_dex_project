@@ -1,0 +1,2 @@
+"use strict";(self.webpackChunksolana_dex_frontend=self.webpackChunksolana_dex_frontend||[]).push([[614],{2614:(n,e,t)=>{t.r(e),t.d(e,{default:()=>o});var s=t(5043),a=t(579);const o=()=>{const[n,e]=(0,s.useState)([{token:"BTC",amount:1},{token:"ETH",amount:10}]);return(0,a.jsxs)("div",{children:[(0,a.jsx)("h2",{children:"Portfolio Management"}),(0,a.jsx)("ul",{children:n.map(((n,e)=>(0,a.jsxs)("li",{children:[n.token,": ",n.amount]},e)))})]})}}}]);
+//# sourceMappingURL=614.764ec2fe.chunk.js.map

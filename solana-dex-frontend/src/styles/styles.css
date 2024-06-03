@@ -1,16 +1,17 @@
+/* General Styles */
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   margin: 0;
   padding: 0;
-  background-color: #121212;
-  color: #e0e0e0;
+  background-color: #121212; /* Dark background */
+  color: #e0e0e0; /* Light gray text */
   min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
 
 header {
-  background-color: #1f1f1f;
+  background-color: #1f1f1f; /* Slightly lighter dark for header */
   color: white;
   padding: 1rem 2rem;
   display: flex;
@@ -45,22 +46,42 @@ nav ul li a {
 }
 
 nav ul li a:hover {
-  color: #1db954;
+  color: #1db954; /* Accent color */
   text-decoration: none;
 }
 
-/* Dropdown content */
+/* Dropdown Styles */
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropbtn {
+  background: none;
+  border: none;
+  color: #b3b3b3;
+  font: inherit;
+  cursor: pointer;
+  font-weight: bold;
+  text-decoration: none;
+  transition: color 0.3s;
+  padding: 0;
+}
+
+.dropbtn:hover {
+  color: #1db954; /* Accent color */
+}
+
 .dropdown-content {
   display: none;
   position: absolute;
-  background-color: #1f1f1f;
+  background-color: #1f1f1f; /* Slightly lighter dark for dropdown */
   min-width: 160px;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
   z-index: 1;
   border-radius: 0.25rem;
 }
 
-/* Dropdown links */
 .dropdown-content a {
   color: #b3b3b3;
   padding: 12px 16px;
@@ -69,12 +90,11 @@ nav ul li a:hover {
 }
 
 .dropdown-content a:hover {
-  background-color: #1db954;
+  background-color: #1db954; /* Accent color */
   color: white;
   border-radius: 0.25rem;
 }
 
-/* Show the dropdown menu on hover */
 .dropdown:hover .dropdown-content {
   display: block;
 }
@@ -83,7 +103,7 @@ button {
   padding: 0.5rem 1rem;
   border: none;
   cursor: pointer;
-  background-color: #1db954;
+  background-color: #1db954; /* Accent color */
   color: white;
   border-radius: 0.25rem;
   transition: background-color 0.3s;
@@ -94,7 +114,7 @@ button:hover {
 }
 
 footer {
-  background-color: #1f1f1f;
+  background-color: #1f1f1f; /* Slightly lighter dark for footer */
   color: #b3b3b3;
   text-align: center;
   padding: 1rem;
@@ -106,17 +126,21 @@ footer {
 .main-content {
   padding: 20px;
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px; /* Add spacing between sections */
 }
 
 h2 {
-  color: #e0e0e0;
+  color: #e0e0e0; /* Light gray */
   border-bottom: 2px solid #333;
   padding-bottom: 0.5rem;
   margin-bottom: 1rem;
 }
 
+/* Card Styles */
 .card {
-  background-color: #1f1f1f;
+  background-color: #1f1f1f; /* Slightly lighter dark for card background */
   padding: 2rem;
   border-radius: 0.5rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -124,7 +148,7 @@ h2 {
 }
 
 .card h3 {
-  color: #1db954;
+  color: #1db954; /* Accent color */
   margin-top: 0;
 }
 
@@ -137,47 +161,59 @@ h2 {
   padding: 0.5rem;
   border-radius: 0.25rem;
   border: 1px solid #333;
-  background-color: #121212;
-  color: #e0e0e0;
+  background-color: #121212; /* Match the dark background */
+  color: #e0e0e0; /* Light gray text */
 }
 
-.token-swap, .limit-order, .stop-loss {
-  background-color: #1f1f1f;
-  padding: 2rem;
-  border-radius: 0.5rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  width: 400px; /* Fixed width for compact look */
-  margin: auto;
-}
-
-.token-swap h3, .limit-order h3, .stop-loss h3 {
-  color: #1db954;
-  margin-top: 0;
-}
-
-.token-swap p, .limit-order p, .stop-loss p {
-  margin: 0.5rem 0;
-  color: #e0e0e0;
-}
-
-.swap-input, .limit-order-input, .stop-loss-input {
-  margin: 1rem 0;
-}
-
-.swap-input input, .limit-order-input input, .stop-loss-input input {
-  width: 100%;
-  padding: 0.5rem;
-  border-radius: 0.25rem;
-  border: 1px solid #333;
-  background-color: #121212;
-  color: #e0e0e0;
-}
-
-/* Center the swap component */
 .token-swap-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 60vh; /* Adjusted height to move the swap component higher */
-  margin-top: 20px; /* Adjusted margin-top to move it higher */
+  min-height: 60vh;
+  margin-top: 20px;
+}
+
+.token-swap {
+  background-color: #1f1f1f; /* Slightly lighter dark for swap background */
+  padding: 2rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  width: 400px;
+  margin: auto;
+}
+
+.token-swap h3 {
+  color: #1db954; /* Accent color */
+  margin-top: 0;
+}
+
+.token-swap label {
+  display: block;
+  color: #b3b3b3; /* Lighter gray for labels */
+  margin-bottom: 0.5rem;
+}
+
+.token-swap input {
+  width: 100%;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  border: 1px solid #333;
+  background-color: #121212; /* Match the dark background */
+  color: #e0e0e0; /* Light gray text */
+  margin-bottom: 1rem;
+}
+
+.token-swap button {
+  width: 100%;
+  background-color: #1db954; /* Accent color */
+  color: white;
+  border: none;
+  padding: 0.75rem;
+  font-size: 1rem;
+  border-radius: 0.25rem;
+  transition: background-color 0.3s;
+}
+
+.token-swap button:hover {
+  background-color: #1ed760;
 }

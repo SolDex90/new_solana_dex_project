@@ -20,6 +20,7 @@ const PortfolioAnalytics = ({ portfolio = [] }) => {
 
   const assetAllocationOptions = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: {
         position: 'top',
@@ -41,7 +42,9 @@ const PortfolioAnalytics = ({ portfolio = [] }) => {
       </div>
       <div>
         <h3>Asset Allocation</h3>
-        <Pie data={assetAllocationData} options={assetAllocationOptions} />
+        <div style={{ width: '400px', height: '400px', margin: 'auto' }}>
+          <Pie data={assetAllocationData} options={assetAllocationOptions} />
+        </div>
       </div>
       <div>
         <h3>Details</h3>
@@ -53,7 +56,6 @@ const PortfolioAnalytics = ({ portfolio = [] }) => {
           ))}
         </ul>
       </div>
-      {/* Add more detailed analytics and visualizations as needed */}
     </div>
   );
 };

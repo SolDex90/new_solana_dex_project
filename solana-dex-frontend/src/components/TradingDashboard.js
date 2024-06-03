@@ -1,7 +1,8 @@
-// src/components/TradingDashboard.js
-import React, { useEffect, useState } from 'react';
-import { Line } from 'react-chartjs-2';
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
+import React, { useEffect, useState, useRef } from 'react';
+import { Chart } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, TimeScale, Tooltip, Legend } from 'chart.js';
+import { CandlestickController, CandlestickElement } from 'chartjs-chart-financial';
+import 'chartjs-adapter-date-fns';
 import Backtest from './Backtest';
 import LimitOrder from './LimitOrder';
 import Staking from './Staking';
@@ -14,10 +15,11 @@ import Alerts from './Alerts';
 import Chat from './Chat';
 import Tutorials from './Tutorials';
 
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
+ChartJS.register(CategoryScale, LinearScale, TimeScale, Tooltip, Legend, CandlestickController, CandlestickElement);
 
 const TradingDashboard = () => {
   const [data, setData] = useState([]);
+  const chartRef = useRef(null);
   const [portfolio] = useState([
     { name: 'BTC', value: 1000, gain: 100, amount: 0.02 },
     { name: 'ETH', value: 500, gain: 50, amount: 0.5 }
@@ -26,9 +28,9 @@ const TradingDashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
       const mockData = [
-        { date: '2024-01-01', price: 100 },
-        { date: '2024-01-02', price: 110 },
-        { date: '2024-01-03', price: 105 },
+        { t: new Date('2024-01-01').getTime(), o: 100, h: 110, l: 90, c: 105 },
+        { t: new Date('2024-01-02').getTime(), o: 105, h: 115, l: 95, c: 100 },
+        { t: new Date('2024-01-03').getTime(), o: 100, h: 110, l: 85, c: 90 },
       ];
       setData(mockData);
     };
@@ -36,40 +38,26 @@ const TradingDashboard = () => {
     fetchData();
   }, []);
 
-  const calculateMovingAverage = (data, windowSize) => {
-    let averages = [];
-    for (let i = 0; i < data.length; i++) {
-      if (i < windowSize - 1) {
-        averages.push(null);
-        continue;
-      }
-      let sum = 0;
-      for (let j = 0; j < windowSize; j++) {
-        sum += data[i - j].price;
-      }
-      averages.push(sum / windowSize);
-    }
-    return averages;
-  };
+  useEffect(() => {
+    // Capture the current chart reference inside the effect
+    const currentChartRef = chartRef.current;
 
-  const movingAverage = calculateMovingAverage(data, 3);
+    return () => {
+      // Destroy the chart instance to avoid canvas reuse issues
+      if (currentChartRef) {
+        currentChartRef.destroy();
+      }
+    };
+  }, []);
 
   const chartData = {
-    labels: data.map(d => d.date),
     datasets: [
       {
-        label: 'Price',
-        data: data.map(d => d.price),
-        fill: false,
-        backgroundColor: 'rgb(75, 192, 192)',
-        borderColor: 'rgba(75, 192, 192, 0.2)',
-      },
-      {
-        label: '3-Day Moving Average',
-        data: movingAverage,
-        fill: false,
-        backgroundColor: 'rgb(192, 75, 192)',
-        borderColor: 'rgba(192, 75, 192, 0.2)',
+        label: 'Candlestick',
+        data: data,
+        type: 'candlestick',
+        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+        borderColor: 'rgba(75, 192, 192, 1)',
       },
     ],
   };
@@ -85,13 +73,31 @@ const TradingDashboard = () => {
         text: 'Trading Dashboard',
       },
     },
+    scales: {
+      x: {
+        type: 'time',
+        time: {
+          unit: 'day',
+        },
+        title: {
+          display: true,
+          text: 'Date',
+        },
+      },
+      y: {
+        title: {
+          display: true,
+          text: 'Price',
+        },
+      },
+    },
   };
 
   return (
     <div style={{ padding: '20px' }}>
       <h2 style={{ marginBottom: '20px' }}>Trading Dashboard</h2>
-      <div style={{ marginBottom: '20px' }}>
-        <Line data={chartData} options={options} />
+      <div style={{ marginBottom: '20px', maxWidth: '600px', height: '400px', margin: 'auto' }}>
+        <Chart ref={chartRef} type='candlestick' data={chartData} options={options} />
       </div>
       <div style={{ marginBottom: '20px' }}>
         <Backtest />

@@ -40,10 +40,10 @@ const Home = () => {
       <p>{message}</p> {/* Display the message from the API */}
       <p>Welcome to the Solana DEX!</p>
       <RealTimeData />
-      <Portfolio />
-      <PortfolioAnalytics />
-      <Staking />
-      <LiquidityPools />
+      {/* <Portfolio /> */}
+      {/* <PortfolioAnalytics /> */}
+      {/* <Staking /> */}
+      {/* <LiquidityPools /> */}
       <TokenChart data={chartData} />
     </main>
   );

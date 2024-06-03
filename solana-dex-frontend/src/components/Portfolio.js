@@ -1,33 +1,30 @@
-import React, { useEffect, useState } from 'react';
-import { firestore, auth } from '../firebase';
+import React from 'react';
+import PortfolioComponent from '../components/Portfolio'; // Renamed to avoid conflict
+import PortfolioAnalytics from '../components/PortfolioAnalytics';
+import Staking from '../components/Staking';
+import LiquidityPools from '../components/LiquidityPools';
+import TradingHistory from '../components/TradingHistory';
 
 const Portfolio = () => {
-  const [portfolio, setPortfolio] = useState([]);
-
-  useEffect(() => {
-    const fetchPortfolio = async () => {
-      const user = auth.currentUser;
-      if (user) {
-        const portfolioRef = firestore.collection('portfolios').doc(user.uid);
-        const doc = await portfolioRef.get();
-        if (doc.exists) {
-          setPortfolio(doc.data().assets);
-        }
-      }
-    };
-
-    fetchPortfolio();
-  }, []);
-
   return (
-    <div>
-      <h2>Your Portfolio</h2>
-      <ul>
-        {portfolio.map((asset, index) => (
-          <li key={index}>{asset.name}: {asset.amount}</li>
-        ))}
-      </ul>
-    </div>
+    <main style={{ padding: '20px' }}>
+      <h2 style={{ marginBottom: '20px' }}>User Portfolio</h2>
+      <div style={{ marginBottom: '20px' }}>
+        <PortfolioComponent />
+      </div>
+      <div style={{ marginBottom: '20px' }}>
+        <PortfolioAnalytics />
+      </div>
+      <div style={{ marginBottom: '20px' }}>
+        <Staking />
+      </div>
+      <div style={{ marginBottom: '20px' }}>
+        <LiquidityPools />
+      </div>
+      <div style={{ marginBottom: '20px' }}>
+        <TradingHistory />
+      </div>
+    </main>
   );
 };
 

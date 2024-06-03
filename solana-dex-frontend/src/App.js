@@ -1,5 +1,5 @@
 import React, { Suspense, lazy } from 'react';
-import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom'; // Import Navigate
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Notifications from './components/Notifications';
@@ -7,15 +7,14 @@ import ThemeToggle from './components/ThemeToggle';
 import { ThemeProvider } from './contexts/ThemeContext';
 import WalletProvider from './WalletProvider';
 import ErrorBoundary from './components/ErrorBoundary';
-import CustomizableDashboard from './components/CustomizableDashboard';
 import { GlobalProvider } from './contexts/GlobalStateContext';
-import ProtectedRoute from './components/ProtectedRoute'; // Import ProtectedRoute
+import ProtectedRoute from './components/ProtectedRoute';
+import './styles/styles.css'; // Ensure the global styles are imported
 
 // Lazy load components
 const Home = lazy(() => import('./pages/Home'));
-// const Trade = lazy(() => import('./pages/Trade')); // Remove this line
 const Wallet = lazy(() => import('./pages/Wallet'));
-const Dashboard = lazy(() => import('./pages/Dashboard'));
+const Portfolio = lazy(() => import('./pages/Portfolio')); // Ensure this matches the file path and case exactly
 const UserProfile = lazy(() => import('./components/UserProfile'));
 const News = lazy(() => import('./components/News'));
 const TransactionHistory = lazy(() => import('./components/TransactionHistory'));
@@ -33,9 +32,12 @@ const SocialTrading = lazy(() => import('./components/SocialTrading'));
 const PortfolioManagement = lazy(() => import('./components/PortfolioManagement'));
 const ExampleChart = lazy(() => import('./components/ExampleChart'));
 const CryptoPrices = lazy(() => import('./components/CryptoPrices'));
-const Swap = lazy(() => import('./components/Swap')); // Add Swap component
-const LimitOrder = lazy(() => import('./components/LimitOrder')); // Add LimitOrder component
-const StopLoss = lazy(() => import('./components/StopLoss')); // Add StopLoss component
+const Swap = lazy(() => import('./components/Swap'));
+const LimitOrder = lazy(() => import('./components/LimitOrder'));
+const StopLoss = lazy(() => import('./components/StopLoss'));
+const DCA = lazy(() => import('./components/DCA'));
+const Perps = lazy(() => import('./components/Perps')); // New Perps component
+const CustomizableDashboard = lazy(() => import('./components/CustomizableDashboard')); // Ensure this is imported
 
 const App = () => {
   return (
@@ -54,8 +56,10 @@ const App = () => {
                   <Route path="/swap" element={<Swap />} />
                   <Route path="/limit-order" element={<LimitOrder />} />
                   <Route path="/stop-loss" element={<StopLoss />} />
+                  <Route path="/dca" element={<DCA />} />
+                  <Route path="/perps" element={<Perps />} /> {/* New Perps route */}
                   <Route path="/wallet" element={<Wallet />} />
-                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/portfolio" element={<Portfolio />} /> {/* Updated from Dashboard to Portfolio */}
                   <Route path="/profile" element={<ProtectedRoute><UserProfile /></ProtectedRoute>} />
                   <Route path="/news" element={<News />} />
                   <Route path="/transactions" element={<ProtectedRoute><TransactionHistory /></ProtectedRoute>} />
@@ -71,7 +75,7 @@ const App = () => {
                   <Route path="/interactive-tutorials" element={<ProtectedRoute><InteractiveTutorials /></ProtectedRoute>} />
                   <Route path="/social-trading" element={<ProtectedRoute><SocialTrading /></ProtectedRoute>} />
                   <Route path="/portfolio-management" element={<ProtectedRoute><PortfolioManagement /></ProtectedRoute>} />
-                  <Route path="/customizable-dashboard" element={<ProtectedRoute><CustomizableDashboard /></ProtectedRoute>} />
+                  <Route path="/customizable-dashboard" element={<ProtectedRoute><CustomizableDashboard /></ProtectedRoute>} /> {/* Fixed import */}
                   <Route path="/example-chart" element={<ExampleChart />} />
                   <Route path="/crypto-prices" element={<CryptoPrices />} />
                 </Routes>

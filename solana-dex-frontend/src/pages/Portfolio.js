@@ -1,16 +1,16 @@
 import React from 'react';
-import Portfolio from '../components/Portfolio';
+import PortfolioComponent from '../components/Portfolio'; // Renamed to avoid conflict
 import PortfolioAnalytics from '../components/PortfolioAnalytics';
 import Staking from '../components/Staking';
 import LiquidityPools from '../components/LiquidityPools';
 import TradingHistory from '../components/TradingHistory';
 
-const Dashboard = () => {
+const Portfolio = () => {
   return (
     <main style={{ padding: '20px' }}>
-      <h2 style={{ marginBottom: '20px' }}>User Dashboard</h2>
+      <h2 style={{ marginBottom: '20px' }}>User Portfolio</h2>
       <div style={{ marginBottom: '20px' }}>
-        <Portfolio />
+        <PortfolioComponent />
       </div>
       <div style={{ marginBottom: '20px' }}>
         <PortfolioAnalytics />
@@ -28,4 +28,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default Portfolio;

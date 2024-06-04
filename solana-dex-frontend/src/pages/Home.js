@@ -1,10 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import RealTimeData from '../components/RealTimeData';
-import Portfolio from '../components/Portfolio';
 import TokenChart from '../components/TokenChart';
-import PortfolioAnalytics from '../components/PortfolioAnalytics';
-import Staking from '../components/Staking';
-import LiquidityPools from '../components/LiquidityPools';
 import { fetchData } from '../utils/apiService';
 
 const Home = () => {
@@ -40,10 +36,6 @@ const Home = () => {
       <p>{message}</p> {/* Display the message from the API */}
       <p>Welcome to the Solana DEX!</p>
       <RealTimeData />
-      {/* <Portfolio /> */}
-      {/* <PortfolioAnalytics /> */}
-      {/* <Staking /> */}
-      {/* <LiquidityPools /> */}
       <TokenChart data={chartData} />
     </main>
   );

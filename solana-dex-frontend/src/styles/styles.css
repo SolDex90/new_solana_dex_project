@@ -18,6 +18,7 @@ header {
   justify-content: space-between;
   align-items: center;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: relative; /* Added to position notifications */
 }
 
 header h1 {
@@ -216,4 +217,67 @@ h2 {
 
 .token-swap button:hover {
   background-color: #1ed760;
+}
+
+/* Chart Container Styles */
+.chart-container {
+  width: 50%; /* Adjust the width as needed */
+  margin: auto; /* Center the chart */
+}
+
+/* Notification Styles */
+.notifications-widget {
+  position: absolute;
+  top: 50%;
+  right: 200px; /* Adjust this value to move the bell icon to the left */
+  transform: translateY(-50%);
+  z-index: 1000;
+}
+
+.bell-icon {
+  background: none;
+  border: none;
+  color: #1db954;
+  font-size: 1.5rem;
+  cursor: pointer;
+  position: relative;
+}
+
+.notification-count {
+  background: red;
+  color: white;
+  border-radius: 50%;
+  padding: 0.2em 0.5em;
+  font-size: 0.8rem;
+  position: absolute;
+  top: -10px;
+  right: -10px;
+}
+
+.notifications-list {
+  background-color: #1f1f1f; /* Slightly lighter dark */
+  color: #e0e0e0;
+  border: 1px solid #333;
+  border-radius: 0.25rem;
+  padding: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-top: 10px;
+  width: 200px;
+}
+
+.notifications-list h4 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-size: 1rem;
+}
+
+.notifications-list ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.notifications-list li {
+  margin-bottom: 5px;
+  font-size: 0.9rem;
 }

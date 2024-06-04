@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Search from '../components/Search';
 import TradingHistory from '../components/TradingHistory';
 import Swap from '../components/Swap';
-import '../styles/styles.css'; // Corrected path
+import '../styles/styles.css'; // Ensure the path is correct
 
 const Trade = () => {
   const [tokens] = useState([

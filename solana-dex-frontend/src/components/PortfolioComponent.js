@@ -1,17 +1,13 @@
 import React from 'react';
-import PortfolioComponent from '../components/Portfolio'; // Renamed to avoid conflict
-import PortfolioAnalytics from '../components/PortfolioAnalytics';
-import Staking from '../components/Staking';
-import LiquidityPools from '../components/LiquidityPools';
-import TradingHistory from '../components/TradingHistory';
+import PortfolioAnalytics from './PortfolioAnalytics';
+import Staking from './Staking';
+import LiquidityPools from './LiquidityPools';
+import TradingHistory from './TradingHistory';
 
-const Portfolio = () => {
+const PortfolioComponent = () => {
   return (
     <main style={{ padding: '20px' }}>
       <h2 style={{ marginBottom: '20px' }}>User Portfolio</h2>
-      <div style={{ marginBottom: '20px' }}>
-        <PortfolioComponent />
-      </div>
       <div style={{ marginBottom: '20px' }}>
         <PortfolioAnalytics />
       </div>
@@ -28,4 +24,4 @@ const Portfolio = () => {
   );
 };
 
-export default Portfolio;
+export default PortfolioComponent;

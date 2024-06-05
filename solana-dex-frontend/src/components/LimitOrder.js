@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
-import { Connection, PublicKey, Transaction } from '@solana/web3.js'; // Removed SystemProgram
+import { Connection, PublicKey, Transaction } from '@solana/web3.js';
 import { SERUM_PROGRAM_ID, Market } from '@project-serum/serum';
+import Swap from './Swap';
+import Chart from './Chart';
+import '../styles/styles.css'; // Ensure you have the appropriate styles
 
 const LimitOrder = () => {
   const { publicKey, signTransaction } = useWallet();
@@ -45,22 +48,30 @@ const LimitOrder = () => {
   };
 
   return (
-    <div>
-      <h2>Limit Order</h2>
-      <input
-        type="number"
-        placeholder="Price"
-        value={price}
-        onChange={(e) => setPrice(e.target.value)}
-      />
-      <input
-        type="number"
-        placeholder="Amount"
-        value={amount}
-        onChange={(e) => setAmount(e.target.value)}
-      />
-      <button onClick={handleLimitOrder}>Place Limit Order</button>
-      <p>{statusMessage}</p>
+    <div className="limit-order-page">
+      <div className="limit-order-container">
+        <div className="limit-order">
+          <h2>Limit Order</h2>
+          <input
+            type="number"
+            placeholder="Price"
+            value={price}
+            onChange={(e) => setPrice(e.target.value)}
+          />
+          <input
+            type="number"
+            placeholder="Amount"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+          />
+          <button onClick={handleLimitOrder}>Place Limit Order</button>
+          <p>{statusMessage}</p>
+        </div>
+        <div className="swap-and-chart">
+          <Swap />
+          <Chart />
+        </div>
+      </div>
     </div>
   );
 };

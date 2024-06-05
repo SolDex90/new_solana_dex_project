@@ -69,7 +69,9 @@ const LimitOrder = () => {
         </div>
         <div className="swap-and-chart">
           <Swap />
-          <Chart />
+          <div className="chart-container">
+            <Chart />
+          </div>
         </div>
       </div>
     </div>

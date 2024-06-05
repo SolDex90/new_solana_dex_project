@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
-import Notifications from './Notifications';
+import Notifications from './Notifications'; // Ensure the correct path
 import '../styles/styles.css'; // Ensure this path is correct
 
 const Header = () => {
@@ -10,9 +10,8 @@ const Header = () => {
       <h1>Solana DEX</h1>
       <nav>
         <ul>
-          <li><Link to="/">Home</Link></li>
           <li className="dropdown">
-            <Link to="/swap" className="dropbtn">Trade</Link> {/* Direct link to Swap */}
+            <Link to="/swap" className="dropbtn">Trade</Link>
             <div className="dropdown-content">
               <Link to="/swap">Swap</Link>
               <Link to="/limit-order">Limit Order</Link>
@@ -25,10 +24,8 @@ const Header = () => {
           <li><Link to="/trading-dashboard">Trading Dashboard</Link></li>
         </ul>
       </nav>
-      <div className="header-right">
-        <Notifications />
-        <WalletMultiButton />
-      </div>
+      <Notifications />
+      <WalletMultiButton />
     </header>
   );
 };

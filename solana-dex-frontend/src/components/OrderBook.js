@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+
+// Remove the axios import since it's not currently used
+// import axios from 'axios';
 
 const mockOrderBookData = {
   bids: [

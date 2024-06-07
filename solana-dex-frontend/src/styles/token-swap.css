@@ -86,6 +86,31 @@
   color: #e0e0e0;
 }
 
+.flip-button-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 10px 0;
+}
+
+.flip-button {
+  background-color: #333;
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.flip-button:hover {
+  background-color: #555;
+}
+
 .token-swap button {
   width: 100%;
   background-color: #1db954;
@@ -99,4 +124,24 @@
 
 .token-swap button:hover {
   background-color: #1ed760;
+}
+
+.price-chart {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #333;
+}
+
+.price-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+}
+
+.price-token {
+  color: #b3b3b3;
+}
+
+.price-value {
+  color: #e0e0e0;
 }

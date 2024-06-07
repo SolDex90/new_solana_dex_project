@@ -80,7 +80,7 @@ const TokenSwap = () => {
     if (fromAmount && prices[fromToken] && prices[toToken]) {
       const fromPrice = prices[fromToken];
       const toPrice = prices[toToken];
-      const convertedAmount = (fromAmount * fromPrice / toPrice).toFixed(2);
+      const convertedAmount = (fromAmount * fromPrice / toPrice).toFixed(10);
       setToAmount(convertedAmount);
     } else {
       setToAmount('');
@@ -98,11 +98,16 @@ const TokenSwap = () => {
     console.log(`Selected ${type} Token:`, token);
   };
 
+  const handleFlip = () => {
+    setFromToken(toToken);
+    setToToken(fromToken);
+    setFromAmount(toAmount);
+    setToAmount(fromAmount);
+  };
+
   const handleSwap = async () => {
-    // Implement the logic for confirming the swap transaction
     setTransactionStatus('Initiating transaction...');
     try {
-      // Replace the following with the actual transaction logic
       await axios.post('http://localhost:3000/api/swap', {
         fromToken,
         toToken,
@@ -151,6 +156,9 @@ const TokenSwap = () => {
               />
             </div>
           </div>
+          <div className="flip-button-container">
+            <button className="flip-button" onClick={handleFlip}>⬆️⬇️</button>
+          </div>
           <div className="token-swap-input">
             <label>To:</label>
             <div className="input-group">
@@ -180,6 +188,16 @@ const TokenSwap = () => {
           </div>
         </div>
         <button onClick={handleSwap}>Swap</button>
+        <div className="price-chart">
+          <div className="price-row">
+            <span className="price-token">{fromToken}</span>
+            <span className="price-value">{prices[fromToken] ? `$${prices[fromToken].toFixed(10)}` : 'N/A'}</span>
+          </div>
+          <div className="price-row">
+            <span className="price-token">{toToken}</span>
+            <span className="price-value">{prices[toToken] ? `$${prices[toToken].toFixed(10)}` : 'N/A'}</span>
+          </div>
+        </div>
       </div>
     </div>
   );

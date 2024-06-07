@@ -11,6 +11,9 @@ const TokenSwap = () => {
   const [showFromDropdown, setShowFromDropdown] = useState(false);
   const [showToDropdown, setShowToDropdown] = useState(false);
   const [prices, setPrices] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [transactionStatus, setTransactionStatus] = useState('');
 
   const fromDropdownRef = useRef(null);
   const toDropdownRef = useRef(null);
@@ -22,6 +25,7 @@ const TokenSwap = () => {
         setTokens(response.data);
       } catch (error) {
         console.error('Error fetching tokens:', error);
+        setError('Failed to fetch tokens');
       }
     };
 
@@ -29,6 +33,8 @@ const TokenSwap = () => {
   }, []);
 
   const fetchPrices = async (tokenIds) => {
+    setLoading(true);
+    setError(null);
     try {
       const jupiterResponse = await axios.get(`https://price.jup.ag/v6/price?ids=${tokenIds.join(',')}`);
       console.log('Jupiter Response:', jupiterResponse.data);
@@ -42,6 +48,9 @@ const TokenSwap = () => {
       setPrices(jupiterPrices);
     } catch (error) {
       console.error('Error fetching prices from Jupiter API:', error);
+      setError('Failed to fetch prices');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -67,21 +76,16 @@ const TokenSwap = () => {
     };
   }, []);
 
-  const handleSwap = () => {
-    console.log('Prices:', prices);
-    console.log('From Token:', fromToken, 'To Token:', toToken);
-    console.log('From Amount:', fromAmount);
-
-    if (prices[fromToken] && prices[toToken]) {
+  useEffect(() => {
+    if (fromAmount && prices[fromToken] && prices[toToken]) {
       const fromPrice = prices[fromToken];
       const toPrice = prices[toToken];
       const convertedAmount = (fromAmount * fromPrice / toPrice).toFixed(2);
-      console.log('Converted Amount:', convertedAmount);
       setToAmount(convertedAmount);
     } else {
-      console.log('Missing prices for selected tokens.');
+      setToAmount('');
     }
-  };
+  }, [fromAmount, prices, fromToken, toToken]);
 
   const handleSelectToken = (token, type) => {
     if (type === 'from') {
@@ -94,10 +98,31 @@ const TokenSwap = () => {
     console.log(`Selected ${type} Token:`, token);
   };
 
+  const handleSwap = async () => {
+    // Implement the logic for confirming the swap transaction
+    setTransactionStatus('Initiating transaction...');
+    try {
+      // Replace the following with the actual transaction logic
+      await axios.post('http://localhost:3000/api/swap', {
+        fromToken,
+        toToken,
+        fromAmount,
+        toAmount
+      });
+      setTransactionStatus('Transaction successful!');
+    } catch (error) {
+      console.error('Error during transaction:', error);
+      setTransactionStatus('Transaction failed. Please try again.');
+    }
+  };
+
   return (
     <div className="token-swap-container">
       <div className="token-swap">
         <h3>Token Swap</h3>
+        {loading && <p>Loading...</p>}
+        {error && <p className="error">{error}</p>}
+        {transactionStatus && <p>{transactionStatus}</p>}
         <div className="token-swap-inputs">
           <div className="token-swap-input">
             <label>From:</label>

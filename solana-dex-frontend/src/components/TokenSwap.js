@@ -28,28 +28,28 @@ const TokenSwap = () => {
     fetchTokens();
   }, []);
 
+  const fetchPrices = async (tokenIds) => {
+    try {
+      const jupiterResponse = await axios.get(`https://price.jup.ag/v6/price?ids=${tokenIds.join(',')}`);
+      console.log('Jupiter Response:', jupiterResponse.data);
+
+      const jupiterPrices = Object.keys(jupiterResponse.data.data).reduce((acc, key) => {
+        acc[jupiterResponse.data.data[key].mintSymbol] = jupiterResponse.data.data[key].price;
+        return acc;
+      }, {});
+
+      console.log('Jupiter Prices:', jupiterPrices);
+      setPrices(jupiterPrices);
+    } catch (error) {
+      console.error('Error fetching prices from Jupiter API:', error);
+    }
+  };
+
   useEffect(() => {
-    const fetchPrices = async () => {
-      try {
-        // Corrected API endpoints based on documentation
-        const jupiterResponse = await axios.get('https://price.jup.ag/v6/price?ids=SOL,USDC');
-        
-        console.log('Jupiter Response:', jupiterResponse.data);
-
-        const jupiterPrices = Object.keys(jupiterResponse.data.data).reduce((acc, key) => {
-          acc[jupiterResponse.data.data[key].mintSymbol] = jupiterResponse.data.data[key].price;
-          return acc;
-        }, {});
-
-        console.log('Jupiter Prices:', jupiterPrices);
-        setPrices(jupiterPrices);
-      } catch (error) {
-        console.error('Error fetching prices from Jupiter API:', error);
-      }
-    };
-
-    fetchPrices();
-  }, []);
+    if (fromToken && toToken) {
+      fetchPrices([fromToken, toToken]);
+    }
+  }, [fromToken, toToken]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {

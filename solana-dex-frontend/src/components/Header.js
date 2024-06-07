@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
-import Notifications from './Notifications'; // Ensure the correct path
 import '../styles/header.css'; // Ensure this path is correct
 
 const Header = () => {
@@ -25,7 +24,7 @@ const Header = () => {
           </ul>
         </nav>
         <div className="header-right">
-          <Notifications />
+          {/* <Notifications />  Remove this line */}
           <WalletMultiButton />
         </div>
       </div>

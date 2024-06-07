@@ -14,7 +14,7 @@ import './chartSetup'; // Import the chart setup file
 // Lazy load components
 const Trade = lazy(() => import('./pages/Trade'));
 const Wallet = lazy(() => import('./pages/Wallet'));
-const PortfolioPage = lazy(() => import('./pages/PortfolioPage')); // Ensure this matches the file path and case exactly
+const PortfolioPage = lazy(() => import('./pages/PortfolioPage'));
 const UserProfile = lazy(() => import('./components/UserProfile'));
 const News = lazy(() => import('./components/News'));
 const TransactionHistory = lazy(() => import('./components/TransactionHistory'));

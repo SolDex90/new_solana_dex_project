@@ -1,25 +1,22 @@
 const express = require('express');
 const cors = require('cors');
-const app = express();
-const port = 5000;
+const { combineAndDeduplicateData } = require('./services/tokenService');
 
-// Enable CORS for all routes
+const app = express();
+const PORT = process.env.PORT || 3000;
+
 app.use(cors());
 
-app.get('/api/hello', (req, res) => {
-  res.send({ message: 'Hello, world!' });
+app.get('/api/tokens', async (req, res) => {
+  try {
+    const tokens = await combineAndDeduplicateData();
+    res.json(tokens);
+  } catch (error) {
+    console.error('Error fetching tokens:', error); // Detailed logging
+    res.status(500).json({ error: 'Failed to fetch tokens' });
+  }
 });
 
-// Define the chart-data endpoint
-app.get('/api/chart-data', (req, res) => {
-  const chartData = [
-    { date: '2024-01-01', price: 100 },
-    { date: '2024-01-02', price: 110 },
-    { date: '2024-01-03', price: 105 },
-  ];
-  res.json(chartData);
-});
-
-app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
+app.listen(PORT, () => {
+  console.log(`Server running at http://localhost:${PORT}`);
 });

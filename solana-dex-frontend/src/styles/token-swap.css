@@ -27,25 +27,63 @@
   margin-bottom: 0.5rem;
 }
 
-.token-swap input,
-.token-swap select {
-  width: 100%;
+.token-swap-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.token-swap-input .input-group {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.dropdown-container {
+  position: relative;
+  flex: 1;
+}
+
+.dropdown-selected {
+  background-color: #121212;
+  color: #e0e0e0;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  border: 1px solid #333;
+  cursor: pointer;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: #1f1f1f;
+  border: 1px solid #333;
+  border-radius: 0.25rem;
+  margin-top: 0.5rem;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1000;
+}
+
+.dropdown-item {
+  padding: 0.5rem;
+  cursor: pointer;
+  color: #e0e0e0;
+}
+
+.dropdown-item:hover {
+  background-color: #333;
+}
+
+.amount-input {
+  width: 100px;
   padding: 0.5rem;
   border-radius: 0.25rem;
   border: 1px solid #333;
   background-color: #121212;
   color: #e0e0e0;
-  margin-bottom: 1rem;
-}
-
-.token-swap select {
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-}
-
-.token-swap .token-swap-section {
-  margin-bottom: 1.5rem;
 }
 
 .token-swap button {
@@ -61,9 +99,4 @@
 
 .token-swap button:hover {
   background-color: #1ed760;
-}
-
-.token-swap .status-message {
-  color: #1db954;
-  margin-top: 1rem;
 }

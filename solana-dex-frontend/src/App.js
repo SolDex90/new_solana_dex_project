@@ -32,12 +32,12 @@ const SocialTrading = lazy(() => import('./components/SocialTrading'));
 const PortfolioManagement = lazy(() => import('./components/PortfolioManagement'));
 const ExampleChart = lazy(() => import('./components/ExampleChart'));
 const CryptoPrices = lazy(() => import('./components/CryptoPrices'));
-const Swap = lazy(() => import('./components/Swap'));
 const LimitOrder = lazy(() => import('./components/LimitOrder'));
 const StopLoss = lazy(() => import('./components/StopLoss'));
 const DCA = lazy(() => import('./components/DCA'));
 const Perps = lazy(() => import('./components/Perps')); // New Perps component
 const CustomizableDashboard = lazy(() => import('./components/CustomizableDashboard')); // Ensure this is imported
+const TokenSwap = lazy(() => import('./components/TokenSwap'));
 
 const App = () => {
   return (
@@ -50,9 +50,9 @@ const App = () => {
             <ErrorBoundary>
               <Suspense fallback={<div>Loading...</div>}>
                 <Routes>
-                  <Route path="/" element={<Navigate to="/trade" />} /> {/* Redirect Home to Trade */}
-                  <Route path="/trade" element={<Trade />} /> {/* Use Trade as the home page */}
-                  <Route path="/swap" element={<Swap />} />
+                  <Route path="/" element={<Navigate to="/swap" />} /> {/* Redirect Home to Swap */}
+                  <Route path="/swap" element={<TokenSwap />} />
+                  <Route path="/trade" element={<Trade />} />
                   <Route path="/limit-order" element={<LimitOrder />} />
                   <Route path="/stop-loss" element={<StopLoss />} />
                   <Route path="/dca" element={<DCA />} />

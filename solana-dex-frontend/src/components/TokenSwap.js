@@ -56,6 +56,7 @@ const TokenSwap = () => {
                 </div>
                 {showFromDropdown && (
                   <div className="dropdown-menu">
+                    <input type="text" placeholder="Search by token or paste address" className="dropdown-search"/>
                     {tokens.map((token) => (
                       <div key={token.address} className="dropdown-item" onClick={() => handleSelectToken(token.symbol, 'from')}>
                         {token.symbol}
@@ -82,6 +83,7 @@ const TokenSwap = () => {
                 </div>
                 {showToDropdown && (
                   <div className="dropdown-menu">
+                    <input type="text" placeholder="Search by token or paste address" className="dropdown-search"/>
                     {tokens.map((token) => (
                       <div key={token.address} className="dropdown-item" onClick={() => handleSelectToken(token.symbol, 'to')}>
                         {token.symbol}

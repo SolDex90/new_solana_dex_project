@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import '../styles/SwapComponent.css';
+import '../styles/token-swap.css';  // Correct import
 
 const Swap = () => {
   const [fromToken, setFromToken] = useState('');

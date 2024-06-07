@@ -1,31 +1,47 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import Notifications from './Notifications'; // Ensure the correct path
-import '../styles/styles.css'; // Ensure this path is correct
+import '../styles/header.css'; // Ensure this path is correct
 
 const Header = () => {
+  const location = useLocation();
+  const isTradePage = location.pathname.startsWith('/trade') || 
+                      location.pathname === '/swap' || 
+                      location.pathname === '/limit-order' || 
+                      location.pathname === '/stop-loss' || 
+                      location.pathname === '/dca' || 
+                      location.pathname === '/perps';
+
   return (
     <header>
-      <h1>Solana DEX</h1>
-      <nav>
-        <ul>
-          <li className="dropdown">
-            <Link to="/swap" className="dropbtn">Trade</Link>
-            <div className="dropdown-content">
-              <Link to="/swap">Swap</Link>
-              <Link to="/limit-order">Limit Order</Link>
-              <Link to="/stop-loss">Stop-Loss</Link>
-              <Link to="/dca">DCA</Link>
-              <Link to="/perps">Perps</Link>
-            </div>
-          </li>
-          <li><Link to="/portfolio">Portfolio</Link></li>
-          <li><Link to="/trading-dashboard">Trading Dashboard</Link></li>
-        </ul>
-      </nav>
-      <Notifications />
-      <WalletMultiButton />
+      <div className="main-nav">
+        <h1>Solana DEX</h1>
+        <nav>
+          <ul>
+            <li><Link to="/trade" className={`main-link ${location.pathname === '/trade' ? 'active' : ''}`}>Trade</Link></li>
+            <li><Link to="/portfolio" className={location.pathname === '/portfolio' ? 'active' : ''}>Portfolio</Link></li>
+            <li><Link to="/trading-dashboard" className={location.pathname === '/trading-dashboard' ? 'active' : ''}>Trading Dashboard</Link></li>
+          </ul>
+        </nav>
+        <div className="header-right">
+          <Notifications />
+          <WalletMultiButton />
+        </div>
+      </div>
+      {isTradePage && (
+        <div className="sub-nav">
+          <nav>
+            <ul>
+              <li><Link to="/swap" className={location.pathname === '/swap' ? 'active' : ''}><span className="icon">🔄</span> Swap <span className="description">The Best Price</span></Link></li>
+              <li><Link to="/limit-order" className={location.pathname === '/limit-order' ? 'active' : ''}><span className="icon">📊</span> Limit Order <span className="description">Set Your Price</span></Link></li>
+              <li><Link to="/stop-loss" className={location.pathname === '/stop-loss' ? 'active' : ''}><span className="icon">🔔</span> Stop-Loss <span className="description">Set and Forget</span></Link></li>
+              <li><Link to="/dca" className={location.pathname === '/dca' ? 'active' : ''}><span className="icon">⏳</span> DCA <span className="description">Set and Forget</span></Link></li>
+              <li><Link to="/perps" className={location.pathname === '/perps' ? 'active' : ''}><span className="icon">💼</span> Perps <span className="description">Gateway to Heaven</span></Link></li>
+            </ul>
+          </nav>
+        </div>
+      )}
     </header>
   );
 };

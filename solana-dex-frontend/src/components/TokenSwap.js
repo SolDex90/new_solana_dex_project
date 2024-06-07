@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
+import { FaCog } from 'react-icons/fa';
+import SlippageModal from './SlippageModal';
 import '../styles/token-swap.css';
 
 const TokenSwap = () => {
   const [tokens, setTokens] = useState([]);
-  const [fromToken, setFromToken] = useState('');
-  const [toToken, setToToken] = useState('');
+  const [fromToken, setFromToken] = useState('SOL');
+  const [toToken, setToToken] = useState('USDC');
   const [fromAmount, setFromAmount] = useState('');
   const [toAmount, setToAmount] = useState('');
   const [showFromDropdown, setShowFromDropdown] = useState(false);
@@ -14,6 +16,8 @@ const TokenSwap = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [transactionStatus, setTransactionStatus] = useState('');
+  const [slippage, setSlippage] = useState(0.5); // default slippage tolerance
+  const [isSlippageModalOpen, setIsSlippageModalOpen] = useState(false);
 
   const fromDropdownRef = useRef(null);
   const toDropdownRef = useRef(null);
@@ -112,7 +116,8 @@ const TokenSwap = () => {
         fromToken,
         toToken,
         fromAmount,
-        toAmount
+        toAmount,
+        slippage
       });
       setTransactionStatus('Transaction successful!');
     } catch (error) {
@@ -124,7 +129,10 @@ const TokenSwap = () => {
   return (
     <div className="token-swap-container">
       <div className="token-swap">
-        <h3>Token Swap</h3>
+        <div className="header">
+          <h3>Token Swap</h3>
+          <FaCog className="cog-icon" onClick={() => setIsSlippageModalOpen(true)} />
+        </div>
         {loading && <p>Loading...</p>}
         {error && <p className="error">{error}</p>}
         {transactionStatus && <p>{transactionStatus}</p>}
@@ -188,6 +196,12 @@ const TokenSwap = () => {
           </div>
         </div>
         <button onClick={handleSwap}>Swap</button>
+        <SlippageModal
+          isOpen={isSlippageModalOpen}
+          onRequestClose={() => setIsSlippageModalOpen(false)}
+          slippage={slippage}
+          setSlippage={setSlippage}
+        />
         <div className="price-chart">
           <div className="price-row">
             <span className="price-token">{fromToken}</span>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import '../styles/token-swap.css';
 
@@ -10,6 +10,10 @@ const TokenSwap = () => {
   const [toAmount, setToAmount] = useState('');
   const [showFromDropdown, setShowFromDropdown] = useState(false);
   const [showToDropdown, setShowToDropdown] = useState(false);
+  const [prices, setPrices] = useState({});
+
+  const fromDropdownRef = useRef(null);
+  const toDropdownRef = useRef(null);
 
   useEffect(() => {
     const fetchTokens = async () => {
@@ -24,11 +28,58 @@ const TokenSwap = () => {
     fetchTokens();
   }, []);
 
+  useEffect(() => {
+    const fetchPrices = async () => {
+      try {
+        // Corrected API endpoints based on documentation
+        const jupiterResponse = await axios.get('https://price.jup.ag/v6/price?ids=SOL,USDC');
+        
+        console.log('Jupiter Response:', jupiterResponse.data);
+
+        const jupiterPrices = Object.keys(jupiterResponse.data.data).reduce((acc, key) => {
+          acc[jupiterResponse.data.data[key].mintSymbol] = jupiterResponse.data.data[key].price;
+          return acc;
+        }, {});
+
+        console.log('Jupiter Prices:', jupiterPrices);
+        setPrices(jupiterPrices);
+      } catch (error) {
+        console.error('Error fetching prices from Jupiter API:', error);
+      }
+    };
+
+    fetchPrices();
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (fromDropdownRef.current && !fromDropdownRef.current.contains(event.target)) {
+        setShowFromDropdown(false);
+      }
+      if (toDropdownRef.current && !toDropdownRef.current.contains(event.target)) {
+        setShowToDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
   const handleSwap = () => {
-    const fromTokenData = tokens.find(token => token.symbol === fromToken);
-    const toTokenData = tokens.find(token => token.symbol === toToken);
-    if (fromTokenData && toTokenData) {
-      setToAmount((fromAmount * fromTokenData.price / toTokenData.price).toFixed(2));
+    console.log('Prices:', prices);
+    console.log('From Token:', fromToken, 'To Token:', toToken);
+    console.log('From Amount:', fromAmount);
+
+    if (prices[fromToken] && prices[toToken]) {
+      const fromPrice = prices[fromToken];
+      const toPrice = prices[toToken];
+      const convertedAmount = (fromAmount * fromPrice / toPrice).toFixed(2);
+      console.log('Converted Amount:', convertedAmount);
+      setToAmount(convertedAmount);
+    } else {
+      console.log('Missing prices for selected tokens.');
     }
   };
 
@@ -40,6 +91,7 @@ const TokenSwap = () => {
     }
     setShowFromDropdown(false);
     setShowToDropdown(false);
+    console.log(`Selected ${type} Token:`, token);
   };
 
   return (
@@ -50,7 +102,7 @@ const TokenSwap = () => {
           <div className="token-swap-input">
             <label>From:</label>
             <div className="input-group">
-              <div className="dropdown-container">
+              <div className="dropdown-container" ref={fromDropdownRef}>
                 <div className="dropdown-selected" onClick={() => setShowFromDropdown(!showFromDropdown)}>
                   {fromToken || 'Select Token'}
                 </div>
@@ -77,7 +129,7 @@ const TokenSwap = () => {
           <div className="token-swap-input">
             <label>To:</label>
             <div className="input-group">
-              <div className="dropdown-container">
+              <div className="dropdown-container" ref={toDropdownRef}>
                 <div className="dropdown-selected" onClick={() => setShowToDropdown(!showToDropdown)}>
                   {toToken || 'Select Token'}
                 </div>

@@ -1,0 +1,11 @@
+/* Footer Styles */
+footer {
+    background-color: #1f1f1f; /* Slightly lighter dark for footer */
+    color: #b3b3b3;
+    text-align: center;
+    padding: 1rem;
+    box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+    margin-top: auto;
+    width: 100%;
+  }
+  

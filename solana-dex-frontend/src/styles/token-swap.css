@@ -16,9 +16,21 @@
   margin: auto;
 }
 
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 .token-swap h3 {
   color: #1db954;
   margin-top: 0;
+}
+
+.cog-icon {
+  color: #1db954;
+  cursor: pointer;
+  font-size: 1.5rem;
 }
 
 .token-swap label {

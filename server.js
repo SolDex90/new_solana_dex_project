@@ -12,7 +12,7 @@ app.get('/api/tokens', async (req, res) => {
     const tokens = await combineAndDeduplicateData();
     res.json(tokens);
   } catch (error) {
-    console.error('Error fetching tokens:', error); // Detailed logging
+    console.error('Error fetching tokens:', error);
     res.status(500).json({ error: 'Failed to fetch tokens' });
   }
 });

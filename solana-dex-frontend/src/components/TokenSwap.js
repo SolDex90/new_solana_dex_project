@@ -1,6 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { FaCog, FaSync } from 'react-icons/fa';
+import { FaSync } from 'react-icons/fa';
+import Dropdown from './Dropdown';
+import AmountInput from './AmountInput';
+import SwapButton from './SwapButton';
+import Slippage from './Slippage';
+import PriceDisplay from './PriceDisplay';
 import SlippageModal from './SlippageModal';
 import '../styles/token-swap.css';
 
@@ -18,9 +23,6 @@ const TokenSwap = () => {
   const [transactionStatus, setTransactionStatus] = useState('');
   const [slippage, setSlippage] = useState(0.5); // default slippage tolerance
   const [isSlippageModalOpen, setIsSlippageModalOpen] = useState(false);
-
-  const fromDropdownRef = useRef(null);
-  const toDropdownRef = useRef(null);
 
   useEffect(() => {
     const fetchTokens = async () => {
@@ -63,22 +65,6 @@ const TokenSwap = () => {
       fetchPrices([fromToken, toToken]);
     }
   }, [fromToken, toToken]);
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (fromDropdownRef.current && !fromDropdownRef.current.contains(event.target)) {
-        setShowFromDropdown(false);
-      }
-      if (toDropdownRef.current && !toDropdownRef.current.contains(event.target)) {
-        setShowToDropdown(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
 
   useEffect(() => {
     if (fromAmount && prices[fromToken] && prices[toToken]) {
@@ -136,13 +122,7 @@ const TokenSwap = () => {
     <div className="token-swap-container">
       <div className="header">
         <FaSync className="refresh-icon" onClick={handleRefresh} />
-        <div className="slippage-container">
-          <div className="slippage-label">Slippage</div>
-          <div className="slippage-info">
-            <span className="slippage-value">{slippage}%</span>
-            <FaCog className="cog-icon" onClick={() => setIsSlippageModalOpen(true)} />
-          </div>
-        </div>
+        <Slippage slippage={slippage} setIsSlippageModalOpen={setIsSlippageModalOpen} />
       </div>
       <div className="token-swap">
         {loading && <p>Loading...</p>}
@@ -152,57 +132,37 @@ const TokenSwap = () => {
           <div className="token-swap-input">
             <label>From:</label>
             <div className="input-group">
-              <div className="dropdown-container" ref={fromDropdownRef}>
-                <div className="dropdown-selected" onClick={() => setShowFromDropdown(!showFromDropdown)}>
-                  {fromToken || 'Select Token'}
-                </div>
-                {showFromDropdown && (
-                  <div className="dropdown-menu">
-                    <input type="text" placeholder="Search by token or paste address" className="dropdown-search"/>
-                    {tokens.map((token) => (
-                      <div key={token.address} className="dropdown-item" onClick={() => handleSelectToken(token.symbol, 'from')}>
-                        {token.symbol}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-              <input
-                type="number"
+              <Dropdown
+                tokens={tokens}
+                selectedToken={fromToken}
+                onSelectToken={(token) => handleSelectToken(token, 'from')}
+                showDropdown={showFromDropdown}
+                setShowDropdown={setShowFromDropdown}
+              />
+              <AmountInput
                 value={fromAmount}
                 onChange={(e) => setFromAmount(e.target.value)}
                 placeholder="Amount"
-                className="amount-input"
               />
             </div>
           </div>
           <div className="flip-button-container">
-            <button className="flip-button" onClick={handleFlip}>⬆️⬇️</button>
+            <SwapButton onClick={handleFlip} />
           </div>
           <div className="token-swap-input">
             <label>To:</label>
             <div className="input-group">
-              <div className="dropdown-container" ref={toDropdownRef}>
-                <div className="dropdown-selected" onClick={() => setShowToDropdown(!showToDropdown)}>
-                  {toToken || 'Select Token'}
-                </div>
-                {showToDropdown && (
-                  <div className="dropdown-menu">
-                    <input type="text" placeholder="Search by token or paste address" className="dropdown-search"/>
-                    {tokens.map((token) => (
-                      <div key={token.address} className="dropdown-item" onClick={() => handleSelectToken(token.symbol, 'to')}>
-                        {token.symbol}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-              <input
-                type="number"
+              <Dropdown
+                tokens={tokens}
+                selectedToken={toToken}
+                onSelectToken={(token) => handleSelectToken(token, 'to')}
+                showDropdown={showToDropdown}
+                setShowDropdown={setShowToDropdown}
+              />
+              <AmountInput
                 value={toAmount}
                 readOnly
                 placeholder="Amount"
-                className="amount-input"
               />
             </div>
           </div>
@@ -214,16 +174,7 @@ const TokenSwap = () => {
           slippage={slippage}
           setSlippage={setSlippage}
         />
-        <div className="price-chart">
-          <div className="price-row">
-            <span className="price-token">{fromToken}</span>
-            <span className="price-value">{prices[fromToken] ? `$${prices[fromToken].toFixed(10)}` : 'N/A'}</span>
-          </div>
-          <div className="price-row">
-            <span className="price-token">{toToken}</span>
-            <span className="price-value">{prices[toToken] ? `$${prices[toToken].toFixed(10)}` : 'N/A'}</span>
-          </div>
-        </div>
+        <PriceDisplay fromToken={fromToken} toToken={toToken} prices={prices} />
       </div>
     </div>
   );

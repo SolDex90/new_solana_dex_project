@@ -1,78 +1,167 @@
-import React, { useState } from 'react';
-import { useWallet } from '@solana/wallet-adapter-react';
-import { Connection, PublicKey, Transaction } from '@solana/web3.js';
-import { SERUM_PROGRAM_ID, Market } from '@project-serum/serum';
-import Swap from './Swap';
-import Chart from './Chart';
-import '../styles/styles.css'; // Ensure you have the appropriate styles
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import Dropdown from './Dropdown';
+import PriceChart from './PriceChart';
+import '../styles/limit-order.css';
 
 const LimitOrder = () => {
-  const { publicKey, signTransaction } = useWallet();
+  const [tokens, setTokens] = useState([]);
+  const [fromToken, setFromToken] = useState('SOL');
+  const [toToken, setToToken] = useState('USDC');
   const [price, setPrice] = useState('');
   const [amount, setAmount] = useState('');
-  const [statusMessage, setStatusMessage] = useState('');
+  const [orderStatus, setOrderStatus] = useState('');
+  const [showFromDropdown, setShowFromDropdown] = useState(false);
+  const [showToDropdown, setShowToDropdown] = useState(false);
+  const [prices, setPrices] = useState({});
+  const [chartData, setChartData] = useState([]);
+  const [chartLabels, setChartLabels] = useState([]);
 
-  const handleLimitOrder = async () => {
-    if (!publicKey) {
-      setStatusMessage('Connect your wallet first');
-      return;
+  useEffect(() => {
+    const fetchTokens = async () => {
+      try {
+        const response = await axios.get('http://localhost:3000/api/tokens');
+        setTokens(response.data);
+      } catch (error) {
+        console.error('Error fetching tokens:', error);
+        setOrderStatus('Failed to fetch tokens');
+      }
+    };
+
+    fetchTokens();
+  }, []);
+
+  useEffect(() => {
+    const fetchPrices = async () => {
+      try {
+        const response = await axios.get(`https://price.jup.ag/v6/price?ids=${fromToken},${toToken}`);
+        const pricesData = response.data.data;
+        setPrices({
+          [fromToken]: pricesData[fromToken].price,
+          [toToken]: pricesData[toToken].price,
+        });
+        if (pricesData[fromToken].price && !price) {
+          setPrice(pricesData[fromToken].price);
+        }
+      } catch (error) {
+        console.error('Error fetching prices:', error);
+        setOrderStatus('Failed to fetch prices');
+      }
+    };
+
+    if (fromToken && toToken) {
+      fetchPrices();
     }
+  }, [fromToken, toToken, price]);
 
-    const connection = new Connection('https://api.mainnet-beta.solana.com');
-    const marketAddress = new PublicKey('YOUR_MARKET_ADDRESS');
-    const market = await Market.load(connection, marketAddress, {}, SERUM_PROGRAM_ID);
+  useEffect(() => {
+    const fetchChartData = async () => {
+      try {
+        const response = await axios.get(`http://localhost:3000/api/chart-data?token=${fromToken}`);
+        setChartData(response.data.prices);
+        setChartLabels(response.data.timestamps);
+      } catch (error) {
+        console.error('Error fetching chart data:', error);
+        setOrderStatus('Failed to fetch chart data');
+      }
+    };
 
-    const owner = publicKey;
-    const payer = publicKey;
+    fetchChartData();
+  }, [fromToken]);
 
-    const [order] = await market.placeOrder({
-      owner,
-      payer,
-      side: 'buy', // 'buy' or 'sell'
-      price: parseFloat(price),
-      size: parseFloat(amount),
-      orderType: 'limit', // 'limit', 'ioc', 'postOnly'
-      clientId: new Date().getTime(),
-    });
-
-    const transaction = new Transaction().add(order);
-    const signedTransaction = await signTransaction(transaction);
-
+  const handlePlaceOrder = async () => {
+    setOrderStatus('Placing order...');
     try {
-      const txid = await connection.sendRawTransaction(signedTransaction.serialize());
-      await connection.confirmTransaction(txid);
-      setStatusMessage(`Order placed: ${txid}`);
+      await axios.post('http://localhost:3000/api/limit-order', {
+        fromToken,
+        toToken,
+        price,
+        amount,
+      });
+      setOrderStatus('Order placed successfully!');
     } catch (error) {
-      setStatusMessage(`Error placing order: ${error.message}`);
+      console.error('Error placing order:', error);
+      setOrderStatus('Failed to place order. Please try again.');
     }
   };
+
+  const handleSelectToken = (token, type) => {
+    if (type === 'from') {
+      setFromToken(token);
+      setShowFromDropdown(false);
+      setPrice(''); // Reset price when changing fromToken
+    } else {
+      setToToken(token);
+      setShowToDropdown(false);
+    }
+  };
+
+  const handleAmountChange = (e) => {
+    setAmount(e.target.value);
+  };
+
+  const totalUSDC = (amount && price && prices[toToken])
+    ? ((amount * price) / prices[toToken]).toFixed(2)
+    : '0.00';
 
   return (
     <div className="limit-order-page">
       <div className="limit-order-container">
-        <div className="limit-order">
-          <h2>Limit Order</h2>
-          <input
-            type="number"
-            placeholder="Price"
-            value={price}
-            onChange={(e) => setPrice(e.target.value)}
-          />
-          <input
-            type="number"
-            placeholder="Amount"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-          />
-          <button onClick={handleLimitOrder}>Place Limit Order</button>
-          <p>{statusMessage}</p>
-        </div>
-        <div className="swap-and-chart">
-          <Swap />
-          <div className="chart-container">
-            <Chart />
+        <h2>Limit Order</h2>
+        {orderStatus && <p>{orderStatus}</p>}
+        <div className="limit-order-section">
+          <h3>You're Selling</h3>
+          <div className="limit-order-input-group">
+            <Dropdown
+              tokens={tokens}
+              selectedToken={fromToken}
+              onSelectToken={(token) => handleSelectToken(token, 'from')}
+              showDropdown={showFromDropdown}
+              setShowDropdown={setShowFromDropdown}
+            />
+            <input
+              type="number"
+              value={amount}
+              onChange={handleAmountChange}
+              placeholder="Amount"
+              className="limit-order-input"
+            />
+          </div>
+          <div className="limit-order-input-group">
+            <label>Sell {fromToken} at </label>
+            <input
+              type="number"
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
+              placeholder="Enter price"
+              className="limit-order-input"
+            />
           </div>
         </div>
+        <div className="limit-order-section">
+          <h3>You're Buying</h3>
+          <div className="limit-order-input-group">
+            <Dropdown
+              tokens={tokens}
+              selectedToken={toToken}
+              onSelectToken={(token) => handleSelectToken(token, 'to')}
+              showDropdown={showToDropdown}
+              setShowDropdown={setShowToDropdown}
+            />
+            <input
+              type="number"
+              value={totalUSDC}
+              readOnly
+              className="limit-order-input"
+            />
+          </div>
+        </div>
+        <button onClick={handlePlaceOrder} className="limit-order-button">
+          Place Limit Order
+        </button>
+      </div>
+      <div className="limit-order-price-chart-container">
+        <PriceChart data={chartData} labels={chartLabels} />
       </div>
     </div>
   );

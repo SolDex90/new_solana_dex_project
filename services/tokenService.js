@@ -23,24 +23,25 @@ async function fetchWithRetry(url, options = {}, retries = 3) {
   }
 }
 
-// Use the correct Jupiter Price API endpoint
 async function fetchFromJupiter() {
-  return fetchWithRetry('https://price.jup.ag/v6/price?ids=SOL');
+  const data = await fetchWithRetry('https://price.jup.ag/v6/price?ids=SOL,USDC,USDT');
+  console.log('Jupiter Data:', data);
+  return data;
 }
 
-// Use the new BirdEye API endpoint with authentication
 async function fetchFromBirdeye() {
   const apiKey = '7707fff5284b4debbdc6487845ea9218'; // Replace with your actual API key
   const headers = {
     'X-API-KEY': apiKey,
     'Content-Type': 'application/json'
   };
-  return fetchWithRetry('https://public-api.birdeye.so/defi/tokenlist', { headers });
+  const data = await fetchWithRetry('https://public-api.birdeye.so/defi/tokenlist', { headers });
+  console.log('BirdEye Data:', data);
+  return data;
 }
 
 async function fetchFromSolanaBlockchain() {
   const connection = new Connection('https://api.mainnet-beta.solana.com');
-  // Implement logic to fetch tokens directly from Solana blockchain
   const tokens = []; // Replace with actual logic
   return tokens;
 }
@@ -54,7 +55,6 @@ async function combineAndDeduplicateData() {
   console.log('BirdEye Tokens:', birdeyeTokens);
   console.log('Blockchain Tokens:', blockchainTokens);
 
-  // Convert Jupiter tokens from object to array
   const jupiterTokensArray = Object.values(jupiterTokens.data).map(token => ({
     address: token.id,
     symbol: token.mintSymbol,
@@ -64,8 +64,11 @@ async function combineAndDeduplicateData() {
   const birdEyeTokensArray = birdeyeTokens.data.tokens.map(token => ({
     address: token.address,
     symbol: token.symbol,
-    price: token.liquidity // Assuming using liquidity as a proxy for price
+    price: token.price // Ensure this is the correct field for price
   }));
+
+  console.log('USDC from Jupiter:', jupiterTokens.data.USDC);
+  console.log('USDC from BirdEye:', birdeyeTokens.data.tokens.find(token => token.symbol === 'USDC'));
 
   const allTokens = [...jupiterTokensArray, ...birdEyeTokensArray, ...blockchainTokens];
 

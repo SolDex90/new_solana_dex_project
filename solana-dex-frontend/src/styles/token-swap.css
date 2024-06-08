@@ -1,6 +1,7 @@
 /* Token Swap Styles */
 .token-swap-container {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   min-height: 60vh;
@@ -12,7 +13,7 @@
   padding: 2rem;
   border-radius: 0.5rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  width: 400px;
+  width: 360px; /* Reduced width */
   margin: auto;
 }
 
@@ -20,17 +21,37 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  width: 360px; /* Match token swap width */
+  margin-bottom: 10px; /* Adjusted spacing */
 }
 
-.token-swap h3 {
-  color: #1db954;
-  margin-top: 0;
+.slippage-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.slippage-label {
+  color: #b3b3b3;
+  font-size: 0.8rem;
+  margin-bottom: 0.25rem;
+}
+
+.slippage-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.slippage-value {
+  color: #b3b3b3;
+  font-size: 1rem;
 }
 
 .cog-icon {
   color: #1db954;
   cursor: pointer;
-  font-size: 1.5rem;
+  font-size: 1rem; /* Adjusted size */
 }
 
 .token-swap label {
@@ -142,6 +163,12 @@
   margin-top: 1rem;
   padding-top: 1rem;
   border-top: 1px solid #333;
+}
+
+.refresh-icon {
+  color: #1db954;
+  cursor: pointer;
+  font-size: 1rem; /* Adjusted size */
 }
 
 .price-row {

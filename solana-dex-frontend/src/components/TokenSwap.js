@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import { FaCog } from 'react-icons/fa';
+import { FaCog, FaSync } from 'react-icons/fa';
 import SlippageModal from './SlippageModal';
 import '../styles/token-swap.css';
 
@@ -126,13 +126,25 @@ const TokenSwap = () => {
     }
   };
 
+  const handleRefresh = () => {
+    if (fromToken && toToken) {
+      fetchPrices([fromToken, toToken]);
+    }
+  };
+
   return (
     <div className="token-swap-container">
-      <div className="token-swap">
-        <div className="header">
-          <h3>Token Swap</h3>
-          <FaCog className="cog-icon" onClick={() => setIsSlippageModalOpen(true)} />
+      <div className="header">
+        <FaSync className="refresh-icon" onClick={handleRefresh} />
+        <div className="slippage-container">
+          <div className="slippage-label">Slippage</div>
+          <div className="slippage-info">
+            <span className="slippage-value">{slippage}%</span>
+            <FaCog className="cog-icon" onClick={() => setIsSlippageModalOpen(true)} />
+          </div>
         </div>
+      </div>
+      <div className="token-swap">
         {loading && <p>Loading...</p>}
         {error && <p className="error">{error}</p>}
         {transactionStatus && <p>{transactionStatus}</p>}

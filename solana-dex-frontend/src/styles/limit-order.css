@@ -1,0 +1,98 @@
+.limit-order-page {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px;
+  }
+  
+  .limit-order-container {
+    width: 45%;
+    padding: 20px;
+    background-color: #2c2c2c;
+    border-radius: 8px;
+    color: white;
+  }
+  
+  .limit-order-price-chart-container {
+    width: 45%;
+    padding: 20px;
+    background-color: #2c2c2c;
+    border-radius: 8px;
+    color: white;
+  }
+  
+  .limit-order-inputs {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .limit-order-input {
+    margin: 10px 0;
+    padding: 10px;
+    border: 1px solid #4c4c4c;
+    border-radius: 4px;
+    background-color: #1c1c1c;
+    color: white;
+  }
+  
+  .limit-order-button {
+    margin-top: 20px;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    background-color: #00b300;
+    color: white;
+    cursor: pointer;
+  }
+  
+  .limit-order-button:hover {
+    background-color: #009900;
+  }
+  
+  .limit-order-dropdown-container {
+    position: relative;
+    margin: 10px 0;
+  }
+  
+  .limit-order-dropdown-selected {
+    padding: 10px;
+    border: 1px solid #4c4c4c;
+    border-radius: 4px;
+    background-color: #1c1c1c;
+    color: white;
+    cursor: pointer;
+  }
+  
+  .limit-order-dropdown-menu {
+    position: absolute;
+    width: 100%;
+    max-height: 200px;
+    overflow-y: auto;
+    background-color: #1c1c1c;
+    border: 1px solid #4c4c4c;
+    border-radius: 4px;
+    z-index: 1;
+  }
+  
+  .limit-order-dropdown-item {
+    padding: 10px;
+    cursor: pointer;
+  }
+  
+  .limit-order-dropdown-item:hover {
+    background-color: #333;
+  }
+  
+  .limit-order-dropdown-search {
+    padding: 10px;
+    border: none;
+    border-bottom: 1px solid #4c4c4c;
+    background-color: #1c1c1c;
+    color: white;
+    outline: none;
+  }
+  
+  .limit-order-price-chart {
+    width: 100%;
+    height: 400px;
+  }
+  

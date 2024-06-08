@@ -3,6 +3,7 @@ import axios from 'axios';
 import Dropdown from './Dropdown';
 import PriceChart from './PriceChart';
 import '../styles/limit-order.css';
+import { fetchChartData } from '../fetchChartData';
 
 const LimitOrder = () => {
   const [tokens, setTokens] = useState([]);
@@ -36,6 +37,7 @@ const LimitOrder = () => {
       try {
         const response = await axios.get(`https://price.jup.ag/v6/price?ids=${fromToken},${toToken}`);
         const pricesData = response.data.data;
+
         setPrices({
           [fromToken]: pricesData[fromToken].price,
           [toToken]: pricesData[toToken].price,
@@ -55,18 +57,18 @@ const LimitOrder = () => {
   }, [fromToken, toToken, price]);
 
   useEffect(() => {
-    const fetchChartData = async () => {
+    const loadChartData = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/api/chart-data?token=${fromToken}`);
-        setChartData(response.data.prices);
-        setChartLabels(response.data.timestamps);
+        const { prices, timestamps } = await fetchChartData(fromToken);
+        setChartData(prices);
+        setChartLabels(timestamps);
       } catch (error) {
         console.error('Error fetching chart data:', error);
         setOrderStatus('Failed to fetch chart data');
       }
     };
 
-    fetchChartData();
+    loadChartData();
   }, [fromToken]);
 
   const handlePlaceOrder = async () => {

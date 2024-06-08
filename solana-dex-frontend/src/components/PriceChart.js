@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import Chart from 'chart.js/auto';
+import 'chartjs-adapter-date-fns';
 
 const PriceChart = ({ data, labels }) => {
   const chartRef = useRef(null);
@@ -21,6 +22,13 @@ const PriceChart = ({ data, labels }) => {
       options: {
         scales: {
           x: {
+            type: 'time',
+            time: {
+              unit: 'hour',
+              displayFormats: {
+                hour: 'MMM d, ha' // Use 'ha' for hour AM/PM without causing issues
+              }
+            },
             title: {
               display: true,
               text: 'Time',
@@ -30,8 +38,24 @@ const PriceChart = ({ data, labels }) => {
             title: {
               display: true,
               text: 'Price',
-            }
+            },
+            beginAtZero: false
           }
+        },
+        plugins: {
+          legend: {
+            display: true,
+            position: 'top'
+          },
+          tooltip: {
+            mode: 'index',
+            intersect: false
+          }
+        },
+        interaction: {
+          mode: 'nearest',
+          axis: 'x',
+          intersect: false
         }
       }
     });

@@ -58,7 +58,7 @@ const LimitOrder = () => {
   useEffect(() => {
     const loadChartData = async () => {
       try {
-        const { prices, timestamps } = await fetchChartData(fromToken);
+        const { prices, timestamps } = await fetchChartData(toToken);
         const formattedData = prices.map((price, index) => ({
           time: timestamps[index].getTime() / 1000,
           value: price,
@@ -71,7 +71,7 @@ const LimitOrder = () => {
     };
 
     loadChartData();
-  }, [fromToken]);
+  }, [toToken]);
 
   const handlePlaceOrder = async () => {
     setOrderStatus('Placing order...');

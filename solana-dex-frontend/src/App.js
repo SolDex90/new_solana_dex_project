@@ -31,7 +31,7 @@ const InteractiveTutorials = lazy(() => import('./components/InteractiveTutorial
 const SocialTrading = lazy(() => import('./components/SocialTrading'));
 const PortfolioManagement = lazy(() => import('./components/PortfolioManagement'));
 const ExampleChart = lazy(() => import('./components/ExampleChart'));
-const CryptoPrices = lazy(() => import('./components/CryptoPrices'));
+// const CryptoPrices = lazy(() => import('./components/CryptoPrices'));
 const LimitOrder = lazy(() => import('./components/LimitOrder'));
 const StopLoss = lazy(() => import('./components/StopLoss'));
 const DCA = lazy(() => import('./components/DCA'));
@@ -76,7 +76,7 @@ const App = () => {
                   <Route path="/portfolio-management" element={<ProtectedRoute><PortfolioManagement /></ProtectedRoute>} />
                   <Route path="/customizable-dashboard" element={<ProtectedRoute><CustomizableDashboard /></ProtectedRoute>} /> {/* Fixed import */}
                   <Route path="/example-chart" element={<ExampleChart />} />
-                  <Route path="/crypto-prices" element={<CryptoPrices />} />
+                  {/* <Route path="/crypto-prices" element={<CryptoPrices />} /> */}
                 </Routes>
               </Suspense>
             </ErrorBoundary>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Dropdown from './Dropdown';
-import PriceChart from './PriceChart';
+import TradingViewChart from './TradingViewChart';
 import '../styles/limit-order.css';
 import { fetchChartData } from '../fetchChartData';
 
@@ -16,7 +16,6 @@ const LimitOrder = () => {
   const [showToDropdown, setShowToDropdown] = useState(false);
   const [prices, setPrices] = useState({});
   const [chartData, setChartData] = useState([]);
-  const [chartLabels, setChartLabels] = useState([]);
 
   useEffect(() => {
     const fetchTokens = async () => {
@@ -60,8 +59,11 @@ const LimitOrder = () => {
     const loadChartData = async () => {
       try {
         const { prices, timestamps } = await fetchChartData(fromToken);
-        setChartData(prices);
-        setChartLabels(timestamps);
+        const formattedData = prices.map((price, index) => ({
+          time: timestamps[index].getTime() / 1000,
+          value: price,
+        }));
+        setChartData(formattedData);
       } catch (error) {
         console.error('Error fetching chart data:', error);
         setOrderStatus('Failed to fetch chart data');
@@ -163,7 +165,7 @@ const LimitOrder = () => {
         </button>
       </div>
       <div className="limit-order-price-chart-container">
-        <PriceChart data={chartData} labels={chartLabels} />
+        <TradingViewChart data={chartData} />
       </div>
     </div>
   );

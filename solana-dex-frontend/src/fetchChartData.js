@@ -32,12 +32,30 @@ export const fetchChartData = async (symbol) => {
       throw new Error('Invalid data format received');
     }
 
-    const prices = data.items.map(item => item.value);
-    const timestamps = data.items.map(item => new Date(item.unixTime * 1000));
+    // Log the structure of one item for debugging
+    console.log('Structure of data item:', data.items[0]);
 
-    return { prices, timestamps };
+    const prices = data.items.map(item => {
+      const value = item.value;
+      // Simulating OHLC data
+      const open = value * (1 + Math.random() * 0.02 - 0.01);
+      const high = value * (1 + Math.random() * 0.04 - 0.02);
+      const low = value * (1 + Math.random() * 0.04 - 0.02);
+      const close = value * (1 + Math.random() * 0.02 - 0.01);
+      return {
+        time: item.unixTime,
+        open,
+        high,
+        low,
+        close
+      };
+    });
+
+    console.log('Formatted chart data:', prices[0]); // Log a single data point for debugging
+
+    return prices;
   } catch (error) {
     console.error(`Error fetching chart data for ${symbol}:`, error);
-    return { prices: [], timestamps: [] };
+    return [];
   }
 };

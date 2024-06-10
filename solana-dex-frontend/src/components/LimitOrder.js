@@ -58,12 +58,8 @@ const LimitOrder = () => {
   useEffect(() => {
     const loadChartData = async () => {
       try {
-        const { prices, timestamps } = await fetchChartData(toToken);
-        const formattedData = prices.map((price, index) => ({
-          time: timestamps[index].getTime() / 1000,
-          value: price,
-        }));
-        setChartData(formattedData);
+        const data = await fetchChartData(toToken);
+        setChartData(data);
       } catch (error) {
         console.error('Error fetching chart data:', error);
         setOrderStatus('Failed to fetch chart data');

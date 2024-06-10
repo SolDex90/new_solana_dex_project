@@ -3,7 +3,7 @@ import axios from 'axios';
 import Dropdown from './Dropdown';
 import TradingViewChart from './TradingViewChart';
 import '../styles/limit-order.css';
-import { fetchChartData } from '../fetchChartData';
+import { fetchChartData } from '../fetchChartData'; // Adjust the import path if necessary
 
 const LimitOrder = () => {
   const [tokens, setTokens] = useState([]);

@@ -32,9 +32,6 @@ export const fetchChartData = async (symbol) => {
       throw new Error('Invalid data format received');
     }
 
-    // Log the structure of one item for debugging
-    console.log('Structure of data item:', data.items[0]);
-
     const prices = data.items.map(item => {
       const value = item.value;
       // Simulating OHLC data

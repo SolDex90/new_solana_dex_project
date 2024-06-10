@@ -13,7 +13,7 @@ const TradingViewChart = ({ data }) => {
 
       if (chartType === 'line') {
         series = chart.addLineSeries();
-        const lineData = data.map(item => ({ time: item.time, value: item.value }));
+        const lineData = data.map(item => ({ time: item.time, value: item.close })); // Using 'close' for line chart
         console.log('Line chart data:', lineData[0]); // Log a single data point for debugging
         series.setData(lineData);
       } else if (chartType === 'candlestick') {

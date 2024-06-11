@@ -172,7 +172,7 @@ const LimitOrder = () => {
           <button onClick={() => setTimeframe('1d')}>1d</button>
           <button onClick={() => setTimeframe('1w')}>1w</button>
         </div>
-        <TradingViewChart data={chartData} />
+        <TradingViewChart data={chartData} setSellPrice={setPrice} />
       </div>
     </div>
   );

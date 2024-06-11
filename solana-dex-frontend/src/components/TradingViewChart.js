@@ -1,12 +1,13 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { createChart } from 'lightweight-charts';
 
-const TradingViewChart = ({ data }) => {
+const TradingViewChart = ({ data, setSellPrice }) => {
   const chartContainerRef = useRef(null);
   const [chartType, setChartType] = useState('line');
   const chartRef = useRef(null);
   const seriesRef = useRef(null);
   const [hoveredTime, setHoveredTime] = useState(null);
+  const horizontalLinesRef = useRef([]);
 
   const updateSeriesData = useCallback((data) => {
     if (seriesRef.current) {
@@ -44,6 +45,31 @@ const TradingViewChart = ({ data }) => {
       updateSeriesData(data);
     }
   }, [chartType, updateSeriesData, data]);
+
+  const handleChartClick = useCallback((param) => {
+    if (!chartRef.current || !param || !param.point) return;
+    
+    const price = seriesRef.current.coordinateToPrice(param.point.y);
+    if (price !== undefined) {
+      setSellPrice(price);
+
+      // Remove previous lines
+      horizontalLinesRef.current.forEach(line => {
+        if (line) {
+          chartRef.current.removeSeries(line);
+        }
+      });
+      horizontalLinesRef.current = [];
+
+      // Add horizontal line
+      const lineSeries = chartRef.current.addLineSeries({
+        color: 'red',
+        lineWidth: 1,
+      });
+      lineSeries.setData([{ time: data[0].time, value: price }, { time: data[data.length - 1].time, value: price }]);
+      horizontalLinesRef.current.push(lineSeries);
+    }
+  }, [data, setSellPrice]);
 
   useEffect(() => {
     if (chartContainerRef.current) {
@@ -83,6 +109,9 @@ const TradingViewChart = ({ data }) => {
 
         setHoveredTime(param.time);
       });
+
+      // Set up the click event
+      chartRef.current.subscribeClick(handleChartClick);
     }
 
     // Cleanup function to remove the chart
@@ -93,7 +122,7 @@ const TradingViewChart = ({ data }) => {
         seriesRef.current = null;
       }
     };
-  }, [updateSeries]);
+  }, [updateSeries, handleChartClick]);
 
   useEffect(() => {
     // Update the series data when the data changes

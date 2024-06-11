@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useCallback } from 'react';
+import React, { useEffect, useRef, useCallback, useState } from 'react';
 import { createChart } from 'lightweight-charts';
 
 const TradingViewChart = ({ data, setSellPrice }) => {
@@ -6,6 +6,7 @@ const TradingViewChart = ({ data, setSellPrice }) => {
   const chartRef = useRef(null);
   const seriesRef = useRef(null);
   const horizontalLinesRef = useRef([]);
+  const [hoveredTime, setHoveredTime] = useState(null);
 
   const updateSeriesData = useCallback((data) => {
     if (seriesRef.current) {
@@ -20,9 +21,28 @@ const TradingViewChart = ({ data, setSellPrice }) => {
     }
   }, []);
 
+  const updateSeries = useCallback(() => {
+    if (chartRef.current) {
+      // Remove the existing series if it exists
+      if (seriesRef.current) {
+        try {
+          chartRef.current.removeSeries(seriesRef.current);
+        } catch (error) {
+          console.error('Error removing series:', error);
+        }
+      }
+
+      // Add the new series
+      seriesRef.current = chartRef.current.addCandlestickSeries();
+
+      // Set the data for the new series
+      updateSeriesData(data);
+    }
+  }, [updateSeriesData, data]);
+
   const handleChartClick = useCallback((param) => {
     if (!chartRef.current || !param || !param.point) return;
-    
+
     const price = seriesRef.current.coordinateToPrice(param.point.y);
     if (price !== undefined) {
       setSellPrice(price);
@@ -30,7 +50,11 @@ const TradingViewChart = ({ data, setSellPrice }) => {
       // Remove previous lines
       horizontalLinesRef.current.forEach(line => {
         if (line) {
-          chartRef.current.removeSeries(line);
+          try {
+            chartRef.current.removeSeries(line);
+          } catch (error) {
+            console.error('Error removing line series:', error);
+          }
         }
       });
       horizontalLinesRef.current = [];
@@ -71,9 +95,17 @@ const TradingViewChart = ({ data, setSellPrice }) => {
         },
       });
 
-      // Add candlestick series to chart
-      seriesRef.current = chartRef.current.addCandlestickSeries();
-      updateSeriesData(data);
+      // Add series to chart
+      updateSeries();
+
+      // Set up the hover event
+      chartRef.current.subscribeCrosshairMove((param) => {
+        if (!param || !param.time) {
+          setHoveredTime(null);
+          return;
+        }
+        setHoveredTime(param.time);
+      });
 
       // Set up the click event
       chartRef.current.subscribeClick(handleChartClick);
@@ -87,16 +119,22 @@ const TradingViewChart = ({ data, setSellPrice }) => {
         seriesRef.current = null;
       }
     };
-  }, [updateSeriesData, handleChartClick, data]);
+  }, [updateSeries, handleChartClick]);
 
   useEffect(() => {
     // Update the series data when the data changes
     updateSeriesData(data);
   }, [data, updateSeriesData]);
 
+  const formatTime = (time) => {
+    const date = new Date(time * 1000);
+    return date.toLocaleString();
+  };
+
   return (
     <div>
       <div ref={chartContainerRef} />
+      {hoveredTime && <div className="hovered-time">Time: {formatTime(hoveredTime)}</div>}
     </div>
   );
 };

@@ -156,6 +156,16 @@ const LimitOrder = () => {
               className="limit-order-input"
             />
           </div>
+          <div className="limit-order-input-group">
+            <label>Buy {toToken} at </label>
+            <input
+              type="number"
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
+              placeholder="Enter price"
+              className="limit-order-input"
+            />
+          </div>
         </div>
         <button onClick={handlePlaceOrder} className="limit-order-button">
           Place Limit Order

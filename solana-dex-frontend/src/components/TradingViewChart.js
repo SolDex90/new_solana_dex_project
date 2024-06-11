@@ -6,6 +6,7 @@ const TradingViewChart = ({ data }) => {
   const [chartType, setChartType] = useState('line');
   const chartRef = useRef(null);
   const seriesRef = useRef(null);
+  const [hoveredTime, setHoveredTime] = useState(null);
 
   const updateSeriesData = useCallback((data) => {
     if (seriesRef.current) {
@@ -72,6 +73,16 @@ const TradingViewChart = ({ data }) => {
 
       // Add series to chart
       updateSeries();
+
+      // Set up the hover event
+      chartRef.current.subscribeCrosshairMove((param) => {
+        if (!param || !param.time) {
+          setHoveredTime(null);
+          return;
+        }
+
+        setHoveredTime(param.time);
+      });
     }
 
     // Cleanup function to remove the chart
@@ -93,12 +104,18 @@ const TradingViewChart = ({ data }) => {
     setChartType((prevType) => (prevType === 'line' ? 'candlestick' : 'line'));
   };
 
+  const formatTime = (time) => {
+    const date = new Date(time * 1000);
+    return date.toLocaleString();
+  };
+
   return (
     <div>
       <button onClick={toggleChartType}>
         Toggle to {chartType === 'line' ? 'Candlestick' : 'Line'} Chart
       </button>
       <div ref={chartContainerRef} />
+      {hoveredTime && <div className="hovered-time">Time: {formatTime(hoveredTime)}</div>}
     </div>
   );
 };

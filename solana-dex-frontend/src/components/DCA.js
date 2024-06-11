@@ -14,6 +14,7 @@ const DCA = () => {
   const [orderStatus, setOrderStatus] = useState('');
   const [showFromDropdown, setShowFromDropdown] = useState(false);
   const [showToDropdown, setShowToDropdown] = useState(false);
+  const [solToUsdc, setSolToUsdc] = useState(0);
 
   useEffect(() => {
     const fetchTokens = async () => {
@@ -26,8 +27,18 @@ const DCA = () => {
       }
     };
 
+    const fetchSolToUsdcRate = async () => {
+      try {
+        const response = await axios.get(`https://price.jup.ag/v6/price?ids=${fromToken}`);
+        setSolToUsdc(response.data.data[fromToken].price);
+      } catch (error) {
+        console.error('Error fetching SOL to USDC rate:', error);
+      }
+    };
+
     fetchTokens();
-  }, []);
+    fetchSolToUsdcRate();
+  }, [fromToken]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -44,6 +55,8 @@ const DCA = () => {
     }
   };
 
+  const equivalentUsdc = (amount * solToUsdc).toFixed(2);
+
   return (
     <div className="card small-card">
       <h2>Dollar Cost Averaging (DCA)</h2>
@@ -58,6 +71,7 @@ const DCA = () => {
               onSelectToken={(token) => handleSelectToken(token, 'from')}
               showDropdown={showFromDropdown}
               setShowDropdown={setShowFromDropdown}
+              style={{ width: '200px' }} // Adjusted width for the ticker bar
             />
             <input
               type="number"
@@ -66,7 +80,11 @@ const DCA = () => {
               onChange={(e) => setAmount(e.target.value)}
               placeholder="Amount to Invest"
               required
+              style={{ marginLeft: '10px', width: '100px' }}
             />
+            <span style={{ marginLeft: '10px', color: '#bbb' }}>
+              ≈ ${equivalentUsdc}
+            </span>
           </div>
         </div>
         <div className="form-group">
@@ -77,6 +95,7 @@ const DCA = () => {
             onSelectToken={(token) => handleSelectToken(token, 'to')}
             showDropdown={showToDropdown}
             setShowDropdown={setShowToDropdown}
+            style={{ width: '200px' }} // Adjusted width for the ticker bar
           />
         </div>
         <div className="form-group">
@@ -88,12 +107,14 @@ const DCA = () => {
               value={interval}
               onChange={(e) => setInterval(e.target.value)}
               required
+              style={{ marginRight: '10px', width: '50px' }}
             />
             <select
               id="frequency"
               value={frequency}
               onChange={(e) => setFrequency(e.target.value)}
               required
+              style={{ width: '100px' }}
             >
               <option value="minute">Minute</option>
               <option value="hour">Hour</option>
@@ -112,8 +133,9 @@ const DCA = () => {
               value={numOrders}
               onChange={(e) => setNumOrders(e.target.value)}
               required
+              style={{ marginRight: '10px', width: '50px' }}
             />
-            <label htmlFor="num-orders">orders</label>
+            <span>orders</span>
           </div>
         </div>
         <button type="submit">Start DCA</button>

@@ -1,50 +1,24 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useEffect, useRef, useCallback } from 'react';
 import { createChart } from 'lightweight-charts';
 
 const TradingViewChart = ({ data, setSellPrice }) => {
   const chartContainerRef = useRef(null);
-  const [chartType, setChartType] = useState('line');
   const chartRef = useRef(null);
   const seriesRef = useRef(null);
-  const [hoveredTime, setHoveredTime] = useState(null);
   const horizontalLinesRef = useRef([]);
 
   const updateSeriesData = useCallback((data) => {
     if (seriesRef.current) {
-      if (chartType === 'line') {
-        const lineData = data.map(item => ({ time: item.time, value: item.close }));
-        seriesRef.current.setData(lineData);
-      } else if (chartType === 'candlestick') {
-        const candlestickData = data.map(item => ({
-          time: item.time,
-          open: item.open,
-          high: item.high,
-          low: item.low,
-          close: item.close,
-        }));
-        seriesRef.current.setData(candlestickData);
-      }
+      const candlestickData = data.map(item => ({
+        time: item.time,
+        open: item.open,
+        high: item.high,
+        low: item.low,
+        close: item.close,
+      }));
+      seriesRef.current.setData(candlestickData);
     }
-  }, [chartType]);
-
-  const updateSeries = useCallback(() => {
-    if (chartRef.current) {
-      // Remove the existing series if it exists
-      if (seriesRef.current) {
-        chartRef.current.removeSeries(seriesRef.current);
-      }
-
-      // Add the new series based on the chart type
-      if (chartType === 'line') {
-        seriesRef.current = chartRef.current.addLineSeries();
-      } else if (chartType === 'candlestick') {
-        seriesRef.current = chartRef.current.addCandlestickSeries();
-      }
-
-      // Set the data for the new series
-      updateSeriesData(data);
-    }
-  }, [chartType, updateSeriesData, data]);
+  }, []);
 
   const handleChartClick = useCallback((param) => {
     if (!chartRef.current || !param || !param.point) return;
@@ -97,18 +71,9 @@ const TradingViewChart = ({ data, setSellPrice }) => {
         },
       });
 
-      // Add series to chart
-      updateSeries();
-
-      // Set up the hover event
-      chartRef.current.subscribeCrosshairMove((param) => {
-        if (!param || !param.time) {
-          setHoveredTime(null);
-          return;
-        }
-
-        setHoveredTime(param.time);
-      });
+      // Add candlestick series to chart
+      seriesRef.current = chartRef.current.addCandlestickSeries();
+      updateSeriesData(data);
 
       // Set up the click event
       chartRef.current.subscribeClick(handleChartClick);
@@ -122,29 +87,16 @@ const TradingViewChart = ({ data, setSellPrice }) => {
         seriesRef.current = null;
       }
     };
-  }, [updateSeries, handleChartClick]);
+  }, [updateSeriesData, handleChartClick, data]);
 
   useEffect(() => {
     // Update the series data when the data changes
     updateSeriesData(data);
   }, [data, updateSeriesData]);
 
-  const toggleChartType = () => {
-    setChartType((prevType) => (prevType === 'line' ? 'candlestick' : 'line'));
-  };
-
-  const formatTime = (time) => {
-    const date = new Date(time * 1000);
-    return date.toLocaleString();
-  };
-
   return (
     <div>
-      <button onClick={toggleChartType}>
-        Toggle to {chartType === 'line' ? 'Candlestick' : 'Line'} Chart
-      </button>
       <div ref={chartContainerRef} />
-      {hoveredTime && <div className="hovered-time">Time: {formatTime(hoveredTime)}</div>}
     </div>
   );
 };

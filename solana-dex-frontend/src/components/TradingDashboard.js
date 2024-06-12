@@ -1,5 +1,5 @@
 import React from 'react';
-import LimitOrder from './LimitOrder';
+import TradingDashLimitOrder from './TradingDashLimitOrder';
 import PaperTrading from './PaperTrading';
 
 const TradingDashboard = () => {
@@ -7,7 +7,7 @@ const TradingDashboard = () => {
     <div style={{ padding: '20px' }}>
       <h2 style={{ marginBottom: '20px' }}>Trading Dashboard</h2>
       <div style={{ marginBottom: '20px' }}>
-        <LimitOrder />
+        <TradingDashLimitOrder />
       </div>
       <div style={{ marginBottom: '20px' }}>
         <PaperTrading />

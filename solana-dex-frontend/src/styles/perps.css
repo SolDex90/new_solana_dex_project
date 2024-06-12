@@ -1,0 +1,96 @@
+.perps-page {
+    padding: 20px;
+    background-color: #1e1e1e;
+    color: #fff;
+  }
+  
+  .perps-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .position-toggle {
+    display: flex;
+  }
+  
+  .position-toggle button {
+    background-color: #333;
+    border: none;
+    color: #fff;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 4px;
+    margin-left: 5px;
+  }
+  
+  .position-toggle button.active {
+    background-color: #4caf50;
+  }
+  
+  .perps-content {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  
+  .perps-container {
+    background-color: #2b2b2b;
+    padding: 20px;
+    border-radius: 8px;
+    flex: 1;
+    min-width: 300px; /* Adjust as needed */
+    margin: 10px;
+  }
+  
+  .perps-section {
+    margin-bottom: 20px;
+  }
+  
+  .perps-input-group {
+    margin-bottom: 10px;
+  }
+  
+  .perps-input {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    background-color: #333;
+    border: none;
+    border-radius: 4px;
+    color: #fff;
+  }
+  
+  .perps-button {
+    padding: 10px 20px;
+    background-color: #4caf50;
+    border: none;
+    border-radius: 4px;
+    color: #fff;
+    cursor: pointer;
+    width: 100%;
+  }
+  
+  .perps-price-chart-container {
+    background-color: #2b2b2b;
+    padding: 20px;
+    border-radius: 8px;
+    flex: 2;
+    min-width: 300px; /* Adjust as needed */
+    margin: 10px;
+  }
+  
+  .timeframe-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  
+  .timeframe-buttons button {
+    background-color: #333;
+    border: none;
+    border-radius: 4px;
+    color: #fff;
+    padding: 5px 10px;
+    cursor: pointer;
+  }
+  

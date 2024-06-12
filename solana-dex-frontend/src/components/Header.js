@@ -1,3 +1,5 @@
+// src/components/Header.js
+
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
@@ -15,10 +17,10 @@ const Header = () => {
   return (
     <header>
       <div className="main-nav">
-        <h1>Solana DEX</h1>
+        <h1><Link to="/trade">Solana DEX</Link></h1> {/* Wrap the logo/Dex name with Link */}
         <nav>
           <ul>
-            <li><Link to="/trade" className={`main-link ${location.pathname === '/trade' ? 'active' : ''}`}>Trade</Link></li>
+            <li><Link to="/trade" className={`main-link ${isTradePage ? 'active' : ''}`}>Trade</Link></li>
             <li><Link to="/portfolio" className={location.pathname === '/portfolio' ? 'active' : ''}>Portfolio</Link></li>
             <li><Link to="/trading-dashboard" className={location.pathname === '/trading-dashboard' ? 'active' : ''}>Trading Dashboard</Link></li>
           </ul>

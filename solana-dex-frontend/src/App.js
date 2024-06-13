@@ -11,6 +11,8 @@ import ProtectedRoute from './components/ProtectedRoute';
 import './styles/styles.css'; // Ensure the global styles are imported
 import './chartSetup'; // Import the chart setup file
 
+import BalanceChecker from './components/BalanceChecker'; // Import BalanceChecker
+
 // Lazy load components
 const Trade = lazy(() => import('./pages/Trade'));
 const Wallet = lazy(() => import('./pages/Wallet'));
@@ -76,6 +78,7 @@ const App = () => {
                   <Route path="/portfolio-management" element={<ProtectedRoute><PortfolioManagement /></ProtectedRoute>} />
                   <Route path="/customizable-dashboard" element={<ProtectedRoute><CustomizableDashboard /></ProtectedRoute>} /> {/* Fixed import */}
                   <Route path="/example-chart" element={<ExampleChart />} />
+                  <Route path="/balance-checker" element={<BalanceChecker />} /> {/* Add BalanceChecker route */}
                   {/* <Route path="/crypto-prices" element={<CryptoPrices />} /> */}
                 </Routes>
               </Suspense>

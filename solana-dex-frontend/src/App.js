@@ -33,13 +33,12 @@ const InteractiveTutorials = lazy(() => import('./components/InteractiveTutorial
 const SocialTrading = lazy(() => import('./components/SocialTrading'));
 const PortfolioManagement = lazy(() => import('./components/PortfolioManagement'));
 const ExampleChart = lazy(() => import('./components/ExampleChart'));
-// const CryptoPrices = lazy(() => import('./components/CryptoPrices'));
 const LimitOrder = lazy(() => import('./components/LimitOrder'));
-const StopLoss = lazy(() => import('./components/StopLoss'));
 const DCA = lazy(() => import('./components/DCA'));
-const Perps = lazy(() => import('./components/Perps')); // New Perps component
-const CustomizableDashboard = lazy(() => import('./components/CustomizableDashboard')); // Ensure this is imported
+const Perps = lazy(() => import('./components/Perps'));
+const CustomizableDashboard = lazy(() => import('./components/CustomizableDashboard'));
 const TokenSwap = lazy(() => import('./components/TokenSwap'));
+const TokenSniper = lazy(() => import('./pages/TokenSniper')); // Corrected import path
 
 const App = () => {
   return (
@@ -56,11 +55,10 @@ const App = () => {
                   <Route path="/swap" element={<TokenSwap />} />
                   <Route path="/trade" element={<Trade />} />
                   <Route path="/limit-order" element={<LimitOrder />} />
-                  <Route path="/stop-loss" element={<StopLoss />} />
                   <Route path="/dca" element={<DCA />} />
-                  <Route path="/perps" element={<Perps />} /> {/* New Perps route */}
+                  <Route path="/perps" element={<Perps />} />
                   <Route path="/wallet" element={<Wallet />} />
-                  <Route path="/portfolio" element={<PortfolioPage />} /> {/* Updated from Dashboard to Portfolio */}
+                  <Route path="/portfolio" element={<PortfolioPage />} />
                   <Route path="/profile" element={<ProtectedRoute><UserProfile /></ProtectedRoute>} />
                   <Route path="/news" element={<News />} />
                   <Route path="/transactions" element={<ProtectedRoute><TransactionHistory /></ProtectedRoute>} />
@@ -76,9 +74,10 @@ const App = () => {
                   <Route path="/interactive-tutorials" element={<ProtectedRoute><InteractiveTutorials /></ProtectedRoute>} />
                   <Route path="/social-trading" element={<ProtectedRoute><SocialTrading /></ProtectedRoute>} />
                   <Route path="/portfolio-management" element={<ProtectedRoute><PortfolioManagement /></ProtectedRoute>} />
-                  <Route path="/customizable-dashboard" element={<ProtectedRoute><CustomizableDashboard /></ProtectedRoute>} /> {/* Fixed import */}
+                  <Route path="/customizable-dashboard" element={<ProtectedRoute><CustomizableDashboard /></ProtectedRoute>} />
                   <Route path="/example-chart" element={<ExampleChart />} />
                   <Route path="/balance-checker" element={<BalanceChecker />} /> {/* Add BalanceChecker route */}
+                  <Route path="/token-sniper" element={<TokenSniper />} /> {/* Add TokenSniper route */}
                   {/* <Route path="/crypto-prices" element={<CryptoPrices />} /> */}
                 </Routes>
               </Suspense>

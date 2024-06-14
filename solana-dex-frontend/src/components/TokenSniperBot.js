@@ -14,6 +14,8 @@ const TokenSniperBot = () => {
   const [profitMultiplier, setProfitMultiplier] = useState('');
   const [snipeBudget, setSnipeBudget] = useState('');
   const [transactionHistory, setTransactionHistory] = useState([]);
+  const [pooledFunds, setPooledFunds] = useState(0);
+  const [snipeType, setSnipeType] = useState('individual'); // New state for snipe type
 
   useEffect(() => {
     const fetchNewTokens = async () => {
@@ -42,6 +44,9 @@ const TokenSniperBot = () => {
       setTimeout(() => {
         setSnipeStatus(`Successfully sniped ${token.name}!`);
         setTransactionHistory([...transactionHistory, { ...token, date: new Date() }]);
+        if (snipeType === 'pool') {
+          setPooledFunds(prev => prev + parseFloat(snipeBudget));
+        }
       }, 2000);
     } catch (error) {
       console.error('Error sniping token:', error);
@@ -144,6 +149,13 @@ const TokenSniperBot = () => {
                 />
               )}
             </div>
+            <div className="filter-item">
+              <label>Snipe Type:</label>
+              <select value={snipeType} onChange={(e) => setSnipeType(e.target.value)}>
+                <option value="individual">Individual Snipe</option>
+                <option value="pool">Pool Snipe</option>
+              </select>
+            </div>
           </div>
         )}
         <p>{snipeStatus}</p>
@@ -197,6 +209,10 @@ const TokenSniperBot = () => {
             </li>
           ))}
         </ul>
+      </div>
+      <div className="pooled-funds-container">
+        <h2>Pooled Funds for Sniping</h2>
+        <p>Total Pooled Funds: ${pooledFunds.toFixed(2)}</p>
       </div>
     </div>
   );

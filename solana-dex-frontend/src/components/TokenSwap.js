@@ -27,7 +27,7 @@ const TokenSwap = () => {
   useEffect(() => {
     const fetchTokens = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/api/tokens');
+        const response = await axios.get('https://your-secure-domain.com/api/tokens');
         setTokens(response.data);
       } catch (error) {
         console.error('Error fetching tokens:', error);
@@ -98,7 +98,7 @@ const TokenSwap = () => {
   const handleSwap = async () => {
     setTransactionStatus('Initiating transaction...');
     try {
-      await axios.post('http://localhost:3000/api/swap', {
+      await axios.post('https://your-secure-domain.com/api/swap', {
         fromToken,
         toToken,
         fromAmount,

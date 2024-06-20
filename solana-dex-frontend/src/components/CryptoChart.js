@@ -9,7 +9,7 @@ function CryptoChart({ symbol }) {
     useEffect(() => {
         async function fetchData() {
             try {
-                const response = await fetch('http://localhost:3000/api/tokens');
+                const response = await fetch('http://64.225.16.208:3000/api/tokens');
                 const tokens = await response.json();
                 const token = tokens.find(t => t.symbol === symbol);
 

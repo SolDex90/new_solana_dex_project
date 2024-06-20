@@ -19,7 +19,7 @@ const DCA = () => {
   useEffect(() => {
     const fetchTokens = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/api/tokens');
+        const response = await axios.get('http://64.225.16.208:3000/api/tokens');
         setTokens(response.data);
       } catch (error) {
         console.error('Error fetching tokens:', error);

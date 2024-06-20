@@ -17,6 +17,11 @@ app.get('/api/tokens', async (req, res) => {
   }
 });
 
+// Add the root handler
+app.get('/', (req, res) => {
+  res.send('Hello, World!');
+});
+
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });

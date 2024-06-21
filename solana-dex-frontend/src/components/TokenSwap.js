@@ -24,10 +24,12 @@ const TokenSwap = () => {
   const [slippage, setSlippage] = useState(0.5); // default slippage tolerance
   const [isSlippageModalOpen, setIsSlippageModalOpen] = useState(false);
 
+  const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:3000';
+
   useEffect(() => {
     const fetchTokens = async () => {
       try {
-        const response = await axios.get('https://api.cryptosion.io/api/tokens');
+        const response = await axios.get(`${API_BASE_URL}/api/tokens`);
         setTokens(response.data);
       } catch (error) {
         console.error('Error fetching tokens:', error);
@@ -36,7 +38,7 @@ const TokenSwap = () => {
     };
 
     fetchTokens();
-  }, []);
+  }, [API_BASE_URL]);
 
   const fetchPrices = async (tokenIds) => {
     setLoading(true);
@@ -98,7 +100,7 @@ const TokenSwap = () => {
   const handleSwap = async () => {
     setTransactionStatus('Initiating transaction...');
     try {
-      await axios.post('https://api.cryptosion.io/api/swap', {
+      await axios.post(`${API_BASE_URL}/api/swap`, {
         fromToken,
         toToken,
         fromAmount,

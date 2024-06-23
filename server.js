@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const { combineAndDeduplicateData } = require('./services/tokenService');
+const { combineAndDeduplicateData, placeLimitOrder, placeDCAOrder, placePerpsOrder } = require('./services/tokenService'); // Import the functions
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -49,6 +49,48 @@ app.post('/api/swap', async (req, res) => {
   } catch (error) {
     console.error('Error during swap:', error); // Detailed logging
     res.status(500).json({ error: 'Swap failed', details: error.message });
+  }
+});
+
+// Add the /api/limit-order endpoint
+app.post('/api/limit-order', async (req, res) => {
+  try {
+    const { fromToken, toToken, price, amount } = req.body;
+
+    const orderResult = await placeLimitOrder(fromToken, toToken, price, amount);
+
+    res.json({ message: 'Limit order placed successfully', orderResult });
+  } catch (error) {
+    console.error('Error placing limit order:', error); // Detailed logging
+    res.status(500).json({ error: 'Failed to place limit order', details: error.message });
+  }
+});
+
+// Add the /api/dca-order endpoint
+app.post('/api/dca-order', async (req, res) => {
+  try {
+    const { fromToken, toToken, amount, frequency, interval, numOrders } = req.body;
+
+    const orderResult = await placeDCAOrder(fromToken, toToken, amount, frequency, interval, numOrders);
+
+    res.json({ message: 'DCA order placed successfully', orderResult });
+  } catch (error) {
+    console.error('Error placing DCA order:', error); // Detailed logging
+    res.status(500).json({ error: 'Failed to place DCA order', details: error.message });
+  }
+});
+
+// Add the /api/perps-order endpoint
+app.post('/api/perps-order', async (req, res) => {
+  try {
+    const { fromToken, toToken, price, amount, position, leverage } = req.body;
+
+    const orderResult = await placePerpsOrder(fromToken, toToken, price, amount, position, leverage);
+
+    res.json({ message: 'Perps order placed successfully', orderResult });
+  } catch (error) {
+    console.error('Error placing Perps order:', error); // Detailed logging
+    res.status(500).json({ error: 'Failed to place Perps order', details: error.message });
   }
 });
 

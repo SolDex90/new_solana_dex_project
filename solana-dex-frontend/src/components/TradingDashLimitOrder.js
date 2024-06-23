@@ -108,7 +108,7 @@ const TradingDashLimitOrder = () => {
   return (
     <div className="limit-order-page">
       <div className="limit-order-container">
-        <h2>Limit Order</h2>
+        <h2>Paper Trading</h2> {/* Updated title */}
         {orderStatus && <p>{orderStatus}</p>}
         <div className="limit-order-section">
           <h3>You're Selling</h3>
@@ -168,7 +168,7 @@ const TradingDashLimitOrder = () => {
           </div>
         </div>
         <button onClick={handlePlaceOrder} className="limit-order-button">
-          Place Limit Order
+          Place Paper Trading Order {/* Updated button text */}
         </button>
       </div>
       <div className="limit-order-price-chart-container">

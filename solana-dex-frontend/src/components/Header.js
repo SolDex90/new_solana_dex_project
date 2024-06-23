@@ -11,6 +11,9 @@ const Header = () => {
                       location.pathname === '/limit-order' || 
                       location.pathname === '/dca' || 
                       location.pathname === '/perps';
+  const isEcosystemPage = location.pathname === '/gaming' || 
+                          location.pathname === '/lending' || 
+                          location.pathname === '/music';
 
   return (
     <header>
@@ -22,7 +25,7 @@ const Header = () => {
             <li><Link to="/portfolio" className={location.pathname === '/portfolio' ? 'active' : ''}>Portfolio</Link></li>
             <li><Link to="/trading-dashboard" className={location.pathname === '/trading-dashboard' ? 'active' : ''}>Trading Dashboard</Link></li>
             <li><Link to="/token-sniper" className={location.pathname === '/token-sniper' ? 'active' : ''}>Token Sniper</Link></li>
-            <li><Link to="/gaming" className={location.pathname === '/gaming' ? 'active' : ''}>Gaming</Link></li> {/* New Gaming Link */}
+            <li><Link to="/gaming" className={`main-link ${isEcosystemPage ? 'active' : ''}`}>Ecosystem</Link></li>
           </ul>
         </nav>
         <div className="header-right">
@@ -38,6 +41,17 @@ const Header = () => {
               <li><Link to="/limit-order" className={location.pathname === '/limit-order' ? 'active' : ''}><span className="icon">📊</span> Limit Order <span className="description">Set Your Price</span></Link></li>
               <li><Link to="/dca" className={location.pathname === '/dca' ? 'active' : ''}><span className="icon">⏳</span> DCA <span className="description">Set and Forget</span></Link></li>
               <li><Link to="/perps" className={location.pathname === '/perps' ? 'active' : ''}><span className="icon">💼</span> Perps <span className="description">Perpetual Contracts</span></Link></li>
+            </ul>
+          </nav>
+        </div>
+      )}
+      {isEcosystemPage && (
+        <div className="sub-nav">
+          <nav>
+            <ul>
+              <li><Link to="/gaming" className={location.pathname === '/gaming' ? 'active' : ''}><span className="icon">🎮</span> Gaming</Link></li>
+              <li><Link to="/lending" className={location.pathname === '/lending' ? 'active' : ''}><span className="icon">💸</span> Lending</Link></li>
+              <li><Link to="/music" className={location.pathname === '/music' ? 'active' : ''}><span className="icon">🎵</span> Music</Link></li>
             </ul>
           </nav>
         </div>

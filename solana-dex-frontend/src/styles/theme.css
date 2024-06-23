@@ -1,0 +1,82 @@
+/* Light mode styles */
+body.light {
+    background: linear-gradient(135deg, #1de9b6, #8e24aa) !important; /* Turquoise to purple gradient */
+    color: #333333;
+  }
+  
+  /* Dark mode styles */
+  body.dark {
+    background-color: #1a1a1a;
+    color: #ffffff;
+  }
+  
+  /* Header */
+  body.light .app-header {
+    background-color: #ffffff;
+    color: #333333;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid #cccccc;
+  }
+  
+  body.dark .app-header {
+    background-color: #2a2a2a;
+    color: #ffffff;
+    border-bottom: 1px solid #444444;
+  }
+  
+  /* Theme switcher button */
+  body.light .theme-switcher {
+    background-color: #ffffff;
+    color: #333333;
+    border: 1px solid #cccccc;
+  }
+  
+  body.dark .theme-switcher {
+    background-color: #333333;
+    color: #ffffff;
+    border: 1px solid #444444;
+  }
+  
+  /* Footer */
+  body.light .footer {
+    background-color: #ffffff;
+    color: #333333;
+    border-top: 1px solid #cccccc;
+  }
+  
+  body.dark .footer {
+    background-color: #2a2a2a;
+    color: #ffffff;
+    border-top: 1px solid #444444;
+  }
+  
+  /* Buttons */
+  body.light .button {
+    background-color: #ffffff;
+    color: #333333;
+    border: 1px solid #cccccc;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  body.dark .button {
+    background-color: #333333;
+    color: #ffffff;
+    border: 1px solid #444444;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  }
+  
+  /* Cards */
+  body.light .card {
+    background-color: #ffffff;
+    color: #333333;
+    border: 1px solid #cccccc;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  body.dark .card {
+    background-color: #2a2a2a;
+    color: #ffffff;
+    border: 1px solid #444444;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  }
+  

@@ -1,8 +1,16 @@
 /* Header and Navigation Styles */
 header {
-  background-color: #1f1f1f; /* Slightly lighter dark for header */
-  color: white;
+  color: inherit; /* Inherit color from body */
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Light and Dark Mode Specific Styles */
+body.light header {
+  background: linear-gradient(135deg, #1de9b6, #8e24aa); /* Turquoise to purple gradient for light mode */
+}
+
+body.dark header {
+  background-color: #1f1f1f; /* Slightly lighter dark for header */
 }
 
 .main-nav {
@@ -15,6 +23,7 @@ header {
 header h1 {
   margin: 0;
   font-size: 1.5rem;
+  color: inherit; /* Inherit color from body */
 }
 
 nav ul {
@@ -32,23 +41,34 @@ nav ul li {
 }
 
 nav ul li a {
-  color: #b3b3b3;
+  color: inherit; /* Inherit color from body */
   text-decoration: none;
   font-weight: bold;
-  transition: color 0.3s;
+  transition: color 0.3s; /* Transition for color */
   display: flex;
   flex-direction: column; /* Stack icon and text vertically */
   align-items: center;
+  padding: 0.25rem 0.5rem; /* Add padding for better click area */
+  border-radius: 0.25rem; /* Border radius for smoother look */
 }
 
 nav ul li a:hover,
 nav ul li a:focus {
-  color: #1db954; /* Accent color */
+  color: #1db954; /* Accent color for hover and focus */
   text-decoration: none;
 }
 
+body.light nav ul li a:hover,
+body.light nav ul li a:focus {
+  color: #0d47a1; /* Dark blue accent color for light mode hover and focus */
+}
+
 nav ul li a.active {
-  color: #1db954; /* Accent color */
+  color: #1db954; /* Accent color for active link */
+}
+
+body.light nav ul li a.active {
+  color: #0d47a1; /* Dark blue accent color for light mode active link */
 }
 
 .header-right {
@@ -58,10 +78,17 @@ nav ul li a.active {
 }
 
 .sub-nav {
-  background-color: #1f1f1f; /* Slightly lighter dark for sub-nav */
   padding: 0.5rem 2rem;
   display: flex;
   justify-content: center; /* Center the sub-nav content */
+}
+
+body.light .sub-nav {
+  background: linear-gradient(135deg, #1de9b6, #8e24aa); /* Turquoise to purple gradient for light mode sub-nav */
+}
+
+body.dark .sub-nav {
+  background-color: #1f1f1f; /* Slightly lighter dark for sub-nav */
 }
 
 .sub-nav ul {
@@ -79,7 +106,7 @@ nav ul li a.active {
 }
 
 .sub-nav ul li a {
-  color: #b3b3b3;
+  color: inherit; /* Inherit color from body */
   text-decoration: none;
   display: flex;
   flex-direction: column; /* Stack icon and text vertically */
@@ -89,10 +116,24 @@ nav ul li a.active {
 }
 
 .sub-nav ul li a:hover,
-.sub-nav ul li a:focus,
-.sub-nav ul li a.active {
+.sub-nav ul li a:focus {
   background-color: #1db954; /* Accent color */
   color: white;
+}
+
+body.light .sub-nav ul li a:hover,
+body.light .sub-nav ul li a:focus {
+  background-color: #0d47a1; /* Dark blue accent color for light mode hover and focus */
+}
+
+.sub-nav ul li a.active {
+  background-color: #1db954; /* Background color for active link */
+  color: white; /* Text color for active link */
+}
+
+body.light .sub-nav ul li a.active {
+  background-color: #0d47a1; /* Dark blue accent color for light mode active link */
+  color: white; /* Text color for active link */
 }
 
 .sub-nav ul li a .icon {
@@ -102,5 +143,5 @@ nav ul li a.active {
 
 .sub-nav ul li a .description {
   font-size: 0.8rem;
-  color: #999;
+  color: inherit; /* Inherit color from body */
 }

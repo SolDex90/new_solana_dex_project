@@ -9,7 +9,6 @@
 }
 
 .token-swap {
-  background-color: #1f1f1f;
   padding: 2rem;
   border-radius: 0.5rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -32,7 +31,6 @@
 }
 
 .slippage-label {
-  color: #b3b3b3;
   font-size: 0.8rem;
   margin-bottom: 0.25rem;
 }
@@ -44,19 +42,16 @@
 }
 
 .slippage-value {
-  color: #b3b3b3;
   font-size: 1rem;
 }
 
 .cog-icon {
-  color: #1db954;
   cursor: pointer;
   font-size: 1rem; /* Adjusted size */
 }
 
 .token-swap label {
   display: block;
-  color: #b3b3b3;
   margin-bottom: 0.5rem;
 }
 
@@ -78,11 +73,9 @@
 }
 
 .dropdown-selected {
-  background-color: #121212;
-  color: #e0e0e0;
   padding: 0.5rem;
   border-radius: 0.25rem;
-  border: 1px solid #333;
+  border: 1px solid;
   cursor: pointer;
 }
 
@@ -91,8 +84,6 @@
   top: 100%;
   left: 0;
   right: 0;
-  background-color: #1f1f1f;
-  border: 1px solid #333;
   border-radius: 0.25rem;
   margin-top: 0.5rem;
   max-height: 200px;
@@ -103,20 +94,16 @@
 .dropdown-item {
   padding: 0.5rem;
   cursor: pointer;
-  color: #e0e0e0;
 }
 
 .dropdown-item:hover {
-  background-color: #333;
+  background-color: rgba(0, 0, 0, 0.1);
 }
 
 .amount-input {
   width: 100px;
   padding: 0.5rem;
   border-radius: 0.25rem;
-  border: 1px solid #333;
-  background-color: #121212;
-  color: #e0e0e0;
 }
 
 .flip-button-container {
@@ -127,8 +114,6 @@
 }
 
 .flip-button {
-  background-color: #333;
-  color: #fff;
   border: none;
   border-radius: 50%;
   width: 40px;
@@ -140,14 +125,8 @@
   align-items: center;
 }
 
-.flip-button:hover {
-  background-color: #555;
-}
-
 .token-swap button {
   width: 100%;
-  background-color: #1db954;
-  color: white;
   border: none;
   padding: 0.75rem;
   font-size: 1rem;
@@ -155,18 +134,13 @@
   transition: background-color 0.3s;
 }
 
-.token-swap button:hover {
-  background-color: #1ed760;
-}
-
 .price-chart {
   margin-top: 1rem;
   padding-top: 1rem;
-  border-top: 1px solid #333;
+  border-top: 1px solid;
 }
 
 .refresh-icon {
-  color: #1db954;
   cursor: pointer;
   font-size: 1rem; /* Adjusted size */
 }
@@ -177,10 +151,109 @@
   padding: 0.5rem 0;
 }
 
-.price-token {
+/* Dark Mode Specific Styles */
+body.dark .token-swap {
+  background-color: #1f1f1f;
+}
+
+body.dark .slippage-label,
+body.dark .slippage-value,
+body.dark .token-swap label,
+body.dark .dropdown-selected,
+body.dark .dropdown-item,
+body.dark .amount-input,
+body.dark .price-token,
+body.dark .price-value {
   color: #b3b3b3;
 }
 
-.price-value {
-  color: #e0e0e0;
+body.dark .dropdown-selected,
+body.dark .amount-input {
+  background-color: #121212;
+  border: 1px solid #333;
+}
+
+body.dark .dropdown-menu {
+  background-color: #1f1f1f;
+  border: 1px solid #333;
+}
+
+body.dark .flip-button {
+  background-color: #333;
+  color: #fff;
+}
+
+body.dark .flip-button:hover {
+  background-color: #555;
+}
+
+body.dark .token-swap button {
+  background-color: #1db954;
+  color: white;
+}
+
+body.dark .token-swap button:hover {
+  background-color: #1ed760;
+}
+
+body.dark .price-chart {
+  border-top: 1px solid #333;
+}
+
+body.dark .refresh-icon {
+  color: #1db954;
+}
+
+/* Light Mode Specific Styles */
+body.light .token-swap {
+  background-color: #ffffff; /* Light background for better contrast */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Slightly larger shadow for depth */
+}
+
+body.light .slippage-label,
+body.light .slippage-value,
+body.light .token-swap label,
+body.light .dropdown-selected,
+body.light .dropdown-item,
+body.light .amount-input,
+body.light .price-token,
+body.light .price-value {
+  color: #333333; /* Dark text color */
+}
+
+body.light .dropdown-selected,
+body.light .amount-input {
+  background-color: #f9f9f9; /* Light background */
+  border: 1px solid #cccccc; /* Lighter border */
+}
+
+body.light .dropdown-menu {
+  background-color: #ffffff; /* White background */
+  border: 1px solid #cccccc; /* Lighter border */
+}
+
+body.light .flip-button {
+  background-color: #cccccc; /* Light grey background */
+  color: #333333; /* Dark text color */
+}
+
+body.light .flip-button:hover {
+  background-color: #aaaaaa; /* Slightly darker grey */
+}
+
+body.light .token-swap button {
+  background-color: #1db954; /* Bright green */
+  color: white;
+}
+
+body.light .token-swap button:hover {
+  background-color: #1ed760;
+}
+
+body.light .price-chart {
+  border-top: 1px solid #cccccc; /* Lighter border */
+}
+
+body.light .refresh-icon {
+  color: #1db954; /* Bright green */
 }

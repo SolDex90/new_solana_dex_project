@@ -21,6 +21,7 @@ const Header = () => {
             <li><Link to="/portfolio" className={location.pathname === '/portfolio' ? 'active' : ''}>Portfolio</Link></li>
             <li><Link to="/trading-dashboard" className={location.pathname === '/trading-dashboard' ? 'active' : ''}>Trading Dashboard</Link></li>
             <li><Link to="/token-sniper" className={location.pathname === '/token-sniper' ? 'active' : ''}>Token Sniper</Link></li>
+            <li><Link to="/gaming" className={location.pathname === '/gaming' ? 'active' : ''}>Gaming</Link></li> {/* New Gaming Link */}
           </ul>
         </nav>
         <div className="header-right">

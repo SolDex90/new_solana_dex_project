@@ -40,6 +40,7 @@ const Perps = lazy(() => import('./components/Perps'));
 const CustomizableDashboard = lazy(() => import('./components/CustomizableDashboard'));
 const TokenSwap = lazy(() => import('./components/TokenSwap'));
 const TokenSniper = lazy(() => import('./pages/TokenSniper')); // Corrected import path
+const GamingPage = lazy(() => import('./pages/GamingPage')); // Import the new GamingPage component
 
 const App = () => {
   return (
@@ -79,6 +80,7 @@ const App = () => {
                   <Route path="/example-chart" element={<ExampleChart />} />
                   <Route path="/balance-checker" element={<BalanceChecker />} /> {/* Add BalanceChecker route */}
                   <Route path="/token-sniper" element={<TokenSniper />} /> {/* Add TokenSniper route */}
+                  <Route path="/gaming" element={<GamingPage />} /> {/* Add GamingPage route */}
                   {/* <Route path="/crypto-prices" element={<CryptoPrices />} /> */}
                 </Routes>
               </Suspense>

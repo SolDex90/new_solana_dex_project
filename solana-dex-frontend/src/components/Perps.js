@@ -21,7 +21,7 @@ const PerpsOrder = () => {
   useEffect(() => {
     const fetchTokens = async () => {
       try {
-        const response = await axios.get('http://64.225.16.208:3000/api/tokens');
+        const response = await axios.get('https://api.cryptosion.io/api/tokens');
         setTokens(response.data);
       } catch (error) {
         console.error('Error fetching tokens:', error);
@@ -69,7 +69,7 @@ const PerpsOrder = () => {
   const handlePlaceOrder = async () => {
     setOrderStatus('Placing order...');
     try {
-      await axios.post('http://64.225.16.208:3000/api/perps-order', {
+      await axios.post('https://api.cryptosion.io/api/perps-order', {
         fromToken,
         toToken,
         price,

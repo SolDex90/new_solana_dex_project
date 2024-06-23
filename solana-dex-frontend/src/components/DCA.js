@@ -19,7 +19,7 @@ const DCA = () => {
   useEffect(() => {
     const fetchTokens = async () => {
       try {
-        const response = await axios.get('http://64.225.16.208:3000/api/tokens');
+        const response = await axios.get('https://api.cryptosion.io/api/tokens');
         setTokens(response.data);
       } catch (error) {
         console.error('Error fetching tokens:', error);
@@ -40,9 +40,24 @@ const DCA = () => {
     fetchSolToUsdcRate();
   }, [fromToken]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     console.log('DCA strategy submitted:', { fromToken, toToken, amount, frequency, interval, numOrders });
+
+    try {
+      await axios.post('https://api.cryptosion.io/api/dca-order', {
+        fromToken,
+        toToken,
+        amount,
+        frequency,
+        interval,
+        numOrders,
+      });
+      setOrderStatus('DCA order placed successfully!');
+    } catch (error) {
+      console.error('Error placing DCA order:', error);
+      setOrderStatus('Failed to place DCA order. Please try again.');
+    }
   };
 
   const handleSelectToken = (token, type) => {

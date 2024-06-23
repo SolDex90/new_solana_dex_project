@@ -255,5 +255,5 @@ body.light .price-chart {
 }
 
 body.light .refresh-icon {
-  color: #1db954; /* Bright green */
+  color: #000000; /* Black color in light mode */
 }

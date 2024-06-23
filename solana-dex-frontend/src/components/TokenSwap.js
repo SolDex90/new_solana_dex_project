@@ -30,7 +30,16 @@ const TokenSwap = () => {
     const fetchTokens = async () => {
       try {
         const response = await axios.get(`${API_BASE_URL}/api/tokens`);
-        setTokens(response.data);
+        console.log('Tokens API response:', response.data);
+
+        // Check if the response is an array or object
+        const tokenData = Array.isArray(response.data) ? response.data : response.data.tokens;
+        
+        if (!Array.isArray(tokenData)) {
+          throw new Error('Expected an array of tokens but received something else');
+        }
+
+        setTokens(tokenData);
       } catch (error) {
         console.error('Error fetching tokens:', error);
         setError('Failed to fetch tokens');

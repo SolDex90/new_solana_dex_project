@@ -206,7 +206,7 @@ body.dark .refresh-icon {
 
 /* Light Mode Specific Styles */
 body.light .token-swap {
-  background-color: #ffffff; /* Light background for better contrast */
+  background: linear-gradient(135deg, #1de9b6, #8e24aa) !important; /* Turquoise to purple gradient */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Slightly larger shadow for depth */
 }
 

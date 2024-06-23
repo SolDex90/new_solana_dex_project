@@ -18,18 +18,37 @@ app.get('/api/tokens', async (req, res) => {
   }
 });
 
+// Define performSwap function
+const performSwap = async (fromToken, toToken, fromAmount, toAmount, slippage) => {
+  try {
+    // Simulate a successful swap logic for demonstration purposes
+    const swapResult = {
+      fromToken,
+      toToken,
+      fromAmount,
+      toAmount,
+      slippage,
+      timestamp: new Date(),
+    };
+    // Add your actual swap logic here, e.g., interacting with a smart contract
+    return swapResult;
+  } catch (error) {
+    console.error('Error in performSwap:', error); // Detailed logging
+    throw new Error('Swap execution failed');
+  }
+};
+
 // Add the /api/swap endpoint
 app.post('/api/swap', async (req, res) => {
   try {
     const { fromToken, toToken, fromAmount, toAmount, slippage } = req.body;
 
-    // Assuming you have a performSwap function that handles the swap logic
     const swapResult = await performSwap(fromToken, toToken, fromAmount, toAmount, slippage);
 
     res.json({ message: 'Swap successful', swapResult });
   } catch (error) {
-    console.error('Error during swap:', error);
-    res.status(500).json({ error: 'Swap failed' });
+    console.error('Error during swap:', error); // Detailed logging
+    res.status(500).json({ error: 'Swap failed', details: error.message });
   }
 });
 

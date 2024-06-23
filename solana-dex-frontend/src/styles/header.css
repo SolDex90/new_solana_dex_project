@@ -142,20 +142,26 @@ body.dark .sub-nav {
 
 .sub-nav ul li a:hover,
 .sub-nav ul li a:focus {
-  background-color: #1e88e5; /* Bright blue color used for the swap button */
+  background-color: #39FF14; /* Neon green color for dark mode hover and focus */
   color: white; /* White text color on hover */
   text-decoration: none; /* Ensure no underline on hover */
 }
 
 body.light .sub-nav ul li a:hover,
 body.light .sub-nav ul li a:focus {
-  background-color: #1e88e5; /* Bright blue color used for the swap button */
+  background-color: #1e88e5; /* Bright blue color for light mode hover and focus */
   color: white; /* White text color on hover */
   text-decoration: none; /* Ensure no underline on hover */
 }
 
 .sub-nav ul li a.active {
   background-color: #1db954; /* Bright green color used for the swap button */
+  color: white; /* Text color for active link */
+  text-decoration: none; /* Ensure no underline for active link */
+}
+
+body.dark .sub-nav ul li a.active {
+  background-color: #1db954; /* Neon green for active link in dark mode */
   color: white; /* Text color for active link */
   text-decoration: none; /* Ensure no underline for active link */
 }

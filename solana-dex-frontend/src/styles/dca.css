@@ -82,3 +82,16 @@ input[type="number"] {
   padding: 5px;
   border-radius: 5px;
 }
+
+/* Light Mode Specific Styles */
+body.light .card {
+  background: linear-gradient(135deg, #1de9b6, #8e24aa) !important;
+  color: black; /* Ensure text is readable on the new background */
+}
+
+body.light select,
+body.light input[type="number"] {
+  background: linear-gradient(135deg, #1de9b6, #8e24aa) !important;
+  color: black; /* Ensure text is readable on the new background */
+  border: 1px solid #cccccc; /* Lighter border for better visibility */
+}

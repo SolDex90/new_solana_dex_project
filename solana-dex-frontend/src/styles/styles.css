@@ -7,3 +7,4 @@
 @import './token-swap.css';
 @import './charts.css';
 @import './notifications.css';
+@import './theme.css';  /* Added import for theme-specific styles */

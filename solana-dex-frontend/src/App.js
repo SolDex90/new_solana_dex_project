@@ -9,6 +9,7 @@ import ErrorBoundary from './components/ErrorBoundary';
 import { GlobalProvider } from './contexts/GlobalStateContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import './styles/styles.css'; // Ensure the global styles are imported
+import './styles/theme.css'; // Import the theme styles
 import './chartSetup'; // Import the chart setup file
 
 import BalanceChecker from './components/BalanceChecker'; // Import BalanceChecker

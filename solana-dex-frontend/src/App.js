@@ -2,7 +2,6 @@ import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import Header from './components/Header';
 import Footer from './components/Footer';
-import ThemeToggle from './components/ThemeToggle';
 import { ThemeProvider } from './contexts/ThemeContext';
 import WalletProvider from './WalletProvider';
 import ErrorBoundary from './components/ErrorBoundary';
@@ -49,7 +48,6 @@ const App = () => {
         <ThemeProvider>
           <Router>
             <Header />
-            <ThemeToggle />
             <ErrorBoundary>
               <Suspense fallback={<div>Loading...</div>}>
                 <Routes>

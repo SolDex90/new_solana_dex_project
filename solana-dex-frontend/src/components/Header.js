@@ -11,9 +11,7 @@ const Header = () => {
                       location.pathname === '/limit-order' || 
                       location.pathname === '/dca' || 
                       location.pathname === '/perps';
-  const isEcosystemPage = location.pathname === '/gaming' || 
-                          location.pathname === '/lending' || 
-                          location.pathname === '/music';
+  const isEcosystemPage = location.pathname.startsWith('/ecosystem');
 
   return (
     <header>
@@ -25,7 +23,7 @@ const Header = () => {
             <li><Link to="/portfolio" className={location.pathname === '/portfolio' ? 'active' : ''}>Portfolio</Link></li>
             <li><Link to="/trading-dashboard" className={location.pathname === '/trading-dashboard' ? 'active' : ''}>Trading Dashboard</Link></li>
             <li><Link to="/token-sniper" className={location.pathname === '/token-sniper' ? 'active' : ''}>Token Sniper</Link></li>
-            <li><Link to="/gaming" className={`main-link ${isEcosystemPage ? 'active' : ''}`}>Ecosystem</Link></li>
+            <li><Link to="/ecosystem" className={`main-link ${isEcosystemPage ? 'active' : ''}`}>Ecosystem</Link></li> {/* Update this line */}
           </ul>
         </nav>
         <div className="header-right">
@@ -49,9 +47,12 @@ const Header = () => {
         <div className="sub-nav">
           <nav>
             <ul>
-              <li><Link to="/gaming" className={location.pathname === '/gaming' ? 'active' : ''}><span className="icon">🎮</span> Gaming</Link></li>
-              <li><Link to="/lending" className={location.pathname === '/lending' ? 'active' : ''}><span className="icon">💸</span> Lending</Link></li>
-              <li><Link to="/music" className={location.pathname === '/music' ? 'active' : ''}><span className="icon">🎵</span> Music</Link></li>
+              <li><Link to="/ecosystem/gaming" className={location.pathname === '/ecosystem/gaming' ? 'active' : ''}><span className="icon">🎮</span> Gaming</Link></li>
+              <li><Link to="/ecosystem/lending" className={location.pathname === '/ecosystem/lending' ? 'active' : ''}><span className="icon">💸</span> Lending</Link></li>
+              <li><Link to="/ecosystem/music" className={location.pathname === '/ecosystem/music' ? 'active' : ''}><span className="icon">🎵</span> Music</Link></li>
+              <li><Link to="/ecosystem/yield-farming" className={location.pathname === '/ecosystem/yield-farming' ? 'active' : ''}><span className="icon">🌾</span> Yield Farming</Link></li>
+              <li><Link to="/ecosystem/staking" className={location.pathname === '/ecosystem/staking' ? 'active' : ''}><span className="icon">🔒</span> Staking</Link></li>
+              <li><Link to="/ecosystem/liquidity" className={location.pathname === '/ecosystem/liquidity' ? 'active' : ''}><span className="icon">💧</span> Liquidity</Link></li>
             </ul>
           </nav>
         </div>

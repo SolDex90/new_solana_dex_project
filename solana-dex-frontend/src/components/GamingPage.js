@@ -4,9 +4,8 @@ import '../styles/GamingPage.css'; // Ensure this path is correct
 const GamingPage = () => {
   return (
     <div className="gaming-page">
-      <h1>Gaming Section</h1>
-      <p>Welcome to the gaming section! Explore a variety of games listed here.</p>
-      {/* Add content and components for the gaming section */}
+      <h1>Gaming</h1>
+      <p>Welcome to the Gaming section of the Ecosystem.</p>
     </div>
   );
 };

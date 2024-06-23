@@ -39,7 +39,12 @@ const Perps = lazy(() => import('./components/Perps'));
 const CustomizableDashboard = lazy(() => import('./components/CustomizableDashboard'));
 const TokenSwap = lazy(() => import('./components/TokenSwap'));
 const TokenSniper = lazy(() => import('./pages/TokenSniper')); // Corrected import path
-const GamingPage = lazy(() => import('./pages/GamingPage')); // Import the new GamingPage component
+const GamingPage = lazy(() => import('./components/GamingPage')); // Import the new GamingPage component
+const LendingPage = lazy(() => import('./components/LendingPage')); // Import the new LendingPage component
+const MusicPage = lazy(() => import('./components/MusicPage')); // Import the new MusicPage component
+const YieldFarmingPage = lazy(() => import('./components/YieldFarmingPage')); // Import the new YieldFarmingPage component
+const StakingPage = lazy(() => import('./components/StakingPage')); // Import the new StakingPage component
+const LiquidityPage = lazy(() => import('./components/LiquidityPage')); // Import the new LiquidityPage component
 
 const App = () => {
   return (
@@ -79,6 +84,11 @@ const App = () => {
                   <Route path="/balance-checker" element={<BalanceChecker />} /> {/* Add BalanceChecker route */}
                   <Route path="/token-sniper" element={<TokenSniper />} /> {/* Add TokenSniper route */}
                   <Route path="/gaming" element={<GamingPage />} /> {/* Add GamingPage route */}
+                  <Route path="/lending" element={<LendingPage />} /> {/* Add LendingPage route */}
+                  <Route path="/music" element={<MusicPage />} /> {/* Add MusicPage route */}
+                  <Route path="/yield-farming" element={<YieldFarmingPage />} /> {/* Add YieldFarmingPage route */}
+                  <Route path="/staking" element={<StakingPage />} /> {/* Add StakingPage route */}
+                  <Route path="/liquidity" element={<LiquidityPage />} /> {/* Add LiquidityPage route */}
                   {/* <Route path="/crypto-prices" element={<CryptoPrices />} /> */}
                 </Routes>
               </Suspense>

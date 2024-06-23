@@ -15,7 +15,7 @@ const Header = () => {
   return (
     <header>
       <div className="main-nav">
-        <h1><Link to="/trade">Cryptosion</Link></h1> {/* Updated the logo/Dex name */}
+        <h1><Link to="/trade" className="logo-link">Cryptosion</Link></h1> {/* Updated the logo/Dex name */}
         <nav>
           <ul>
             <li><Link to="/trade" className={`main-link ${isTradePage ? 'active' : ''}`}>Trade</Link></li>

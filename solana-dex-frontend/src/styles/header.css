@@ -26,6 +26,11 @@ header h1 {
   color: inherit; /* Inherit color from body */
 }
 
+header h1 a {
+  text-decoration: none; /* Remove underline */
+  color: inherit; /* Inherit color from header h1 */
+}
+
 nav ul {
   list-style: none;
   display: flex;
@@ -42,7 +47,7 @@ nav ul li {
 
 nav ul li a {
   color: inherit; /* Inherit color from body */
-  text-decoration: none;
+  text-decoration: none; /* Remove underline */
   font-weight: bold;
   transition: color 0.3s; /* Transition for color */
   display: flex;
@@ -55,20 +60,23 @@ nav ul li a {
 nav ul li a:hover,
 nav ul li a:focus {
   color: #1db954; /* Accent color for hover and focus */
-  text-decoration: none;
+  text-decoration: none; /* Ensure no underline on hover */
 }
 
 body.light nav ul li a:hover,
 body.light nav ul li a:focus {
   color: #0d47a1; /* Dark blue accent color for light mode hover and focus */
+  text-decoration: none; /* Ensure no underline on hover */
 }
 
 nav ul li a.active {
   color: #1db954; /* Accent color for active link */
+  text-decoration: none; /* Ensure no underline for active link */
 }
 
 body.light nav ul li a.active {
   color: #0d47a1; /* Dark blue accent color for light mode active link */
+  text-decoration: none; /* Ensure no underline for active link */
 }
 
 .header-right {
@@ -124,7 +132,7 @@ body.dark .sub-nav {
 
 .sub-nav ul li a {
   color: inherit; /* Inherit color from body */
-  text-decoration: none;
+  text-decoration: none; /* Remove underline */
   display: flex;
   flex-direction: column; /* Stack icon and text vertically */
   align-items: center;
@@ -135,22 +143,27 @@ body.dark .sub-nav {
 .sub-nav ul li a:hover,
 .sub-nav ul li a:focus {
   background-color: #1db954; /* Accent color */
-  color: white;
+  color: white; /* White text color on hover */
+  text-decoration: none; /* Ensure no underline on hover */
 }
 
 body.light .sub-nav ul li a:hover,
 body.light .sub-nav ul li a:focus {
   background-color: #0d47a1; /* Dark blue accent color for light mode hover and focus */
+  color: white; /* White text color on hover */
+  text-decoration: none; /* Ensure no underline on hover */
 }
 
 .sub-nav ul li a.active {
   background-color: #1db954; /* Background color for active link */
   color: white; /* Text color for active link */
+  text-decoration: none; /* Ensure no underline for active link */
 }
 
 body.light .sub-nav ul li a.active {
   background-color: #0d47a1; /* Dark blue accent color for light mode active link */
   color: white; /* Text color for active link */
+  text-decoration: none; /* Ensure no underline for active link */
 }
 
 .sub-nav ul li a .icon {

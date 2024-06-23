@@ -223,13 +223,17 @@ body.light .price-value {
 
 body.light .dropdown-selected,
 body.light .amount-input {
-  background-color: #f9f9f9; /* Light background */
+  background: linear-gradient(135deg, #1de9b6, #8e24aa); /* Turquoise to purple gradient */
   border: 1px solid #cccccc; /* Lighter border */
 }
 
 body.light .dropdown-menu {
-  background-color: #ffffff; /* White background */
+  background: linear-gradient(135deg, #1de9b6, #8e24aa); /* Turquoise to purple gradient */
   border: 1px solid #cccccc; /* Lighter border */
+}
+
+body.light .dropdown-item {
+  background: linear-gradient(135deg, #1de9b6, #8e24aa); /* Turquoise to purple gradient */
 }
 
 body.light .flip-button {

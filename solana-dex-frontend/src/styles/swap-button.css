@@ -1,0 +1,28 @@
+.flip-button {
+    border: none;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #1e88e5; /* Bright blue */
+    color: black; /* Set the text color to black */
+  }
+  
+  .flip-button:hover {
+    background-color: #1976d2; /* Slightly darker blue on hover */
+    color: black; /* Ensure the text color stays black */
+  }
+  
+  .flip-button svg {
+    fill: none; /* Ensure the SVG icons are filled with black color */
+    stroke: black; /* Set the stroke color to black */
+  }
+  
+  .flip-button svg path {
+    stroke-width: 2;
+  }
+  

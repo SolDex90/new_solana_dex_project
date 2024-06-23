@@ -242,12 +242,12 @@ body.light .flip-button:hover {
 }
 
 body.light .token-swap button {
-  background-color: #1db954; /* Bright green */
+  background-color: #1e88e5; /* Bright blue */
   color: white;
 }
 
 body.light .token-swap button:hover {
-  background-color: #1ed760;
+  background-color: #1976d2; /* Slightly darker blue */
 }
 
 body.light .price-chart {

@@ -1,3 +1,4 @@
+/* Limit Order Styles */
 .limit-order-page {
   display: flex;
   justify-content: space-between;
@@ -101,4 +102,20 @@
 .limit-order-price-chart {
   width: 100%;
   height: 400px;
+}
+
+/* Light Mode Specific Styles */
+body.light .limit-order-container,
+body.light .limit-order-price-chart-container {
+  background: linear-gradient(135deg, #1de9b6, #8e24aa) !important;
+  color: black; /* Ensure text is readable on the new background */
+}
+
+body.light .limit-order-input,
+body.light .limit-order-dropdown-selected,
+body.light .limit-order-dropdown-menu,
+body.light .limit-order-dropdown-search {
+  background: linear-gradient(135deg, #1de9b6, #8e24aa) !important;
+  color: black; /* Ensure text is readable on the new background */
+  border: 1px solid #cccccc; /* Lighter border for better visibility */
 }

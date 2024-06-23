@@ -1,34 +1,33 @@
-/* src/styles/GamingPage.css */
+/* src/components/GamingPage.css */
 
 /* Light mode styles for the gaming page */
 body.light .gaming-page {
-    padding: 20px;
-    background: linear-gradient(135deg, #1de9b6, #8e24aa); /* Turquoise to purple gradient */
-    color: #333333;
-    border: 1px solid #cccccc;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    margin: 20px;
-    border-radius: 8px;
-  }
-  
-  /* Dark mode styles for the gaming page */
-  body.dark .gaming-page {
-    padding: 20px;
-    background-color: #2a2a2a;
-    color: #ffffff;
-    border: 1px solid #444444;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-    margin: 20px;
-    border-radius: 8px;
-  }
-  
-  .gaming-page h1 {
-    font-size: 2em;
-    margin-bottom: 10px;
-  }
-  
-  .gaming-page p {
-    font-size: 1.2em;
-    margin-bottom: 20px;
-  }
-  
+  padding: 20px;
+  background: linear-gradient(135deg, #1de9b6, #8e24aa); /* Turquoise to purple gradient */
+  color: #333333;
+  border: 1px solid #cccccc;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin: 20px;
+  border-radius: 8px;
+}
+
+/* Dark mode styles for the gaming page */
+body.dark .gaming-page {
+  padding: 20px;
+  background-color: #2a2a2a;
+  color: #ffffff;
+  border: 1px solid #444444;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  margin: 20px;
+  border-radius: 8px;
+}
+
+.gaming-page h1 {
+  font-size: 2em;
+  margin-bottom: 10px;
+}
+
+.gaming-page p {
+  font-size: 1.2em;
+  margin-bottom: 20px;
+}

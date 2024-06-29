@@ -12,6 +12,7 @@ const YieldFarmingPage = () => {
     { name: 'SOL/USDT', tvl: '$1,000,000', apr: '12%', volume: '$500,000' },
     { name: 'SOL/USDC', tvl: '$750,000', apr: '10%', volume: '$300,000' },
     { name: 'SOL/BONK', tvl: '$500,000', apr: '15%', volume: '$200,000' },
+    { name: 'SOL/WIF', tvl: '$600,000', apr: '14%', volume: '$250,000' },
   ];
 
   const handleStake = () => {
@@ -42,7 +43,7 @@ const YieldFarmingPage = () => {
     <div className="yield-farming-page">
       <h1>Yield Farming</h1>
       <p>Welcome to the Yield Farming section of the Ecosystem. Stake your tokens and earn rewards!</p>
-      
+
       <div className="pools">
         <h2>Pools</h2>
         <table>
@@ -68,8 +69,8 @@ const YieldFarmingPage = () => {
       </div>
 
       {selectedPool && (
-        <div className="modal">
-          <div className="modal-content">
+        <div className="modal" onClick={closeModal}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <span className="close" onClick={closeModal}>&times;</span>
             <h2>{selectedPool.name} - Add Liquidity</h2>
             <input

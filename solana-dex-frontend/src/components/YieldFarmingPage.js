@@ -39,6 +39,17 @@ const YieldFarmingPage = () => {
     setSelectedPool(null);
   };
 
+  const handleModalClick = (e) => {
+    // Prevent closing if the click was inside the modal content
+    e.stopPropagation();
+  };
+
+  const handleOutsideClick = (e) => {
+    if (e.target === e.currentTarget) {
+      closeModal();
+    }
+  };
+
   return (
     <div className="yield-farming-page">
       <h1>Yield Farming</h1>
@@ -69,8 +80,8 @@ const YieldFarmingPage = () => {
       </div>
 
       {selectedPool && (
-        <div className="modal" onClick={closeModal}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-overlay" onClick={handleOutsideClick}>
+          <div className="modal" onClick={handleModalClick}>
             <span className="close" onClick={closeModal}>&times;</span>
             <h2>{selectedPool.name} - Add Liquidity</h2>
             <input

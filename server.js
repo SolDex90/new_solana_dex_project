@@ -2,17 +2,24 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const { Keypair } = require('@solana/web3.js');
-const { combineAndDeduplicateData, placeLimitOrder, placeDCAOrder, placePerpsOrder } = require('./services/tokenService'); // Import the functions
+const { combineAndDeduplicateData, placeLimitOrder, placeDCAOrder, placePerpsOrder } = require('./services/tokenService');
 
 // Load keypair from environment variables
-const keypairData = JSON.parse(process.env.MY_DEX_PROJECT_PRIVATE_KEY);
+let keypairData;
+try {
+    keypairData = JSON.parse(process.env.MY_DEX_PROJECT_PRIVATE_KEY);
+} catch (error) {
+    console.error('Invalid JSON format for MY_DEX_PROJECT_PRIVATE_KEY:', error.message);
+    process.exit(1);
+}
+
 const keypair = Keypair.fromSecretKey(new Uint8Array(keypairData));
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(cors());
-app.use(express.json()); // Ensure JSON parsing is enabled
+app.use(express.json());
 
 app.get('/api/tokens', async (req, res) => {
   try {
@@ -24,10 +31,8 @@ app.get('/api/tokens', async (req, res) => {
   }
 });
 
-// Define performSwap function
 const performSwap = async (fromToken, toToken, fromAmount, toAmount, slippage) => {
   try {
-    // Simulate a successful swap logic for demonstration purposes
     const swapResult = {
       fromToken,
       toToken,
@@ -36,15 +41,13 @@ const performSwap = async (fromToken, toToken, fromAmount, toAmount, slippage) =
       slippage,
       timestamp: new Date(),
     };
-    // Add your actual swap logic here, e.g., interacting with a smart contract
     return swapResult;
   } catch (error) {
-    console.error('Error in performSwap:', error); // Detailed logging
+    console.error('Error in performSwap:', error);
     throw new Error('Swap execution failed');
   }
 };
 
-// Add the /api/swap endpoint
 app.post('/api/swap', async (req, res) => {
   try {
     const { fromToken, toToken, fromAmount, toAmount, slippage } = req.body;
@@ -53,12 +56,11 @@ app.post('/api/swap', async (req, res) => {
 
     res.json({ message: 'Swap successful', swapResult });
   } catch (error) {
-    console.error('Error during swap:', error); // Detailed logging
+    console.error('Error during swap:', error);
     res.status(500).json({ error: 'Swap failed', details: error.message });
   }
 });
 
-// Add the /api/limit-order endpoint
 app.post('/api/limit-order', async (req, res) => {
   try {
     const { fromToken, toToken, price, amount } = req.body;
@@ -67,12 +69,11 @@ app.post('/api/limit-order', async (req, res) => {
 
     res.json({ message: 'Limit order placed successfully', orderResult });
   } catch (error) {
-    console.error('Error placing limit order:', error); // Detailed logging
+    console.error('Error placing limit order:', error);
     res.status(500).json({ error: 'Failed to place limit order', details: error.message });
   }
 });
 
-// Add the /api/dca-order endpoint
 app.post('/api/dca-order', async (req, res) => {
   try {
     const { fromToken, toToken, amount, frequency, interval, numOrders } = req.body;
@@ -81,12 +82,11 @@ app.post('/api/dca-order', async (req, res) => {
 
     res.json({ message: 'DCA order placed successfully', orderResult });
   } catch (error) {
-    console.error('Error placing DCA order:', error); // Detailed logging
+    console.error('Error placing DCA order:', error);
     res.status(500).json({ error: 'Failed to place DCA order', details: error.message });
   }
 });
 
-// Add the /api/perps-order endpoint
 app.post('/api/perps-order', async (req, res) => {
   try {
     const { fromToken, toToken, price, amount, position, leverage } = req.body;
@@ -95,12 +95,11 @@ app.post('/api/perps-order', async (req, res) => {
 
     res.json({ message: 'Perps order placed successfully', orderResult });
   } catch (error) {
-    console.error('Error placing Perps order:', error); // Detailed logging
+    console.error('Error placing Perps order:', error);
     res.status(500).json({ error: 'Failed to place Perps order', details: error.message });
   }
 });
 
-// Add the root handler
 app.get('/', (req, res) => {
   res.send('Hello, World!');
 });

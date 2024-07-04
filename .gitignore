@@ -24,3 +24,4 @@ deploy_log.txt
 my_dex_project-keypair.json
 target/deploy/my_dex_project-keypair.json
 new_solana_dex_project/my_dex_project-keypair.json
+.env

@@ -1,3 +1,4 @@
+# General patterns
 .anchor
 .DS_Store
 target
@@ -9,4 +10,14 @@ WSL2-Linux-Kernel/
 perf.data
 perf.data.old
 flamegraph.svg
+
+# Environment files
 .env
+
+# Keypair files
+*.keypair.json
+
+# Log files
+*.log
+build_log.txt
+deploy_log.txt

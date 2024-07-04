@@ -1,6 +1,12 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const { Keypair } = require('@solana/web3.js');
 const { combineAndDeduplicateData, placeLimitOrder, placeDCAOrder, placePerpsOrder } = require('./services/tokenService'); // Import the functions
+
+// Load keypair from environment variables
+const keypairData = JSON.parse(process.env.MY_DEX_PROJECT_PRIVATE_KEY);
+const keypair = Keypair.fromSecretKey(new Uint8Array(keypairData));
 
 const app = express();
 const PORT = process.env.PORT || 3000;

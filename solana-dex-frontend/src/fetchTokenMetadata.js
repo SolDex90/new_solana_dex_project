@@ -1,8 +1,11 @@
 import axios from 'axios';
 
+// Ensure the environment variables are loaded
+require('dotenv').config();
+
 export const fetchTokenMetadata = async () => {
   try {
-    const apiKey = '7707fff5284b4debbdc6487845ea9218';
+    const apiKey = process.env.REACT_APP_BIRDEYE_API_KEY; // Fetching API key from environment variable
     const headers = {
       'X-API-KEY': apiKey,
       'x-chain': 'solana'

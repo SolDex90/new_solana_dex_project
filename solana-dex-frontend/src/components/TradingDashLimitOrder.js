@@ -173,16 +173,16 @@ const TradingDashLimitOrder = () => {
       </div>
       <div className="limit-order-price-chart-container">
         <div className="timeframe-buttons">
-          <button onClick={() => setTimeframe('1m')}>1m</button>
-          <button onClick={() => setTimeframe('5m')}>5m</button>
-          <button onClick={() => setTimeframe('15m')}>15m</button>
-          <button onClick={() => setTimeframe('30m')}>30m</button>
-          <button onClick={() => setTimeframe('1h')}>1h</button>
-          <button onClick={() => setTimeframe('4h')}>4h</button>
+          <button onClick={() => setTimeframe('1')}>1m</button>
+          <button onClick={() => setTimeframe('5')}>5m</button>
+          <button onClick={() => setTimeframe('15')}>15m</button>
+          <button onClick={() => setTimeframe('30')}>30m</button>
+          <button onClick={() => setTimeframe('60')}>1h</button>
+          <button onClick={() => setTimeframe('240')}>4h</button>
           <button onClick={() => setTimeframe('1d')}>1d</button>
           <button onClick={() => setTimeframe('1w')}>1w</button>
         </div>
-        <TradingViewChart data={chartData} setSellPrice={setPrice} />
+        <TradingViewChart interval={timeframe} symbol={'Wrapped SOL'} data={chartData} setSellPrice={setPrice} />
       </div>
     </div>
   );

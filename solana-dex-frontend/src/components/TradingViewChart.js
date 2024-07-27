@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { datafeed } from '../utils/datafeed';
 
 const TradingViewChart = ({ symbol, interval }) => {
   const containerRef = useRef(null);
@@ -18,11 +19,12 @@ const TradingViewChart = ({ symbol, interval }) => {
         enable_publishing: false,
         allow_symbol_change: true,
         hideideas: true,
+        datafeed
       });
     }
   }, [symbol, interval]);
 
-  return <div id={`tradingview_${symbol}`} ref={containerRef} style={{ height: '400px' }} />;
+  return <div id={`tradingview_Chart`} ref={containerRef} style={{ height: '400px' }} />;
 };
 
 export default TradingViewChart;

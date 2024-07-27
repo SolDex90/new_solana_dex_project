@@ -185,7 +185,7 @@ const PerpsOrder = () => {
           <button onClick={() => setTimeframe('1d')}>1d</button>
           <button onClick={() => setTimeframe('1w')}>1w</button>
         </div>
-        <TradingViewChart data={chartData} setSellPrice={setPrice} />
+        <TradingViewChart interval={timeframe} symbol={'Wrapped SOL'} data={chartData} setSellPrice={setPrice} />
       </div>
     </div>
   );

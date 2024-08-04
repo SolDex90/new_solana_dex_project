@@ -3,6 +3,8 @@ import axios from 'axios';
 import Dropdown from './Dropdown';
 import TradingViewChart from './TradingViewChart';
 import '../styles/limit-order.css';
+import { Connection, VersionedTransaction, Keypair } from '@solana/web3.js';
+import bs58 from 'bs58';  // If using a local wallet
 import { fetchChartData } from '../fetchChartData'; // Adjust the import path if necessary
 
 const LimitOrder = () => {
@@ -17,6 +19,7 @@ const LimitOrder = () => {
   const [prices, setPrices] = useState({});
   const [chartData, setChartData] = useState([]);
 
+  // Fetch tokens
   useEffect(() => {
     const fetchTokens = async () => {
       try {
@@ -27,10 +30,10 @@ const LimitOrder = () => {
         setOrderStatus('Failed to fetch tokens');
       }
     };
-
     fetchTokens();
   }, []);
 
+  // Fetch prices whenever fromToken, toToken, or price changes
   useEffect(() => {
     const fetchPrices = async () => {
       try {
@@ -49,12 +52,10 @@ const LimitOrder = () => {
         setOrderStatus('Failed to fetch prices');
       }
     };
-
-    if (fromToken && toToken) {
-      fetchPrices();
-    }
+    fetchPrices();
   }, [fromToken, toToken, price]);
 
+  // Load chart data whenever toToken changes
   useEffect(() => {
     const loadChartData = async () => {
       try {
@@ -65,23 +66,48 @@ const LimitOrder = () => {
         setOrderStatus('Failed to fetch chart data');
       }
     };
-
     loadChartData();
   }, [toToken]);
 
+  // Handle placing the order
   const handlePlaceOrder = async () => {
-    setOrderStatus('Placing order...');
+    setOrderStatus('Fetching the best route...');
     try {
-      await axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/limit-order`, {
-        fromToken,
-        toToken,
-        price,
-        amount,
+      const connection = new Connection('https://api.mainnet-beta.solana.com');
+      const walletPrivateKey = 'YOUR_WALLET_PRIVATE_KEY'; // Replace with your actual wallet private key
+      const wallet = Keypair.fromSecretKey(bs58.decode(walletPrivateKey));
+
+      // Fetch the best swap route from Jupiter
+      const quoteResponse = await axios.get(
+        `https://quote-api.jup.ag/v6/quote?inputMint=${fromToken}&outputMint=${toToken}&amount=${amount}&slippageBps=50`
+      );
+      if (!quoteResponse.data || quoteResponse.data.length === 0) {
+        setOrderStatus('No available route found.');
+        return;
+      }
+
+      setOrderStatus('Route found. Preparing transaction...');
+
+      // Prepare the swap transaction
+      const transactionResponse = await axios.post('https://quote-api.jup.ag/v6/swap', {
+        quoteResponse: quoteResponse.data,
+        userPublicKey: wallet.publicKey.toString(),
+        orderType: 'limit', // Specify it's a limit order
+        price, // Set the desired price for the limit order
       });
-      setOrderStatus('Order placed successfully!');
+
+      const transaction = VersionedTransaction.deserialize(
+        Buffer.from(transactionResponse.data.swapTransaction, 'base64')
+      );
+
+      transaction.sign([wallet]);
+      const txid = await connection.sendRawTransaction(transaction.serialize());
+
+      await connection.confirmTransaction(txid);
+      setOrderStatus(`Limit order placed successfully! Transaction ID: ${txid}`);
     } catch (error) {
-      console.error('Error placing order:', error);
-      setOrderStatus('Failed to place order. Please try again.');
+      console.error('Error during order placement:', error);
+      setOrderStatus('Order placement failed. Please try again.');
     }
   };
 
@@ -152,16 +178,6 @@ const LimitOrder = () => {
               type="number"
               value={totalUSDC}
               readOnly
-              className="limit-order-input"
-            />
-          </div>
-          <div className="limit-order-input-group">
-            <label>Buy {toToken} at </label>
-            <input
-              type="number"
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
-              placeholder="Enter price"
               className="limit-order-input"
             />
           </div>

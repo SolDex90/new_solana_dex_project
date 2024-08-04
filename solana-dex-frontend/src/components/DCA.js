@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Dropdown from './Dropdown';
 import '../styles/dca.css';
+import { Connection, VersionedTransaction, Keypair } from '@solana/web3.js';
+import bs58 from 'bs58';
 
 const DCA = () => {
   const [tokens, setTokens] = useState([]);
@@ -45,18 +47,67 @@ const DCA = () => {
     console.log('DCA strategy submitted:', { fromToken, toToken, amount, frequency, interval, numOrders });
 
     try {
-      await axios.post('https://api.cryptosion.io/api/dca-order', {
-        fromToken,
-        toToken,
-        amount,
-        frequency,
-        interval,
-        numOrders,
-      });
-      setOrderStatus('DCA order placed successfully!');
+      const connection = new Connection('https://api.mainnet-beta.solana.com');
+      const walletPrivateKey = 'YOUR_WALLET_PRIVATE_KEY'; // Replace with your actual wallet private key
+      const wallet = Keypair.fromSecretKey(bs58.decode(walletPrivateKey));
+
+      setOrderStatus('Fetching best route...');
+
+      const quoteResponse = await axios.get(
+        `https://quote-api.jup.ag/v6/quote?inputMint=${fromToken}&outputMint=${toToken}&amount=${amount}&slippageBps=50`
+      );
+
+      if (!quoteResponse.data || quoteResponse.data.length === 0) {
+        setOrderStatus('No available route found.');
+        return;
+      }
+
+      setOrderStatus('Route found. Preparing transaction...');
+
+      for (let i = 0; i < numOrders; i++) {
+        const transactionResponse = await axios.post('https://quote-api.jup.ag/v6/swap', {
+          quoteResponse: quoteResponse.data,
+          userPublicKey: wallet.publicKey.toString(),
+        });
+
+        const transaction = VersionedTransaction.deserialize(
+          Buffer.from(transactionResponse.data.swapTransaction, 'base64')
+        );
+
+        transaction.sign([wallet]);
+        const rawTransaction = transaction.serialize();
+
+        setTimeout(async () => {
+          try {
+            const txid = await connection.sendRawTransaction(rawTransaction);
+            await connection.confirmTransaction(txid);
+            setOrderStatus(`DCA order ${i + 1} placed successfully! Transaction ID: ${txid}`);
+          } catch (error) {
+            console.error(`Error during DCA order ${i + 1}:`, error);
+            setOrderStatus(`DCA order ${i + 1} failed. Please try again.`);
+          }
+        }, i * intervalToMs(interval, frequency));
+      }
     } catch (error) {
       console.error('Error placing DCA order:', error);
       setOrderStatus('Failed to place DCA order. Please try again.');
+    }
+  };
+
+  const intervalToMs = (interval, frequency) => {
+    switch (frequency) {
+      case 'minute':
+        return interval * 60 * 1000;
+      case 'hour':
+        return interval * 60 * 60 * 1000;
+      case 'daily':
+        return interval * 24 * 60 * 60 * 1000;
+      case 'weekly':
+        return interval * 7 * 24 * 60 * 60 * 1000;
+      case 'monthly':
+        return interval * 30 * 24 * 60 * 60 * 1000;
+      default:
+        return interval * 60 * 1000;
     }
   };
 

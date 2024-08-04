@@ -16,7 +16,6 @@ const LimitOrder = () => {
   const [showToDropdown, setShowToDropdown] = useState(false);
   const [prices, setPrices] = useState({});
   const [chartData, setChartData] = useState([]);
-  const [timeframe, setTimeframe] = useState('15m'); // Default timeframe
 
   useEffect(() => {
     const fetchTokens = async () => {
@@ -59,7 +58,7 @@ const LimitOrder = () => {
   useEffect(() => {
     const loadChartData = async () => {
       try {
-        const data = await fetchChartData(toToken, timeframe);
+        const data = await fetchChartData(toToken, '1d'); // Fetch daily chart data as a default
         setChartData(data);
       } catch (error) {
         console.error('Error fetching chart data:', error);
@@ -68,7 +67,7 @@ const LimitOrder = () => {
     };
 
     loadChartData();
-  }, [toToken, timeframe]);
+  }, [toToken]);
 
   const handlePlaceOrder = async () => {
     setOrderStatus('Placing order...');
@@ -172,16 +171,6 @@ const LimitOrder = () => {
         </button>
       </div>
       <div className="limit-order-price-chart-container">
-        <div className="timeframe-buttons">
-          <button onClick={() => setTimeframe('1m')}>1m</button>
-          <button onClick={() => setTimeframe('5m')}>5m</button>
-          <button onClick={() => setTimeframe('15m')}>15m</button>
-          <button onClick={() => setTimeframe('30m')}>30m</button>
-          <button onClick={() => setTimeframe('1h')}>1h</button>
-          <button onClick={() => setTimeframe('4h')}>4h</button>
-          <button onClick={() => setTimeframe('1d')}>1d</button>
-          <button onClick={() => setTimeframe('1w')}>1w</button>
-        </div>
         <TradingViewChart data={chartData} setSellPrice={setPrice} />
       </div>
     </div>

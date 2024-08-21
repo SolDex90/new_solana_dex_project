@@ -3,6 +3,8 @@ import axios from 'axios';
 import Dropdown from './Dropdown';
 import TradingViewChart from './TradingViewChart';
 import '../styles/limit-order.css';
+import { Connection, VersionedTransaction, Keypair } from '@solana/web3.js';
+import bs58 from 'bs58'; // If using a local wallet
 import { fetchChartData } from '../fetchChartData'; // Adjust the import path if necessary
 
 const LimitOrder = () => {
@@ -16,8 +18,8 @@ const LimitOrder = () => {
   const [showToDropdown, setShowToDropdown] = useState(false);
   const [prices, setPrices] = useState({});
   const [chartData, setChartData] = useState([]);
-  const [timeframe, setTimeframe] = useState('15m'); // Default timeframe
 
+  // Fetch tokens
   useEffect(() => {
     const fetchTokens = async () => {
       try {
@@ -28,61 +30,105 @@ const LimitOrder = () => {
         setOrderStatus('Failed to fetch tokens');
       }
     };
-
     fetchTokens();
   }, []);
 
+  // Fetch prices whenever fromToken, toToken, or price changes
   useEffect(() => {
     const fetchPrices = async () => {
       try {
         const response = await axios.get(`https://price.jup.ag/v6/price?ids=${fromToken},${toToken}`);
-        const pricesData = response.data.data;
+        const pricesData = response.data?.data;
 
-        setPrices({
-          [fromToken]: pricesData[fromToken].price,
-          [toToken]: pricesData[toToken].price,
-        });
-        if (pricesData[fromToken].price && !price) {
-          setPrice(pricesData[fromToken].price);
+        console.log('API response:', pricesData); // Debugging to see the structure of the response
+
+        if (pricesData) {
+          const fromTokenPrice = pricesData[fromToken]?.price;
+          const toTokenPrice = pricesData[toToken]?.price;
+
+          if (fromTokenPrice && toTokenPrice) {
+            setPrices({
+              [fromToken]: fromTokenPrice,
+              [toToken]: toTokenPrice,
+            });
+
+            if (!price) {
+              setPrice(fromTokenPrice);
+            }
+          } else {
+            if (!fromTokenPrice) {
+              console.error(`Price data for ${fromToken} is missing.`);
+            }
+            if (!toTokenPrice) {
+              console.error(`Price data for ${toToken} is missing.`);
+            }
+            setOrderStatus('Failed to fetch prices. Some data is missing.');
+          }
+        } else {
+          console.error('Invalid API response format:', pricesData);
+          setOrderStatus('Failed to fetch prices. Invalid API response.');
         }
       } catch (error) {
         console.error('Error fetching prices:', error);
         setOrderStatus('Failed to fetch prices');
       }
     };
-
-    if (fromToken && toToken) {
-      fetchPrices();
-    }
+    fetchPrices();
   }, [fromToken, toToken, price]);
 
+  // Load chart data whenever toToken changes
   useEffect(() => {
     const loadChartData = async () => {
       try {
-        const data = await fetchChartData(toToken, timeframe);
+        const data = await fetchChartData(toToken, '1d'); // Fetch daily chart data as a default
         setChartData(data);
       } catch (error) {
         console.error('Error fetching chart data:', error);
         setOrderStatus('Failed to fetch chart data');
       }
     };
-
     loadChartData();
-  }, [toToken, timeframe]);
+  }, [toToken]);
 
+  // Handle placing the order
   const handlePlaceOrder = async () => {
-    setOrderStatus('Placing order...');
+    setOrderStatus('Fetching the best route...');
     try {
-      await axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/limit-order`, {
-        fromToken,
-        toToken,
-        price,
-        amount,
+      const connection = new Connection('https://api.mainnet-beta.solana.com');
+      const walletPrivateKey = process.env.REACT_APP_WALLET_PRIVATE_KEY; // Replace with your actual wallet private key
+      const wallet = Keypair.fromSecretKey(bs58.decode(walletPrivateKey));
+
+      // Fetch the best swap route from Jupiter
+      const quoteResponse = await axios.get(
+        `https://quote-api.jup.ag/v6/quote?inputMint=${fromToken}&outputMint=${toToken}&amount=${amount}&slippageBps=50`
+      );
+      if (!quoteResponse.data || quoteResponse.data.length === 0) {
+        setOrderStatus('No available route found.');
+        return;
+      }
+
+      setOrderStatus('Route found. Preparing transaction...');
+
+      // Prepare the swap transaction
+      const transactionResponse = await axios.post('https://quote-api.jup.ag/v6/swap', {
+        quoteResponse: quoteResponse.data,
+        userPublicKey: wallet.publicKey.toString(),
+        orderType: 'limit', // Specify it's a limit order
+        price, // Set the desired price for the limit order
       });
-      setOrderStatus('Order placed successfully!');
+
+      const transaction = VersionedTransaction.deserialize(
+        Buffer.from(transactionResponse.data.swapTransaction, 'base64')
+      );
+
+      transaction.sign([wallet]);
+      const txid = await connection.sendRawTransaction(transaction.serialize());
+
+      await connection.confirmTransaction(txid);
+      setOrderStatus(`Limit order placed successfully! Transaction ID: ${txid}`);
     } catch (error) {
-      console.error('Error placing order:', error);
-      setOrderStatus('Failed to place order. Please try again.');
+      console.error('Error during order placement:', error);
+      setOrderStatus('Order placement failed. Please try again.');
     }
   };
 
@@ -156,32 +202,12 @@ const LimitOrder = () => {
               className="limit-order-input"
             />
           </div>
-          <div className="limit-order-input-group">
-            <label>Buy {toToken} at </label>
-            <input
-              type="number"
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
-              placeholder="Enter price"
-              className="limit-order-input"
-            />
-          </div>
         </div>
         <button onClick={handlePlaceOrder} className="limit-order-button">
           Place Limit Order
         </button>
       </div>
       <div className="limit-order-price-chart-container">
-        <div className="timeframe-buttons">
-          <button onClick={() => setTimeframe('1m')}>1m</button>
-          <button onClick={() => setTimeframe('5m')}>5m</button>
-          <button onClick={() => setTimeframe('15m')}>15m</button>
-          <button onClick={() => setTimeframe('30m')}>30m</button>
-          <button onClick={() => setTimeframe('1h')}>1h</button>
-          <button onClick={() => setTimeframe('4h')}>4h</button>
-          <button onClick={() => setTimeframe('1d')}>1d</button>
-          <button onClick={() => setTimeframe('1w')}>1w</button>
-        </div>
         <TradingViewChart data={chartData} setSellPrice={setPrice} />
       </div>
     </div>

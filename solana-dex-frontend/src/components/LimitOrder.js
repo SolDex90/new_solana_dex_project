@@ -44,7 +44,7 @@ const LimitOrder = () => {
 
         if (pricesData) {
           const fromTokenPrice = pricesData[fromToken]?.price;
-          const toTokenPrice = pricesData[toToken]?.price;
+          const toTokenPrice = toToken === 'USDC' ? 1 : pricesData[toToken]?.price; // Set USDC price to $1 if not available
 
           if (fromTokenPrice && toTokenPrice) {
             setPrices({

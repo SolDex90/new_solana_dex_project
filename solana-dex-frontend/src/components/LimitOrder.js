@@ -3,11 +3,13 @@ import axios from 'axios';
 import Dropdown from './Dropdown';
 import TradingViewChart from './TradingViewChart';
 import '../styles/limit-order.css';
-import { Connection, VersionedTransaction, Keypair } from '@solana/web3.js';
+import { Connection, VersionedTransaction, Keypair, Transaction } from '@solana/web3.js';
 import bs58 from 'bs58'; // If using a local wallet
 import { fetchChartData } from '../fetchChartData'; // Adjust the import path if necessary
+import { useWallet } from '@solana/wallet-adapter-react';
 
 const LimitOrder = () => {
+  const wallet = useWallet();
   const [tokens, setTokens] = useState([]);
   const [fromToken, setFromToken] = useState('SOL');
   const [toToken, setToToken] = useState('USDC');
@@ -18,7 +20,9 @@ const LimitOrder = () => {
   const [showToDropdown, setShowToDropdown] = useState(false);
   const [prices, setPrices] = useState({});
   const [chartData, setChartData] = useState([]);
-
+  const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:3000';
+  const END_POINT = process.env.RPC_END_POINT || 'https://hidden-patient-slug.solana-mainnet.quiknode.pro/d8cb6d9a7b156d44efaca020f46f9196d20bc926';
+  const base = Keypair.generate();
   // Fetch tokens
   useEffect(() => {
     const fetchTokens = async () => {
@@ -92,40 +96,47 @@ const LimitOrder = () => {
 
   // Handle placing the order
   const handlePlaceOrder = async () => {
-    setOrderStatus('Fetching the best route...');
+    if (!wallet){
+      setOrderStatus('Please Connect Wallet!');
+      return;
+    }
     try {
-      const connection = new Connection('https://api.mainnet-beta.solana.com');
-      const walletPrivateKey = process.env.REACT_APP_WALLET_PRIVATE_KEY; // Replace with your actual wallet private key
-      const wallet = Keypair.fromSecretKey(bs58.decode(walletPrivateKey));
-
-      // Fetch the best swap route from Jupiter
-      const quoteResponse = await axios.get(
-        `https://quote-api.jup.ag/v6/quote?inputMint=${fromToken}&outputMint=${toToken}&amount=${amount}&slippageBps=50`
-      );
-      if (!quoteResponse.data || quoteResponse.data.length === 0) {
-        setOrderStatus('No available route found.');
-        return;
-      }
-
-      setOrderStatus('Route found. Preparing transaction...');
-
-      // Prepare the swap transaction
-      const transactionResponse = await axios.post('https://quote-api.jup.ag/v6/swap', {
-        quoteResponse: quoteResponse.data,
-        userPublicKey: wallet.publicKey.toString(),
-        orderType: 'limit', // Specify it's a limit order
-        price, // Set the desired price for the limit order
+      setOrderStatus('initiating transaction...');
+      console.log(process.env.RPC_END_POINT);
+      const connection = new Connection(END_POINT);
+      const walletAddress = wallet.publicKey;
+      const sendingBase = base.publicKey.toString();
+      const res = await axios.post(`${API_BASE_URL}/api/limit-order`,{
+        fromToken,
+        walletAddress,
+        amount,
+        totalUSDC,
+        price,
+        toToken,
+        sendingBase,
       });
+      
+      setOrderStatus('Sending transaction...');
+      const tx = res.data.orderResult.tx;
+      const transactionBuf = Buffer.from(tx, 'base64');
+      var transaction = Transaction.from(transactionBuf);
+      const signedTransaction = await wallet.signTransaction(transaction)
+      signedTransaction.partialSign(base);
 
-      const transaction = VersionedTransaction.deserialize(
-        Buffer.from(transactionResponse.data.swapTransaction, 'base64')
-      );
-
-      transaction.sign([wallet]);
-      const txid = await connection.sendRawTransaction(transaction.serialize());
-
-      await connection.confirmTransaction(txid);
-      setOrderStatus(`Limit order placed successfully! Transaction ID: ${txid}`);
+      const latestBlockhash = await connection.getLatestBlockhash();
+      console.log('LATEST BLOCKHASH:', latestBlockhash);
+      
+      const txid = await connection.sendRawTransaction(signedTransaction.serialize(),{
+        skipPreflight:true,
+        maxRetries:2,
+      });
+      await connection.confirmTransaction({
+        blockhash:latestBlockhash,
+        lastValidBlockHeight:latestBlockhash.lastValidBlockHeight,
+        signature:txid
+      })
+      setOrderStatus(`Transaction succeed! Transaction ID: ${txid}`);  
+      console.log(`https://solscan.io/tx/${txid}`);
     } catch (error) {
       console.error('Error during order placement:', error);
       setOrderStatus('Order placement failed. Please try again.');

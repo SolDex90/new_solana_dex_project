@@ -8,6 +8,7 @@
     "@fortawesome/fontawesome-svg-core": "^6.5.2",
     "@fortawesome/free-solid-svg-icons": "^6.5.2",
     "@fortawesome/react-fontawesome": "^0.2.2",
+    "@jup-ag/dca-sdk": "2.3.5",
     "@ledgerhq/devices": "^8.3.0",
     "@ledgerhq/errors": "^6.16.4",
     "@ledgerhq/hw-transport": "^6.30.6",

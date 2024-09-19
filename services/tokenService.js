@@ -1,4 +1,6 @@
 const { Connection } = require('@solana/web3.js');
+const {Token} = require('../models/mintTokenModel');
+const { getMinimumBalanceForRentExemptAccountWithExtensions } = require('@solana/spl-token');
 
 async function fetchWithRetry(url, options = {}, retries = 3) {
   const fetch = (await import('node-fetch')).default;
@@ -41,7 +43,7 @@ async function fetchFromBirdeye() {
 }
 
 async function fetchFromSolanaBlockchain() {
-  const connection = new Connection('https://api.mainnet-beta.solana.com');
+  const connection = new Connection('https://api.devnet.solana.com');
   const tokens = []; // Replace with actual logic
   return tokens;
 }
@@ -83,23 +85,6 @@ async function combineAndDeduplicateData() {
 }
 
 // Define the placeLimitOrder function
-async function placeLimitOrder(fromToken, toToken, price, amount) {
-  try {
-    // Simulate the limit order placement for demonstration purposes
-    const limitOrderResult = {
-      fromToken,
-      toToken,
-      price,
-      amount,
-      timestamp: new Date(),
-    };
-    // Add your actual limit order placement logic here
-    return limitOrderResult;
-  } catch (error) {
-    console.error('Error in placeLimitOrder:', error);
-    throw new Error('Limit order placement failed');
-  }
-}
 
 // Define the placeDCAOrder function
 async function placeDCAOrder(fromToken, toToken, amount, frequency, interval, numOrders) {
@@ -143,4 +128,12 @@ async function placePerpsOrder(fromToken, toToken, price, amount, position, leve
   }
 }
 
-module.exports = { combineAndDeduplicateData, placeLimitOrder, placeDCAOrder, placePerpsOrder };
+async function getMintAddressFromString(symbol) {
+  
+}
+
+exports.getTokenBySymbol = async(symbol)=>{
+  return Token.findOne({symbol:symbol});
+}
+
+module.exports = { combineAndDeduplicateData, placeDCAOrder, placePerpsOrder };

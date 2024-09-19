@@ -28,7 +28,7 @@ const LiquidityPools = () => {
       return;
     }
 
-    const connection = new Connection('https://api.mainnet-beta.solana.com');
+    const connection = new Connection('https://api.devnet.solana.com');
     const poolAddress = new PublicKey(pool.address);
 
     const transaction = new Transaction().add(

@@ -13,7 +13,7 @@ const Staking = () => {
       return;
     }
 
-    const connection = new Connection('https://api.mainnet-beta.solana.com');
+    const connection = new Connection('https://api.devnet.solana.com');
     const stakingAccount = new PublicKey('YOUR_STAKING_ACCOUNT'); // Replace with your staking account
 
     const transaction = new Transaction().add(

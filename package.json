@@ -13,11 +13,14 @@
     "@project-serum/anchor": "^0.26.0",
     "@solana/spl-token": "^0.4.6",
     "@solana/web3.js": "^1.93.1",
+    "axios": "^1.7.7",
     "base58-js": "^2.0.0",
     "bs58": "^5.0.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
-    "express": "^4.19.2"
+    "express": "^4.19.2",
+    "mongodb": "^6.9.0",
+    "mongoose": "^8.6.2"
   },
   "devDependencies": {
     "@types/bn.js": "^5.1.0",

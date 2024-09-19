@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Dropdown from './Dropdown';
+import { useWallet } from '@solana/wallet-adapter-react';
 import '../styles/dca.css';
+import { Connection, sendAndConfirmTransaction } from '@solana/web3.js';
+
 
 const DCA = () => {
   const [tokens, setTokens] = useState([]);
@@ -15,7 +18,7 @@ const DCA = () => {
   const [showFromDropdown, setShowFromDropdown] = useState(false);
   const [showToDropdown, setShowToDropdown] = useState(false);
   const [solToUsdc, setSolToUsdc] = useState(0);
-
+  const wallet = useWallet();
   useEffect(() => {
     const fetchTokens = async () => {
       try {
@@ -42,18 +45,34 @@ const DCA = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('DCA strategy submitted:', { fromToken, toToken, amount, frequency, interval, numOrders });
-
     try {
-      await axios.post('https://api.cryptosion.io/api/dca-order', {
+      const res = await axios.post('https://api.cryptosion.io/api/dca-order', {
         fromToken,
-        toToken,
-        amount,
-        frequency,
-        interval,
-        numOrders,
+        toToken
       });
-      setOrderStatus('DCA order placed successfully!');
+      setOrderStatus('DCA ordering...!');
+      // const connection = new Connection(process.env.RPC_END_POINT);
+      // //const connection = 
+      // const dca =  new MyDCA(connection, Network.DEVNET);
+      // const user = wallet;
+      // const params = {
+      //   payer: user.publicKey,
+      //   user: user.publicKey,
+      //   inAmount: numOrders * amount * Math.pow(10, res.data.orderResult.inputDecimal),
+      //   inAmountPerCycle: amount * Math.pow(10, res.data.orderResult.inputDecimal),
+      //   cycleSecondsApart: frequency,
+      //   inputMint: res.data.orderResult.inputMint,
+      //   outputMint: res.data.orderResult.outputMint,
+      //   minOutAmountPerCycle:null,
+      //   maxOutAmountPerCycle:null,
+      //   startAt:null,
+      // };
+      // const {tx, dcaPubKey} = await dca.createDcaV2(params);
+      
+      // setOrderStatus('Sending DCA order...!');
+      // const txid = await sendAndConfirmTransaction(connection, tx, [wallet, wallet]);
+      // setOrderStatus(`DCA order created: ${txid}`);
+
     } catch (error) {
       console.error('Error placing DCA order:', error);
       setOrderStatus('Failed to place DCA order. Please try again.');
@@ -131,11 +150,11 @@ const DCA = () => {
               required
               style={{ width: '100px' }}
             >
-              <option value="minute">Minute</option>
-              <option value="hour">Hour</option>
-              <option value="daily">Day</option>
-              <option value="weekly">Week</option>
-              <option value="monthly">Month</option>
+              <option value="60">Minute</option>
+              <option value="3600">Hour</option>
+              <option value="86400">Day</option>
+              <option value="604800">Week</option>
+              <option value="77760000">Month</option>
             </select>
           </div>
         </div>

@@ -8,6 +8,10 @@ import Slippage from './Slippage';
 import PriceDisplay from './PriceDisplay';
 import SlippageModal from './SlippageModal';
 import '../styles/token-swap.css';
+import { useWallet } from '@solana/wallet-adapter-react';
+import { VersionedTransaction, Keypair, Connection } from '@solana/web3.js';
+
+
 
 const TokenSwap = () => {
   const [tokens, setTokens] = useState([]);
@@ -23,6 +27,8 @@ const TokenSwap = () => {
   const [transactionStatus, setTransactionStatus] = useState('');
   const [slippage, setSlippage] = useState(0.5); // default slippage tolerance
   const [isSlippageModalOpen, setIsSlippageModalOpen] = useState(false);
+  const wallet = useWallet();
+  
 
   const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:3000';
 
@@ -107,16 +113,37 @@ const TokenSwap = () => {
   };
 
   const handleSwap = async () => {
+    const connection = new Connection('https://hidden-patient-slug.solana-mainnet.quiknode.pro/d8cb6d9a7b156d44efaca020f46f9196d20bc926');
     setTransactionStatus('Initiating transaction...');
+    const walletAddress = wallet.publicKey;
     try {
-      await axios.post(`${API_BASE_URL}/api/swap`, {
+      const res = await axios.post(`${API_BASE_URL}/api/swap`, {
         fromToken,
         toToken,
         fromAmount,
         toAmount,
+        walletAddress,
         slippage
       });
-      setTransactionStatus('Transaction successful!');
+      
+      setTransactionStatus('Signing transaction...');
+      const swapTransaction = res.data.swapResult;
+      const swapTransactionBuf = Buffer.from(swapTransaction,'base64');
+      const transaction = VersionedTransaction.deserialize(swapTransactionBuf);
+      const signTransaction = await wallet.signTransaction(transaction);
+      
+
+      setTransactionStatus('Sending signed transaction to Solana Network');
+      const latestBlockhash = await connection.getLatestBlockhash();
+      console.log('LATEST BLOCKHASH:', latestBlockhash);
+      const txid = await connection.sendRawTransaction(signTransaction.serialize());
+      await connection.confirmTransaction({
+        blockhash:latestBlockhash,
+        lastValidBlockHeight:latestBlockhash.lastValidBlockHeight,
+        signature:txid
+      });  
+      setTransactionStatus(`Transaction succeed! Transaction ID: ${txid}`);  
+      console.log(`https://solscan.io/tx/${txid}`);
     } catch (error) {
       console.error('Error during transaction:', error);
       setTransactionStatus('Transaction failed. Please try again.');

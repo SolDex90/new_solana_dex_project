@@ -9,7 +9,7 @@ export const fetchTokenMetadata = async () => {
     };
 
     const response = await axios.get('https://public-api.birdeye.so/defi/tokenlist', { headers });
-
+  
     if (response.data.success) {
       return response.data.data.tokens;
     } else {

@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Dropdown from './Dropdown';
-import TradingViewChart from './TradingViewChart';
 import '../styles/limit-order.css';
-import { Connection, VersionedTransaction, Keypair, Transaction } from '@solana/web3.js';
-import bs58 from 'bs58'; // If using a local wallet
+import { Connection, Keypair, Transaction } from '@solana/web3.js';
 import { fetchChartData } from '../fetchChartData'; // Adjust the import path if necessary
 import { useWallet } from '@solana/wallet-adapter-react';
 
@@ -20,15 +18,28 @@ const LimitOrder = () => {
   const [showToDropdown, setShowToDropdown] = useState(false);
   const [prices, setPrices] = useState({});
   const [chartData, setChartData] = useState([]);
-  const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:3000';
+  const [inputMintToken, setInputMintToken] = useState([]);
+  const [outputMintToken, setOutputMintToken] = useState([]);
+  const [iframeSrc, setIframeSrc] = useState('https://birdeye.so/tv-widget/So11111111111111111111111111111111111111112/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v?chain=solana&viewMode=base%2Fquote&chartInterval=1D&chartType=AREA&chartTimezone=America%2FLos_Angeles&chartLeftToolbar=show&theme=dark')
+  const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000';
   const END_POINT = process.env.RPC_END_POINT || 'https://hidden-patient-slug.solana-mainnet.quiknode.pro/d8cb6d9a7b156d44efaca020f46f9196d20bc926';
   const base = Keypair.generate();
   // Fetch tokens
   useEffect(() => {
     const fetchTokens = async () => {
       try {
-        const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/tokens`);
+        const response = await axios.get(`${API_BASE_URL}/api/tokens`);
         setTokens(response.data);
+        
+        // Set the mint addresses for the default tokens
+        const fromTokenMint = response.data.find(token => token.symbol === fromToken)?.address;
+        const toTokenMint = response.data.find(token => token.symbol === toToken)?.address;
+        
+        if (fromTokenMint && toTokenMint) {
+          setInputMintToken(fromTokenMint);
+          setOutputMintToken(toTokenMint);
+          setIframeSrc(`https://birdeye.so/tv-widget/${fromTokenMint}/${toTokenMint}?chain=solana&viewMode=base%2Fquote&chartInterval=1D&chartType=AREA&chartTimezone=America%2FLos_Angeles&chartLeftToolbar=show&theme=dark`);
+        }
       } catch (error) {
         console.error('Error fetching tokens:', error);
         setOrderStatus('Failed to fetch tokens');
@@ -43,9 +54,6 @@ const LimitOrder = () => {
       try {
         const response = await axios.get(`https://price.jup.ag/v6/price?ids=${fromToken},${toToken}`);
         const pricesData = response.data?.data;
-
-        console.log('API response:', pricesData); // Debugging to see the structure of the response
-
         if (pricesData) {
           const fromTokenPrice = pricesData[fromToken]?.price;
           const toTokenPrice = toToken === 'USDC' ? 1 : pricesData[toToken]?.price; // Set USDC price to $1 if not available
@@ -93,6 +101,10 @@ const LimitOrder = () => {
     };
     loadChartData();
   }, [toToken]);
+  useEffect(() => {
+    // Update iframeSrc when fromToken or toToken changes
+    setIframeSrc(`https://birdeye.so/tv-widget/${inputMintToken}/${outputMintToken}?chain=solana&viewMode=base%2Fquote&chartInterval=1D&chartType=AREA&chartTimezone=America%2FLos_Angeles&chartLeftToolbar=show&theme=dark`);
+  }, [inputMintToken, outputMintToken]);
 
   // Handle placing the order
   const handlePlaceOrder = async () => {
@@ -102,7 +114,6 @@ const LimitOrder = () => {
     }
     try {
       setOrderStatus('initiating transaction...');
-      console.log(process.env.RPC_END_POINT);
       const connection = new Connection(END_POINT);
       const walletAddress = wallet.publicKey;
       const sendingBase = base.publicKey.toString();
@@ -143,15 +154,22 @@ const LimitOrder = () => {
     }
   };
 
+  //const iframeSrc = `https://birdeye.so/tv-widget/${inputMintToken}/${outputMintToken}?chain=solana&viewMode=base%2Fquote&chartInterval=1D&chartType=AREA&chartTimezone=America%2FLos_Angeles&chartLeftToolbar=show&theme=dark`;
+
   const handleSelectToken = (token, type) => {
     if (type === 'from') {
       setFromToken(token);
       setShowFromDropdown(false);
       setPrice(''); // Reset price when changing fromToken
+      const tokenMint = tokens.find(tokenMint=> tokenMint.symbol === token);
+      setInputMintToken(tokenMint.address);
     } else {
       setToToken(token);
       setShowToDropdown(false);
+      const tokenMint = tokens.find(tokenMint=> tokenMint.symbol === token);
+      setOutputMintToken(tokenMint.address);
     }
+
   };
 
   const handleAmountChange = (e) => {
@@ -169,6 +187,24 @@ const LimitOrder = () => {
         {orderStatus && <p>{orderStatus}</p>}
         <div className="limit-order-section">
           <h3>You're Selling</h3>
+          <div className="limit-order-input-group">
+            <Dropdown
+              tokens={tokens}
+              selectedToken={toToken}
+              onSelectToken={(token) => handleSelectToken(token, 'to')}
+              showDropdown={showToDropdown}
+              setShowDropdown={setShowToDropdown}
+            />
+            <input
+              type="number"
+              value={totalUSDC}
+              readOnly
+              className="limit-order-input"
+            />
+          </div>
+        </div>
+        <div className="limit-order-section">
+          <h3>You're buying</h3>
           <div className="limit-order-input-group">
             <Dropdown
               tokens={tokens}
@@ -196,30 +232,20 @@ const LimitOrder = () => {
             />
           </div>
         </div>
-        <div className="limit-order-section">
-          <h3>You're Buying</h3>
-          <div className="limit-order-input-group">
-            <Dropdown
-              tokens={tokens}
-              selectedToken={toToken}
-              onSelectToken={(token) => handleSelectToken(token, 'to')}
-              showDropdown={showToDropdown}
-              setShowDropdown={setShowToDropdown}
-            />
-            <input
-              type="number"
-              value={totalUSDC}
-              readOnly
-              className="limit-order-input"
-            />
-          </div>
-        </div>
+        
         <button onClick={handlePlaceOrder} className="limit-order-button">
           Place Limit Order
         </button>
       </div>
       <div className="limit-order-price-chart-container">
-        <TradingViewChart data={chartData} setSellPrice={setPrice} />
+      <iframe 
+        width="100%" 
+        height="600" 
+        src={iframeSrc}
+        frameborder="0" 
+        allowfullscreen>
+      </iframe>
+        {/* <TradingViewChart symbol={getTradingSymbol()} interval="1" /> */}
       </div>
     </div>
   );

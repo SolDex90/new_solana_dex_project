@@ -150,10 +150,10 @@ app.post('/api/limit-order', async (req, res) => {
 async function placeDCAOrder(fromToken, toToken) {
   try {
     // Simulate the DCA order placement for demonstration purposes
-    const inputMintTokenData = getMintAddress(fromToken);
+    const inputMintTokenData =await getMintAddress(fromToken);
     const inputMint = inputMintTokenData.address;
     const inputDecimal = inputMintTokenData.decimal;
-    const outputMintTokenData = getMintAddress(toToken);
+    const outputMintTokenData =await getMintAddress(toToken);
     const outputMint = outputMintTokenData.address;
     const outputDecimal = outputMintTokenData.decimal;
 
@@ -174,7 +174,7 @@ app.post('/api/dca-order', async (req, res) => {
     const { fromToken, toToken, amount, frequency, interval, numOrders } = req.body;
 
     const orderResult = await placeDCAOrder(fromToken, toToken);
-
+    console.log('Order Result:',orderResult);
     res.json({ message: 'DCA order placed successfully', orderResult });
   } catch (error) {
     ////console.error('Error placing DCA order:', error);
@@ -187,7 +187,7 @@ app.post('/api/perps-order', async (req, res) => {
     const { fromToken, toToken, price, amount, position, leverage } = req.body;
 
     const orderResult = await placePerpsOrder(fromToken, toToken, price, amount, position, leverage);
-
+    
     res.json({ message: 'Perps order placed successfully', orderResult });
   } catch (error) {
     ////console.error('Error placing Perps order:', error);

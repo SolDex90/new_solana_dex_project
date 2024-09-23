@@ -3,9 +3,8 @@ import axios from 'axios';
 import Dropdown from './Dropdown';
 import '../styles/limit-order.css';
 import { Connection, Keypair, Transaction } from '@solana/web3.js';
-import { fetchChartData } from '../fetchChartData'; // Adjust the import path if necessary
 import { useWallet } from '@solana/wallet-adapter-react';
-
+import { getSymbolFromMint, getDecimalOfMint } from '../utils/apiService';
 const LimitOrder = () => {
   const wallet = useWallet();
   const [tokens, setTokens] = useState([]);
@@ -17,9 +16,11 @@ const LimitOrder = () => {
   const [showFromDropdown, setShowFromDropdown] = useState(false);
   const [showToDropdown, setShowToDropdown] = useState(false);
   const [prices, setPrices] = useState({});
-  const [chartData, setChartData] = useState([]);
   const [inputMintToken, setInputMintToken] = useState([]);
   const [outputMintToken, setOutputMintToken] = useState([]);
+  const [activeTab, setActiveTab] = useState('openOrders'); 
+  const [openOrders, setOpenOrders] = useState([]);
+  const [allVerifiedTokens, setAllVerifiedTokens] = useState([]);
   const [iframeSrc, setIframeSrc] = useState('https://birdeye.so/tv-widget/So11111111111111111111111111111111111111112/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v?chain=solana&viewMode=base%2Fquote&chartInterval=1D&chartType=AREA&chartTimezone=America%2FLos_Angeles&chartLeftToolbar=show&theme=dark')
   const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000';
   const END_POINT = process.env.RPC_END_POINT || 'https://hidden-patient-slug.solana-mainnet.quiknode.pro/d8cb6d9a7b156d44efaca020f46f9196d20bc926';
@@ -30,8 +31,8 @@ const LimitOrder = () => {
       try {
         const response = await axios.get(`${API_BASE_URL}/api/tokens`);
         setTokens(response.data);
-        
-        // Set the mint addresses for the default tokens
+        const res = await axios.get(`https://tokens.jup.ag/tokens?tags=verified`);
+        setAllVerifiedTokens(res.data);
         const fromTokenMint = response.data.find(token => token.symbol === fromToken)?.address;
         const toTokenMint = response.data.find(token => token.symbol === toToken)?.address;
         
@@ -46,8 +47,17 @@ const LimitOrder = () => {
       }
     };
     fetchTokens();
-  }, []);
+  }, [API_BASE_URL, fromToken, toToken]);
+  useEffect(() => {
+    const fetchOrders = async () => {
+      if (wallet.connected && wallet.publicKey) {
+        const orders = await fetchOpenOrders(wallet.publicKey.toString());
+        setOpenOrders(orders);
+      }
+    };
 
+    fetchOrders();
+  }, [wallet.connected, wallet.publicKey]);
   // Fetch prices whenever fromToken, toToken, or price changes
   useEffect(() => {
     const fetchPrices = async () => {
@@ -88,19 +98,6 @@ const LimitOrder = () => {
     fetchPrices();
   }, [fromToken, toToken, price]);
 
-  // Load chart data whenever toToken changes
-  useEffect(() => {
-    const loadChartData = async () => {
-      try {
-        const data = await fetchChartData(toToken, '1d'); // Fetch daily chart data as a default
-        setChartData(data);
-      } catch (error) {
-        console.error('Error fetching chart data:', error);
-        setOrderStatus('Failed to fetch chart data');
-      }
-    };
-    loadChartData();
-  }, [toToken]);
   useEffect(() => {
     // Update iframeSrc when fromToken or toToken changes
     setIframeSrc(`https://birdeye.so/tv-widget/${inputMintToken}/${outputMintToken}?chain=solana&viewMode=base%2Fquote&chartInterval=1D&chartType=AREA&chartTimezone=America%2FLos_Angeles&chartLeftToolbar=show&theme=dark`);
@@ -147,15 +144,56 @@ const LimitOrder = () => {
         signature:txid
       })
       setOrderStatus(`Transaction succeed! Transaction ID: ${txid}`);  
-      console.log(`https://solscan.io/tx/${txid}`);
     } catch (error) {
       console.error('Error during order placement:', error);
       setOrderStatus('Order placement failed. Please try again.');
     }
   };
 
-  //const iframeSrc = `https://birdeye.so/tv-widget/${inputMintToken}/${outputMintToken}?chain=solana&viewMode=base%2Fquote&chartInterval=1D&chartType=AREA&chartTimezone=America%2FLos_Angeles&chartLeftToolbar=show&theme=dark`;
+  const handleCancelOrder = async (orderId)=>{
+    if (!orderId){
+      return
+    }
+    const response = axios.post(`${API_BASE_URL}/api/limit-order`,{
+      orderId: orderId
+    });
+    const connection=  new Connection(END_POINT);
+    const tx = response.data.tx;
+    const transactionBuf = Buffer.from(tx, 'base64');
+      var transaction = Transaction.from(transactionBuf);
+      const signedTransaction = await wallet.signTransaction(transaction)
+      signedTransaction.partialSign(base);
 
+      const latestBlockhash = await connection.getLatestBlockhash();
+      console.log('LATEST BLOCKHASH:', latestBlockhash);
+      
+      const txid = await connection.sendRawTransaction(signedTransaction.serialize(),{
+        skipPreflight:true,
+        maxRetries:2,
+      });
+      await connection.confirmTransaction({
+        blockhash:latestBlockhash,
+        lastValidBlockHeight:latestBlockhash.lastValidBlockHeight,
+        signature:txid
+      })
+  };
+
+  const fetchOpenOrders = async (walletAddress)=>{
+    try {
+      const response = await axios.post(`${API_BASE_URL}/api/limit-order-history`, {
+        walletAddress: walletAddress
+      });
+      return response.data.fetchResult;
+    } catch (error) {
+      console.error('Error fetching open orders:', error);
+      return [];
+    }
+  }
+  //const iframeSrc = `https://birdeye.so/tv-widget/${inputMintToken}/${outputMintToken}?chain=solana&viewMode=base%2Fquote&chartInterval=1D&chartType=AREA&chartTimezone=America%2FLos_Angeles&chartLeftToolbar=show&theme=dark`;
+  const handleTabClick = (tab) => {
+    setActiveTab(tab);
+  };
+  
   const handleSelectToken = (token, type) => {
     if (type === 'from') {
       setFromToken(token);
@@ -171,6 +209,16 @@ const LimitOrder = () => {
     }
 
   };
+  const handleConnectWallet = async () => {
+    try {
+      if (!wallet.connected) {
+        await wallet.connect();
+      }
+    } catch (error) {
+      console.error('Error connecting wallet:', error);
+      setOrderStatus('Failed to connect wallet. Please select a wallet.');
+    }
+  };
 
   const handleAmountChange = (e) => {
     setAmount(e.target.value);
@@ -179,6 +227,44 @@ const LimitOrder = () => {
   const totalUSDC = (amount && price && prices[toToken])
     ? ((amount * price) / prices[toToken]).toFixed(2)
     : '0.00';
+
+  const renderHistoryTable= (orders)=>{
+    const historyData = orders.orderHistory;
+    return historyData.map((history)=>(
+      <tr key = {history.id} >
+        <td style={{display:'none'}}>{history.orderKey}</td>
+        <td>{getSymbolFromMint(history.inputMint, tokens)} ➡️ {getSymbolFromMint( history.outputMint, tokens)}</td>
+        <td>{parseFloat(history.oriInAmount) / Math.pow(10, getDecimalOfMint(history.inputMint, allVerifiedTokens))}{" "}
+          {getSymbolFromMint(history.inputMint, tokens)}
+        </td>
+        <td>{parseFloat(history.oriOutAmount) / Math.pow(10, getDecimalOfMint(history.outputMint, allVerifiedTokens))}{" "}
+          {getSymbolFromMint(history.outputMint, tokens)}
+        </td>
+        <td>{history.createdAt}</td>
+        <td>{history.state}</td>
+      </tr>
+    ));
+  }
+
+  const renderOpenOrdersTable= (orders)=>{
+    const openOrderData = orders.openOrders;
+    if (!openOrderData){
+      return;
+    }
+    return openOrderData.map((history)=>(
+      <tr key = {history.id} >
+        <td style={{display:'none'}}>{history.orderKey}</td>
+        <td>
+          {(parseFloat(history.oriInAmount) / Math.pow(10, getDecimalOfMint(history.inputMint, allVerifiedTokens)))}
+          {" "}  {getSymbolFromMint(history.inputMint, tokens)} ➡️ 
+          {(parseFloat(history.oriOutAmount) / Math.pow(10, getDecimalOfMint(history.outputMint, allVerifiedTokens)))/ (parseFloat(history.oriInAmount) / Math.pow(10, getDecimalOfMint(history.inputMint, allVerifiedTokens)))}
+          {" "} {getSymbolFromMint( history.outputMint, tokens)}
+        </td>
+        <td>{history.expiredAt}</td>
+        <td><button onclick ={handleCancelOrder(history.id)}>Cancel</button></td>
+      </tr>
+    ));
+  }
 
   return (
     <div className="limit-order-page">
@@ -232,21 +318,77 @@ const LimitOrder = () => {
             />
           </div>
         </div>
-        
-        <button onClick={handlePlaceOrder} className="limit-order-button">
-          Place Limit Order
+        <button disabled={!wallet.connected}  onClick={wallet.connected? handlePlaceOrder: handleConnectWallet } className="limit-order-button wallet-adapter-button">
+          {wallet.connected ? 'Place limit order': 'Connect wallet'}
         </button>
+        <div className="tab-container">
+          <div 
+            className={`tab-item ${activeTab === 'openOrders' ? 'active' : ''}`} 
+            onClick={() => handleTabClick('openOrders')}
+          >
+            Open Orders
+          </div>
+          <div 
+            className={`tab-item ${activeTab === 'history' ? 'active' : ''}`} 
+            onClick={() => handleTabClick('history')}
+          >
+            History
+          </div>
+        </div>
+        {wallet.connected? (
+          <div className="tab-content">
+          {activeTab === 'openOrders' && (
+            <div className="order-table">
+              <table>
+                <thead>
+                  <tr>
+                    <th style={{display:'none'}}>Order id</th>
+                    <th>Order Info</th>
+                    <th>Price</th>
+                    <th>Expiry</th>
+                    <th>Filled Size</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {renderOpenOrdersTable(openOrders)}
+                </tbody>
+              </table>
+            </div>
+          )}
+          {activeTab === 'history' && (
+            <div className="order-table">
+              <table>
+                <thead>
+                  <tr>
+                    <th style={{display:'none'}} >Order ID</th>
+                    <th>Pair</th>
+                    <th>Sell</th>
+                    <th>Buy</th>
+                    <th>Date</th>
+                    <th>State</th>
+                    <th style={{display:'none'}}></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {renderHistoryTable(openOrders)}
+                </tbody>
+              </table>
+            </div>
+          )}
+      </div>): (<span>Pease connect wallet</span>) }
       </div>
       <div className="limit-order-price-chart-container">
-      <iframe 
-        width="100%" 
-        height="600" 
-        src={iframeSrc}
-        frameborder="0" 
-        allowfullscreen>
-      </iframe>
-        {/* <TradingViewChart symbol={getTradingSymbol()} interval="1" /> */}
+        <iframe 
+          title='TradingIFrame'
+          width="100%" 
+          height="600" 
+          src={iframeSrc}
+          allowFullScreen>
+        </iframe>
+          {/* <TradingViewChart symbol={getTradingSymbol()} interval="1" /> */}
       </div>
+    
     </div>
   );
 };

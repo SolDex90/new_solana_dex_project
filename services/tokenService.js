@@ -87,7 +87,7 @@ async function combineAndDeduplicateData() {
 // Define the placeLimitOrder function
 
 // Define the placeDCAOrder function
-async function placeDCAOrder(fromToken, toToken, amount, frequency, interval, numOrders) {
+async function placeDCAOrder(fromToken, toToken) {
   try {
     // Simulate the DCA order placement for demonstration purposes
     const dcaOrderResult = {

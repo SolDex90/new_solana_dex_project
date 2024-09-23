@@ -3,8 +3,8 @@ import axios from 'axios';
 import Dropdown from './Dropdown';
 import { useWallet } from '@solana/wallet-adapter-react';
 import '../styles/dca.css';
-import { Connection, Keypair, sendAndConfirmRawTransaction, Transaction,sendAndConfirmTransaction } from '@solana/web3.js';
-import { CloseDCAParams, CreateDCAParamsV2, DCA as MyDCA, DepositParams, WithdrawParams, Network } from '@jup-ag/dca-sdk';
+import { Connection} from '@solana/web3.js';
+import {DCA as MyDCA, Network } from '@jup-ag/dca-sdk';
 
 const DCA = () => {
   const [tokens, setTokens] = useState([]);
@@ -55,7 +55,7 @@ const DCA = () => {
 
     fetchTokens();
     fetchSolToUsdcRate();
-  }, [fromToken]);
+  }, [fromToken, API_BASE_URL, toToken]);
 
   useEffect(() => {
     // Update iframeSrc when fromToken or toToken changes
@@ -88,7 +88,7 @@ const DCA = () => {
         startAt:null,
       };
       console.log(params);
-      const {tx, dcaPubKey} = await dca.createDcaV2(params);
+      const {tx} = await dca.createDcaV2(params);
       console.log(tx);
       const latestBlockHash =await connection.getLatestBlockhash();
       tx.recentBlockhash = latestBlockHash.blockhashblockhash;
@@ -207,11 +207,10 @@ const DCA = () => {
       </div>
       <div className='card small-card'>
         <iframe 
+          title='DCA Trading IFrame'
           width="100%" 
           height="600" 
-          src={iframeSrc}
-          frameborder="0" 
-          allowfullscreen>
+          src={iframeSrc}>
         </iframe>
       </div>
     </div>

@@ -33,3 +33,20 @@ export const postData = async (endpoint, data) => {
     throw error;
   }
 };
+
+export const getMintFromSymbol =  (symbol, tokens) => {
+  const mintAddress = tokens.find(token => token.symbol === symbol)?.address;
+  return mintAddress;
+};
+
+export const getSymbolFromMint =  (mintAddress, tokens) => {
+  const symbol = tokens.find(token => token.address === mintAddress)?.symbol;
+  const symbolString = symbol;
+  return symbolString;
+};
+
+export const getDecimalOfMint = (mintAddress, tokens)=>{
+  const decimal = tokens.find(token=>token.address === mintAddress)?.decimals;
+  console.log("Decimal:", decimal);
+  return decimal;
+};

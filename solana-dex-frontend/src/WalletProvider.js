@@ -6,6 +6,7 @@ import {
 import {
   SolflareWalletAdapter,
   LedgerWalletAdapter,
+  PhantomWalletAdapter
 } from '@solana/wallet-adapter-wallets';
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
 
@@ -17,6 +18,7 @@ const WalletProvider = ({ children }) => {
       // Remove PhantomWalletAdapter if it's registered automatically
       new SolflareWalletAdapter(),
       new LedgerWalletAdapter(),
+      
     ],
     []
   );

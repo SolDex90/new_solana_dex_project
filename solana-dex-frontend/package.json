@@ -20,6 +20,7 @@
     "@solana/wallet-adapter-react": "^0.15.35",
     "@solana/wallet-adapter-react-ui": "^0.9.35",
     "@solana/wallet-adapter-wallets": "^0.19.32",
+    "@solana/web3.js": "1.77.3",
     "axios": "^1.7.2",
     "browserify-zlib": "^0.2.0",
     "bs58": "^5.0.0",
@@ -97,7 +98,8 @@
     "@ledgerhq/errors": "6.16.4",
     "@ledgerhq/hw-transport": "6.30.6",
     "@ledgerhq/hw-transport-webhid": "6.28.6",
-    "@ledgerhq/logs": "6.12.0"
+    "@ledgerhq/logs": "6.12.0",
+    "@solana/web3.js": "1.77.3"
   },
   "engines": {
     "node": ">=16.0.0",

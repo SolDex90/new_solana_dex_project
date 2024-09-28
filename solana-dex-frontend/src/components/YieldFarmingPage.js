@@ -10,14 +10,19 @@ const YieldFarmingPage = () => {
   const [removeLiquidityAmount, setRemoveLiquidityAmount] = useState('');
   const [pools, setPools] = useState([]);
 
-  useEffect(()=>{
-    const fetchPools = async ()=> {
-      const res = axios.get('https://docs-demo.stellar-mainnet.quiknode.pro/liquidity_pools');
-      console.log("Pools:", res);
-    }
+  useEffect(() => {
+    const fetchPools = async () => {
+      try {
+        const res = await axios.get('https://docs-demo.stellar-mainnet.quiknode.pro/liquidity_pools');
+        setPools(res.data); // Assuming that the data is in res.data
+        console.log("Pools:", res.data);
+      } catch (error) {
+        console.error('Error fetching pools:', error);
+      }
+    };
     fetchPools();
-;  });
-  
+  }, []); // Add an empty dependency array to ensure it only runs once
+
   const handleStake = () => {
     // Add logic for staking tokens
   };
@@ -86,6 +91,7 @@ const YieldFarmingPage = () => {
         <div className="modal-overlay" onClick={handleOutsideClick}>
           <div className="modal" onClick={handleModalClick}>
             <span className="close" onClick={closeModal}>&times;</span>
+
             <h2>{selectedPool.name} - Add Liquidity</h2>
             <input
               type="number"

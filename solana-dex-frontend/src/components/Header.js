@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
-import ThemeToggle from './ThemeToggle';
 import '../styles/header.css';
 
 const Header = () => {
@@ -29,7 +28,6 @@ const Header = () => {
         </nav>
         <div className="header-right">
           <WalletMultiButton />
-          <ThemeToggle />
         </div>
       </div>
       {isTradePage && (

@@ -6,13 +6,14 @@ const TradingViewChart = ({ symbol, interval }) => {
   useEffect(() => {
     if (window.TradingView) {
       new window.TradingView.widget({
+        dataSource:"Crypto",
         symbol: symbol,
         interval: interval,
         container_id: containerRef.current.id,
         width: "100%",
-        height: "100%",
-        theme: "light",
-        style: "1",
+        height: "300px",
+        theme: "dark",
+        style: "2",
         locale: "en",
         toolbar_bg: "#f1f3f6",
         enable_publishing: false,
@@ -22,7 +23,7 @@ const TradingViewChart = ({ symbol, interval }) => {
     }
   }, [symbol, interval]);
 
-  return <div id={`tradingview_${symbol}`} ref={containerRef} style={{ height: '400px' }} />;
+  return <div id={`tradingview_0a135`} symbol = {symbol} ref={containerRef} style={{ height: '300px' }} />;
 };
 
 export default TradingViewChart;

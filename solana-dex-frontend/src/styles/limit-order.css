@@ -14,6 +14,9 @@
 }
 
 .limit-order-price-chart-container {
+  display: flex;
+  flex-direction: column;
+  height: 70vh;
   width: 45%;
   padding: 20px;
   background-color: #2c2c2c;
@@ -118,4 +121,107 @@ body.light .limit-order-dropdown-search {
   background: linear-gradient(135deg, #1de9b6, #8e24aa) !important;
   color: black; /* Ensure text is readable on the new background */
   border: 1px solid #cccccc; /* Lighter border for better visibility */
+}
+.tab-container {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 20px;
+}
+
+.tab-item {
+  flex: 1;
+  text-align: center;
+  padding: 10px 0;
+  cursor: pointer;
+  font-weight: bold;
+  color: white;
+  border: 2px solid transparent;
+}
+
+/* .tab-item:hover {
+
+} */
+
+.tab-item.active {
+  border-bottom: 2px solid #3a6df0;
+}
+
+/* Tab content styling */
+.tab-content {
+  margin-top: 20px;
+}
+
+.order-table {
+  margin-top: 20px;
+}
+
+.order-table table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #2b2b2b;
+}
+
+.order-table table th,
+.order-table table td {
+  table-layout: auto;
+  padding: 5px;
+  text-align: left;
+  color: white;
+  border: 1px solid white;
+  white-space:nowrap;
+}
+
+.order-table table th {
+  background-color: #3a3a3a;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.order-table table td {
+  background-color: #242424;
+}
+
+.order-table table tr:hover {
+  background-color: #343434;
+}
+
+td{
+  padding: 8px;
+  word-break: break-word; /* Break long words and wrap text */
+  white-space: normal; /* Allow text to wrap inside cells */
+  vertical-align: top; /* Align content at the top for consistent display */
+  border: 1px solid #ccc; /* Optional: Borders for clarity */
+}
+
+/* Responsive design for mobile */
+@media screen and (max-width: 768px) {
+  .tab-item {
+    font-size: 14px;
+  }
+
+  .order-table table {
+    font-size: 12px;
+  }
+
+  .order-table table th,
+  .order-table table td {
+    padding: 10px;
+  }
+}
+
+/* General button styles, unchanged */
+.limit-order-button {
+  background-color: #3a6df0;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  margin-top: 20px;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+}
+
+.limit-order-button:hover {
+  background-color: #3054d1;
 }

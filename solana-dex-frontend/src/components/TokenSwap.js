@@ -9,7 +9,7 @@ import PriceDisplay from './PriceDisplay';
 import SlippageModal from './SlippageModal';
 import '../styles/token-swap.css';
 import { useWallet } from '@solana/wallet-adapter-react';
-import { VersionedTransaction, Keypair, Connection } from '@solana/web3.js';
+import { VersionedTransaction, Connection } from '@solana/web3.js';
 
 
 
@@ -131,17 +131,17 @@ const TokenSwap = () => {
       const swapTransactionBuf = Buffer.from(swapTransaction,'base64');
       const transaction = VersionedTransaction.deserialize(swapTransactionBuf);
       const signTransaction = await wallet.signTransaction(transaction);
-      
-
       setTransactionStatus('Sending signed transaction to Solana Network');
       const latestBlockhash = await connection.getLatestBlockhash();
-      console.log('LATEST BLOCKHASH:', latestBlockhash);
       const txid = await connection.sendRawTransaction(signTransaction.serialize());
+      
+      setTransactionStatus('Confirming...');
       await connection.confirmTransaction({
         blockhash:latestBlockhash,
         lastValidBlockHeight:latestBlockhash.lastValidBlockHeight,
         signature:txid
-      });  
+      });
+
       setTransactionStatus(`Transaction succeed! Transaction ID: ${txid}`);  
       console.log(`https://solscan.io/tx/${txid}`);
     } catch (error) {

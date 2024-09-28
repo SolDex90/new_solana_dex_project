@@ -1,11 +1,15 @@
-require('dotenv').config();
-
+import { config } from 'dotenv';
 const {MongoClient} = require('mongodb');
 const express = require('express');
 const cors = require('cors');
 const { Keypair } = require('@solana/web3.js');
 const { combineAndDeduplicateData,  placePerpsOrder } = require('./services/tokenService');
 const axios = require('axios');
+
+const client = new MongoClient(process.env.MONGO_CONNECTION_STRING);
+client.connect();
+console.log('db connected');
+const database = client.db('solana_dex');
 
 const getMintAddress = async(symbol)=>{
     try{
@@ -21,4 +25,4 @@ const getMintAddress = async(symbol)=>{
     catch(error){
       console.error("Error occurd getting mint address", error);
     }
-  }
+}

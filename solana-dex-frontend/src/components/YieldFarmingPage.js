@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import '../styles/YieldFarmingPage.css';
 
 const YieldFarmingPage = () => {
@@ -7,14 +8,16 @@ const YieldFarmingPage = () => {
   const [unstakeAmount, setUnstakeAmount] = useState('');
   const [addLiquidityAmount, setAddLiquidityAmount] = useState('');
   const [removeLiquidityAmount, setRemoveLiquidityAmount] = useState('');
+  const [pools, setPools] = useState([]);
 
-  const pools = [
-    { name: 'SOL/USDT', tvl: '$1,000,000', apr: '12%', volume: '$500,000' },
-    { name: 'SOL/USDC', tvl: '$750,000', apr: '10%', volume: '$300,000' },
-    { name: 'SOL/BONK', tvl: '$500,000', apr: '15%', volume: '$200,000' },
-    { name: 'SOL/WIF', tvl: '$600,000', apr: '14%', volume: '$250,000' },
-  ];
-
+  useEffect(()=>{
+    const fetchPools = async ()=> {
+      const res = axios.get('https://docs-demo.stellar-mainnet.quiknode.pro/liquidity_pools');
+      console.log("Pools:", res);
+    }
+    fetchPools();
+;  });
+  
   const handleStake = () => {
     // Add logic for staking tokens
   };

@@ -106,14 +106,15 @@ app.post('/api/swap', async (req, res) => {
 });
 async function placeLimitOrder(fromToken, toToken, price, amount, walletAddress, totalUSDC, sendingBase) {
   try {
-    const inputMintTokenData = await getMintAddress(fromToken);
+    const inputMintTokenData = await getMintAddress(toToken);
     const inputMint = inputMintTokenData.address;
     const inDecimal = inputMintTokenData.decimal
-    const inAmount = amount * Math.pow(10, inDecimal);
-    const outputMintTokenData = await getMintAddress(toToken);
+    
+    const outputMintTokenData = await getMintAddress(fromToken);
     const outputMint = outputMintTokenData.address;
     const outDecimal = outputMintTokenData.decimal;
-    const outAmount =  totalUSDC * Math.pow(10, outDecimal);
+    const inAmount = totalUSDC * Math.pow(10, outDecimal);
+    const outAmount =  amount * Math.pow(10, inDecimal);
     const {data:tx} = await axios.post(`${process.env.JUPITER_LIMIT_ORDER_API_RUL}createOrder`,{
       owner:walletAddress,
       inAmount: inAmount,
@@ -134,6 +135,22 @@ async function placeLimitOrder(fromToken, toToken, price, amount, walletAddress,
   }
 }
 
+app.post('/api/limit-order-history', async (req, res) =>{
+  try{
+    const {walletAddress} = req.body;
+    const response1 = await axios.get(`https://jup.ag/api/limit/v1/openorders?wallet=${walletAddress}`);
+    const response2 = await axios.get(`https://jup.ag/api/limit/v1/orderHistory?wallet=${walletAddress}`);
+    const openOrders = response1.data;
+    const orderHistory = response2.data
+    const fetchResult = {openOrders, orderHistory};
+    res.json({message: 'Open order fetched successfully',fetchResult});
+  }
+  catch (error){
+    console.error('Error fetching order history.', error);
+    res.status(500).json({error:'Failed to place limit orde history', details: error});
+  }
+} );
+
 app.post('/api/limit-order', async (req, res) => {
   try {
     const { fromToken, toToken, price, amount, walletAddress, totalUSDC, sendingBase } = req.body;
@@ -150,10 +167,10 @@ app.post('/api/limit-order', async (req, res) => {
 async function placeDCAOrder(fromToken, toToken) {
   try {
     // Simulate the DCA order placement for demonstration purposes
-    const inputMintTokenData = getMintAddress(fromToken);
+    const inputMintTokenData =await getMintAddress(fromToken);
     const inputMint = inputMintTokenData.address;
     const inputDecimal = inputMintTokenData.decimal;
-    const outputMintTokenData = getMintAddress(toToken);
+    const outputMintTokenData =await getMintAddress(toToken);
     const outputMint = outputMintTokenData.address;
     const outputDecimal = outputMintTokenData.decimal;
 
@@ -174,7 +191,7 @@ app.post('/api/dca-order', async (req, res) => {
     const { fromToken, toToken, amount, frequency, interval, numOrders } = req.body;
 
     const orderResult = await placeDCAOrder(fromToken, toToken);
-
+    console.log('Order Result:',orderResult);
     res.json({ message: 'DCA order placed successfully', orderResult });
   } catch (error) {
     ////console.error('Error placing DCA order:', error);
@@ -187,13 +204,17 @@ app.post('/api/perps-order', async (req, res) => {
     const { fromToken, toToken, price, amount, position, leverage } = req.body;
 
     const orderResult = await placePerpsOrder(fromToken, toToken, price, amount, position, leverage);
-
+    
     res.json({ message: 'Perps order placed successfully', orderResult });
   } catch (error) {
     ////console.error('Error placing Perps order:', error);
     res.status(500).json({ error: 'Failed to place Perps order', details: error.message });
   }
 });
+
+// app.get('/api/all-tokens', async (req, res) => {
+//   const veriviedTokens = await getMintAddress()
+// });
 
 app.get('/', (req, res) => {
   res.send('Hello, World!');

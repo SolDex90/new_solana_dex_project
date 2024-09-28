@@ -1,5 +1,5 @@
 const { Connection } = require('@solana/web3.js');
-const {Token} = require('../models/mintTokenModel');
+const { Token } = require('../models/mintTokenModel');
 const { getMinimumBalanceForRentExemptAccountWithExtensions } = require('@solana/spl-token');
 
 async function fetchWithRetry(url, options = {}, retries = 3) {
@@ -27,6 +27,13 @@ async function fetchWithRetry(url, options = {}, retries = 3) {
 
 async function fetchFromJupiter() {
   const data = await fetchWithRetry('https://price.jup.ag/v6/price?ids=SOL,USDC,USDT');
+  
+  // Check if data exists and contains the expected structure
+  if (!data || !data.data) {
+    console.error('Invalid data from Jupiter API:', data);
+    throw new Error('Failed to fetch valid data from Jupiter API');
+  }
+  
   console.log('Jupiter Data:', data);
   return data;
 }
@@ -38,6 +45,13 @@ async function fetchFromBirdeye() {
     'Content-Type': 'application/json'
   };
   const data = await fetchWithRetry('https://public-api.birdeye.so/defi/tokenlist', { headers });
+  
+  // Check if data exists and contains the expected structure
+  if (!data || !data.data || !data.data.tokens) {
+    console.error('Invalid data from BirdEye API:', data);
+    throw new Error('Failed to fetch valid data from BirdEye API');
+  }
+  
   console.log('BirdEye Data:', data);
   return data;
 }
@@ -49,39 +63,50 @@ async function fetchFromSolanaBlockchain() {
 }
 
 async function combineAndDeduplicateData() {
-  const jupiterTokens = await fetchFromJupiter();
-  const birdeyeTokens = await fetchFromBirdeye();
-  const blockchainTokens = await fetchFromSolanaBlockchain();
+  try {
+    const jupiterTokens = await fetchFromJupiter();
+    const birdeyeTokens = await fetchFromBirdeye();
+    const blockchainTokens = await fetchFromSolanaBlockchain();
 
-  console.log('Jupiter Tokens:', jupiterTokens);
-  console.log('BirdEye Tokens:', birdeyeTokens);
-  console.log('Blockchain Tokens:', blockchainTokens);
+    console.log('Jupiter Tokens:', jupiterTokens);
+    console.log('BirdEye Tokens:', birdeyeTokens);
+    console.log('Blockchain Tokens:', blockchainTokens);
 
-  const jupiterTokensArray = Object.values(jupiterTokens.data).map(token => ({
-    address: token.id,
-    symbol: token.mintSymbol,
-    price: token.price
-  }));
-
-  const birdEyeTokensArray = birdeyeTokens.data.tokens.map(token => ({
-    address: token.address,
-    symbol: token.symbol,
-    price: token.price // Ensure this is the correct field for price
-  }));
-
-  console.log('USDC from Jupiter:', jupiterTokens.data.USDC);
-  console.log('USDC from BirdEye:', birdeyeTokens.data.tokens.find(token => token.symbol === 'USDC'));
-
-  const allTokens = [...jupiterTokensArray, ...birdEyeTokensArray, ...blockchainTokens];
-
-  const uniqueTokens = allTokens.reduce((acc, token) => {
-    if (!acc.find(t => t.address === token.address)) {
-      acc.push(token);
+    // Validate that jupiterTokens.data exists
+    if (!jupiterTokens || !jupiterTokens.data) {
+      console.error('Jupiter tokens data is missing or invalid:', jupiterTokens);
+      return [];
     }
-    return acc;
-  }, []);
 
-  return uniqueTokens;
+    const jupiterTokensArray = Object.values(jupiterTokens.data).map(token => ({
+      address: token.id,
+      symbol: token.mintSymbol,
+      price: token.price
+    }));
+
+    const birdEyeTokensArray = birdeyeTokens.data.tokens.map(token => ({
+      address: token.address,
+      symbol: token.symbol,
+      price: token.price // Ensure this is the correct field for price
+    }));
+
+    console.log('USDC from Jupiter:', jupiterTokens.data.USDC);
+    console.log('USDC from BirdEye:', birdeyeTokens.data.tokens.find(token => token.symbol === 'USDC'));
+
+    const allTokens = [...jupiterTokensArray, ...birdEyeTokensArray, ...blockchainTokens];
+
+    const uniqueTokens = allTokens.reduce((acc, token) => {
+      if (!acc.find(t => t.address === token.address)) {
+        acc.push(token);
+      }
+      return acc;
+    }, []);
+
+    return uniqueTokens;
+  } catch (error) {
+    console.error('Error in combineAndDeduplicateData:', error);
+    throw new Error('Failed to combine and deduplicate data');
+  }
 }
 
 // Define the placeLimitOrder function
@@ -128,12 +153,8 @@ async function placePerpsOrder(fromToken, toToken, price, amount, position, leve
   }
 }
 
-async function getMintAddressFromString(symbol) {
-  
-}
-
-exports.getTokenBySymbol = async(symbol)=>{
+exports.getTokenBySymbol = async(symbol) => {
   return Token.findOne({symbol:symbol});
-}
+};
 
 module.exports = { combineAndDeduplicateData, placeDCAOrder, placePerpsOrder };

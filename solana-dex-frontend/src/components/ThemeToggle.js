@@ -1,14 +1,16 @@
-import React from 'react';
-import { useTheme } from '../contexts/ThemeContext';
+import React, { createContext, useContext } from 'react';
 
-const ThemeToggle = () => {
-  const { theme, toggleTheme } = useTheme();
+const ThemeContext = createContext();
+
+export const useTheme = () => useContext(ThemeContext);
+
+export const ThemeProvider = ({ children }) => {
+  // No need for toggle, always set dark mode
+  const theme = 'dark';
 
   return (
-    <button onClick={toggleTheme} className="theme-switcher">
-      {theme === 'light' ? '🌙' : '☀️'}
-    </button>
+    <ThemeContext.Provider value={{ theme }}>
+      {children}
+    </ThemeContext.Provider>
   );
 };
-
-export default ThemeToggle;

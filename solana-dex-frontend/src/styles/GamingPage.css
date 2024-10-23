@@ -3,7 +3,7 @@
 /* Light mode styles for the gaming page */
 body.light .gaming-page {
   padding: 20px;
-  background: linear-gradient(135deg, #1de9b6, #8e24aa); /* Turquoise to purple gradient */
+  background: linear-gradient(135deg,#00C8FF, #003Fb7); /* Turquoise to purple gradient */
   color: #333333;
   border: 1px solid #cccccc;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);

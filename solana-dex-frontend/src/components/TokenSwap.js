@@ -10,7 +10,7 @@ import SlippageModal from './SlippageModal';
 import '../styles/token-swap.css';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { VersionedTransaction, Connection } from '@solana/web3.js';
-
+import toggle from '../images/toggle.png';
 
 
 const TokenSwap = () => {
@@ -159,60 +159,98 @@ const TokenSwap = () => {
   return (
     <div className="token-swap-container">
       <div className="header">
-        <FaSync className="refresh-icon" onClick={handleRefresh} />
-        <Slippage slippage={slippage} setIsSlippageModalOpen={setIsSlippageModalOpen} />
+        {/* <FaSync className="refresh-icon" onClick={handleRefresh} />
+        <Slippage slippage={slippage} setIsSlippageModalOpen={setIsSlippageModalOpen} /> */}
       </div>
-      <div className="token-swap">
-        {loading && <p>Loading...</p>}
-        {error && <p className="error">{error}</p>}
-        {transactionStatus && <p>{transactionStatus}</p>}
-        <div className="token-swap-inputs">
-          <div className="token-swap-input">
-            <label>From:</label>
-            <div className="input-group">
-              <Dropdown
-                tokens={tokens}
-                selectedToken={fromToken}
-                onSelectToken={(token) => handleSelectToken(token, 'from')}
-                showDropdown={showFromDropdown}
-                setShowDropdown={setShowFromDropdown}
-              />
-              <AmountInput
-                value={fromAmount}
-                onChange={(e) => setFromAmount(e.target.value)}
-                placeholder="Amount"
-              />
+      <div className='token-swap-body'>
+        <div className="token-swap">
+          {loading && <p>Loading...</p>}
+          {error && <p className="error">{error}</p>}
+          {transactionStatus && <p>{transactionStatus}</p>}
+          <div className="token-swap-inputs">
+            <div className="token-swap-input">
+              <label>You're Selling:</label>
+              <div className="input-group">
+                <Dropdown
+                  tokens={tokens}
+                  selectedToken={fromToken}
+                  onSelectToken={(token) => handleSelectToken(token, 'from')}
+                  showDropdown={showFromDropdown}
+                  setShowDropdown={setShowFromDropdown}
+                />
+                <AmountInput
+                  value={fromAmount}
+                  onChange={(e) => setFromAmount(e.target.value)}
+                  placeholder="0.0"
+                />
+              </div>
+            </div>
+            <div className="flip-button-container">
+              {/* <SwapButton onClick={handleFlip} /> */}
+              <div onClick={handleFlip}>
+                <img src={toggle}/>
+              </div> 
+            </div>
+            
+
+            <div className="token-swap-input">
+              <label>You're Buying:</label>
+              <div className="input-group">
+                <Dropdown
+                  tokens={tokens}
+                  selectedToken={toToken}
+                  onSelectToken={(token) => handleSelectToken(token, 'to')}
+                  showDropdown={showToDropdown}
+                  setShowDropdown={setShowToDropdown}
+                />
+                <AmountInput
+                  value={toAmount}
+                  readOnly
+                  placeholder="0.0"
+                />
+              </div>
             </div>
           </div>
-          <div className="flip-button-container">
-            <SwapButton onClick={handleFlip} />
+          <div  className='handle-swap-btn'>
+            <button onClick={handleSwap}>Swap</button>
           </div>
-          <div className="token-swap-input">
-            <label>To:</label>
-            <div className="input-group">
-              <Dropdown
-                tokens={tokens}
-                selectedToken={toToken}
-                onSelectToken={(token) => handleSelectToken(token, 'to')}
-                showDropdown={showToDropdown}
-                setShowDropdown={setShowToDropdown}
-              />
-              <AmountInput
-                value={toAmount}
-                readOnly
-                placeholder="Amount"
-              />
-            </div>
-          </div>
+          <SlippageModal
+            isOpen={isSlippageModalOpen}
+            onRequestClose={() => setIsSlippageModalOpen(false)}
+            slippage={slippage}
+            setSlippage={setSlippage}
+          />
+          <PriceDisplay fromToken={fromToken} toToken={toToken} prices={prices} />
         </div>
-        <button onClick={handleSwap}>Swap</button>
-        <SlippageModal
-          isOpen={isSlippageModalOpen}
-          onRequestClose={() => setIsSlippageModalOpen(false)}
-          slippage={slippage}
-          setSlippage={setSlippage}
-        />
-        <PriceDisplay fromToken={fromToken} toToken={toToken} prices={prices} />
+        <div class="settings-container">
+          <div class="settings-item">
+              <label class="setting-label">
+                  MEV Protection
+                  <span class="info-icon">i</span>
+              </label>
+              <label class="switch">
+                  <input type="checkbox"/>
+                  <span class="slider round"></span>
+              </label>
+          </div>
+          
+          <div class="settings-item">
+              <label class="setting-label">
+                  Slippage Settings
+                  <span class="info-icon">i</span>
+              </label>
+              <div class="slippage-options">
+                <Slippage slippage={slippage} setIsSlippageModalOpen={setIsSlippageModalOpen} />
+              </div>
+          </div>
+
+          <div class="settings-item">
+              <label class="setting-label">Max Slippage:</label>
+              <input type="text" class="slippage-input" value="3%" readonly/>
+          </div>
+
+          <button class="save-btn">Save Settings</button>
+        </div>
       </div>
     </div>
   );

@@ -5,6 +5,7 @@
   "dependencies": {
     "@babel/plugin-syntax-flow": "^7.24.6",
     "@babel/plugin-transform-react-jsx": "^7.24.6",
+    "@fontsource/space-grotesk": "^5.1.0",
     "@fortawesome/fontawesome-svg-core": "^6.5.2",
     "@fortawesome/free-solid-svg-icons": "^6.5.2",
     "@fortawesome/react-fontawesome": "^0.2.2",
@@ -119,5 +120,6 @@
     "webpack": "^5.91.0"
   },
   "main": "index.js",
-  "license": "MIT"
+  "license": "MIT",
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }

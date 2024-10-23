@@ -6,7 +6,7 @@ body.light .budget-container input,
 body.light .filter-widget,
 body.light .filter-item input,
 body.light .filter-item select {
-    background: linear-gradient(135deg, #1de9b6, #8e24aa); /* Turquoise to purple gradient */
+    background: linear-gradient(135deg,#00C8FF, #003Fb7); /* Turquoise to purple gradient */
     color: white;
     border-radius: 8px;
     padding: 20px;
@@ -16,7 +16,7 @@ body.light .filter-item select {
 }
 
 body.light .budget-container input {
-    background: linear-gradient(135deg, #1de9b6, #8e24aa); /* Turquoise to purple gradient */
+    background: linear-gradient(135deg,#00C8FF, #003Fb7); /* Turquoise to purple gradient */
     color: white;
     border-radius: 4px;
     padding: 8px;
@@ -24,7 +24,7 @@ body.light .budget-container input {
 }
 
 body.light .filter-widget {
-    background: linear-gradient(135deg, #1de9b6, #8e24aa); /* Turquoise to purple gradient */
+    background: linear-gradient(135deg,#00C8FF, #003Fb7); /* Turquoise to purple gradient */
     color: white;
     border-radius: 8px;
     padding: 15px;
@@ -33,7 +33,7 @@ body.light .filter-widget {
 
 body.light .filter-item input,
 body.light .filter-item select {
-    background: linear-gradient(135deg, #1de9b6, #8e24aa); /* Turquoise to purple gradient */
+    background: linear-gradient(135deg,#00C8FF, #003Fb7); /* Turquoise to purple gradient */
     color: white;
     border-radius: 4px;
     padding: 8px;

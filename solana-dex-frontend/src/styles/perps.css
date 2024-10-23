@@ -1,7 +1,7 @@
 .perps-page {
-    padding: 20px;
-    background-color: #1e1e1e;
-    color: #fff;
+    display: flex;
+    justify-content: space-between;
+    margin: 50px;
   }
   
   .perps-header {
@@ -9,6 +9,18 @@
     justify-content: space-between;
     align-items: center;
   }
+
+  .perps-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .right-section {
+    display: flex;
+    align-items: center;
+  }
+  
   
   .position-toggle {
     display: flex;
@@ -25,7 +37,7 @@
   }
   
   .position-toggle button.active {
-    background-color: #4caf50;
+    background: linear-gradient(to right, #00C0FF, #003FB7) !important;
   }
   
   .perps-content {
@@ -34,49 +46,67 @@
   }
   
   .perps-container {
-    background-color: #2b2b2b;
+    width: 25%;
     padding: 20px;
+    background-color: #1f1f1fa3;
     border-radius: 8px;
-    flex: 1;
-    min-width: 300px; /* Adjust as needed */
-    margin: 10px;
+    color: white;
   }
   
   .perps-section {
-    margin-bottom: 20px;
+    background-color: #1A1A1A;
+    padding: 20px;
+    margin: 10px 0 10px 0;
+    border-radius: 8px;
+    flex-direction: column;
+    display: flex;
   }
   
   .perps-input-group {
+    align-items: center;
     margin-bottom: 10px;
   }
-  
-  .perps-input {
-    width: 100%;
+
+  .perps-input-group select {
+    background: linear-gradient(to right, #00C0FF, #003FB7) !important;
+    width: 50%;
+    margin-bottom: 10px;
     padding: 10px;
-    margin-top: 5px;
-    background-color: #333;
+    border-radius: 8px;
+  }
+  
+  .perps-input-group .perps-input {
+    width: 100px;
+    padding: 10px;
     border: none;
-    border-radius: 4px;
+    border-radius: 8px;
     color: #fff;
+    margin-left: 20px;
+    background-color: #1f1f1f;
+    border: 1px solid white;
   }
   
   .perps-button {
-    padding: 10px 20px;
-    background-color: #4caf50;
+    padding: 20px;
+    background: linear-gradient(to right, #00C0FF, #003FB7) !important;
     border: none;
-    border-radius: 4px;
+    border-radius: 8px;
     color: #fff;
     cursor: pointer;
     width: 100%;
+    font-size: 16px;
+    font-weight: 700;
   }
   
   .perps-price-chart-container {
-    background-color: #2b2b2b;
+    display: flex;
+    flex-direction: column;
+    height: 70vh;
+    width: 65%;
     padding: 20px;
+    background-color: #1f1f1fa3;
     border-radius: 8px;
-    flex: 2;
-    min-width: 300px; /* Adjust as needed */
-    margin: 10px;
+    color: white;
   }
   
   .timeframe-buttons {

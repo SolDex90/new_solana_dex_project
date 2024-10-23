@@ -2,13 +2,13 @@
 .limit-order-page {
   display: flex;
   justify-content: space-between;
-  margin: 20px;
+  margin: 50px;
 }
 
 .limit-order-container {
-  width: 45%;
+  width: 25%;
   padding: 20px;
-  background-color: #2c2c2c;
+  background-color: #1f1f1fa3;
   border-radius: 8px;
   color: white;
 }
@@ -17,47 +17,84 @@
   display: flex;
   flex-direction: column;
   height: 70vh;
-  width: 45%;
+  width: 65%;
   padding: 20px;
-  background-color: #2c2c2c;
+  background-color: #1f1f1fa3;
   border-radius: 8px;
   color: white;
 }
 
 .limit-order-section {
+  background-color: #1f1f1fa3;
+  border-radius: 12px;
+  padding: 20px;
   margin-bottom: 20px;
+  color: white;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-.limit-order-input-group {
+.limit-order-section-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 10px;
 }
 
-.limit-order-input {
-  flex: 1;
-  margin-left: 10px;
-  padding: 10px;
-  border: 1px solid #4c4c4c;
-  border-radius: 4px;
-  background-color: #1c1c1c;
-  color: white;
+.limit-order-section-header h3 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.right-section {
+  display: flex;
+  align-items: center;
+}
+
+.right-section img {
+  margin-right: 8px;
+}
+
+.balance {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.limit-order-input-group {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.limit-order-input-group .dropdown-container {
+  margin-right: 40px;
+}
+
+.limit-order-input-group label {
+  font-size: 14px;
+  color: #b0b0b0;
+}
+
+.limit-order-limit-price-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.limit-order-limit-price-group input {
+  margin-top: 10px;
 }
 
 .limit-order-button {
+  width: 100%;
   margin-top: 20px;
-  padding: 10px;
+  padding: 12px;
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
   background-color: #00b300;
   color: white;
   cursor: pointer;
 }
 
-.limit-order-button:hover {
-  background-color: #009900;
-}
 
 .limit-order-dropdown-container {
   position: relative;
@@ -110,7 +147,7 @@
 /* Light Mode Specific Styles */
 body.light .limit-order-container,
 body.light .limit-order-price-chart-container {
-  background: linear-gradient(135deg, #1de9b6, #8e24aa) !important;
+  background-color: #1A1A1Af0 !important;
   color: black; /* Ensure text is readable on the new background */
 }
 
@@ -118,10 +155,22 @@ body.light .limit-order-input,
 body.light .limit-order-dropdown-selected,
 body.light .limit-order-dropdown-menu,
 body.light .limit-order-dropdown-search {
-  background: linear-gradient(135deg, #1de9b6, #8e24aa) !important;
+  background: linear-gradient(90deg, #00C8FF, #003Fb7) !important;
   color: black; /* Ensure text is readable on the new background */
   border: 1px solid #cccccc; /* Lighter border for better visibility */
 }
+
+.limit-orders-hisory {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin: 50px;
+  width: 65%;
+  background-color: #1A1A1A;
+  border-radius: 8px;
+}
+
+
 .tab-container {
   display: flex;
   justify-content: flex-start;
@@ -135,7 +184,6 @@ body.light .limit-order-dropdown-search {
   cursor: pointer;
   font-weight: bold;
   color: white;
-  border: 2px solid transparent;
 }
 
 /* .tab-item:hover {
@@ -143,12 +191,14 @@ body.light .limit-order-dropdown-search {
 } */
 
 .tab-item.active {
-  border-bottom: 2px solid #3a6df0;
+  background: linear-gradient(to right, #00C0FF, #003FB7) !important;
+  border-radius: 8px;
 }
 
 /* Tab content styling */
 .tab-content {
   margin-top: 20px;
+  border-radius: 8px;
 }
 
 .order-table {
@@ -211,13 +261,14 @@ td{
 
 /* General button styles, unchanged */
 .limit-order-button {
-  background-color: #3a6df0;
+  background: linear-gradient(to right, #00C0FF, #003FB7) !important;
   color: white;
   padding: 10px 20px;
   border: none;
   cursor: pointer;
   font-size: 16px;
   margin-top: 20px;
+  margin-bottom: 20px;
   border-radius: 5px;
   transition: background-color 0.3s;
 }
@@ -225,3 +276,6 @@ td{
 .limit-order-button:hover {
   background-color: #3054d1;
 }
+
+
+

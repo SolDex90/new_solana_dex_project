@@ -1,0 +1,1887 @@
+diff --git a/solana-dex-frontend/package.json b/solana-dex-frontend/package.json
+index 42b77ff..30606b6 100644
+--- a/solana-dex-frontend/package.json
++++ b/solana-dex-frontend/package.json
+@@ -5,6 +5,7 @@
+   "dependencies": {
+     "@babel/plugin-syntax-flow": "^7.24.6",
+     "@babel/plugin-transform-react-jsx": "^7.24.6",
++    "@fontsource/space-grotesk": "^5.1.0",
+     "@fortawesome/fontawesome-svg-core": "^6.5.2",
+     "@fortawesome/free-solid-svg-icons": "^6.5.2",
+     "@fortawesome/react-fontawesome": "^0.2.2",
+@@ -119,5 +120,6 @@
+     "webpack": "^5.91.0"
+   },
+   "main": "index.js",
+-  "license": "MIT"
++  "license": "MIT",
++  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
+ }
+diff --git a/solana-dex-frontend/src/App.js b/solana-dex-frontend/src/App.js
+index ef97021..bddbdf7 100644
+--- a/solana-dex-frontend/src/App.js
++++ b/solana-dex-frontend/src/App.js
+@@ -10,8 +10,12 @@ import ProtectedRoute from './components/ProtectedRoute';
+ import './styles/styles.css'; // Ensure the global styles are imported
+ import './styles/theme.css'; // Import the theme styles
+ import './chartSetup'; // Import the chart setup file
++import "@fontsource/space-grotesk"; // Defaults to weight 400
++// import "@fontsource/space-grotesk/400.css"; // Specify weight
++// import "@fontsource/space-grotesk/400-italic.css";
+ 
+ import BalanceChecker from './components/BalanceChecker'; // Import BalanceChecker
++import bgVideo from './images/background.mp4';
+ 
+ // Lazy load components
+ const Trade = lazy(() => import('./pages/Trade'));
+@@ -51,6 +55,9 @@ const App = () => {
+     <GlobalProvider>
+       <WalletProvider>
+         <ThemeProvider>
++        <video autoPlay loop muted className="bg-vid">
++          <source src={bgVideo} type="video/mp4" />
++        </video>
+           <Router>
+             <Header />
+             <ErrorBoundary>
+diff --git a/solana-dex-frontend/src/components/DCA.js b/solana-dex-frontend/src/components/DCA.js
+index 3756b39..21abcea 100644
+--- a/solana-dex-frontend/src/components/DCA.js
++++ b/solana-dex-frontend/src/components/DCA.js
+@@ -121,12 +121,19 @@ const DCA = () => {
+ 
+   return (
+     <div className = 'dca-page'>
+-      <div className="card small-card">
+-        <h2>Dollar Cost Averaging (DCA)</h2>
++      <div className='dca-page-section'>
++        <iframe 
++          title='DCA Trading IFrame'
++          width="100%" 
++          height="600" 
++          src={iframeSrc}>
++        </iframe>
++      </div>
++      <div className="dca-page-chart">
+         {orderStatus && <p>{orderStatus}</p>}
+         <form onSubmit={handleSubmit}>
+           <div className="form-group">
+-            <label htmlFor="from-token">I want to sell:</label>
++            <label htmlFor="from-token">I Want To Allocate</label>
+             <div className="inline-fields">
+               <Dropdown
+                 tokens={tokens}
+@@ -141,17 +148,16 @@ const DCA = () => {
+                 id="amount"
+                 value={amount}
+                 onChange={(e) => setAmount(e.target.value)}
+-                placeholder="Amount to Invest"
++                placeholder="0.2"
++                min={0}
++                step={0.1}
+                 required
+-                style={{ marginLeft: '10px', width: '100px' }}
++                style={{ marginLeft: '10px', width: '100px',  padding: '10px', marginTop: '10px' }}
+               />
+-              <span style={{ marginLeft: '10px', color: '#bbb' }}>
+-                ≈ ${equivalentUsdc}
+-              </span>
+             </div>
+           </div>
+           <div className="form-group">
+-            <label htmlFor="to-token">To buy:</label>
++            <label htmlFor="to-token">To buy</label>
+             <Dropdown
+               tokens={tokens}
+               selectedToken={toToken}
+@@ -170,7 +176,7 @@ const DCA = () => {
+                 value={interval}
+                 onChange={(e) => setInterval(e.target.value)}
+                 required
+-                style={{ marginRight: '10px', width: '50px' }}
++                style={{ marginRight: '10px', width: '50px', color: 'white' }}
+               />
+               <select
+                 id="frequency"
+@@ -196,22 +202,13 @@ const DCA = () => {
+                 value={numOrders}
+                 onChange={(e) => setNumOrders(e.target.value)}
+                 required
+-                style={{ marginRight: '10px', width: '50px' }}
++                style={{ marginRight: '10px', width: '50px', color: 'white' }}
+               />
+               <span>orders</span>
+             </div>
+           </div>
+           <button type="submit">Start DCA</button>
+         </form>
+-        
+-      </div>
+-      <div className='card small-card'>
+-        <iframe 
+-          title='DCA Trading IFrame'
+-          width="100%" 
+-          height="600" 
+-          src={iframeSrc}>
+-        </iframe>
+       </div>
+     </div>
+   );
+diff --git a/solana-dex-frontend/src/components/Footer.js b/solana-dex-frontend/src/components/Footer.js
+index d0f1dd4..097f773 100644
+--- a/solana-dex-frontend/src/components/Footer.js
++++ b/solana-dex-frontend/src/components/Footer.js
+@@ -2,7 +2,7 @@ import React from 'react';
+ 
+ const Footer = () => {
+   return (
+-    <footer>
++    <footer style={{color:'white', textAlign:'center', padding: '10px'}}>
+       <p>&copy; 2024 Solana DEX. All rights reserved.</p>
+     </footer>
+   );
+diff --git a/solana-dex-frontend/src/components/Header.js b/solana-dex-frontend/src/components/Header.js
+index ad14a0b..b9d9389 100644
+--- a/solana-dex-frontend/src/components/Header.js
++++ b/solana-dex-frontend/src/components/Header.js
+@@ -3,6 +3,9 @@ import { Link, useLocation } from 'react-router-dom';
+ import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
+ import ThemeToggle from './ThemeToggle';
+ import '../styles/header.css';
++import logo from '../images/cryptosionLogo.png';
++import setting from '../images/setting.png';
++import clock from '../images/clock.png';
+ 
+ const Header = () => {
+   const location = useLocation();
+@@ -15,50 +18,67 @@ const Header = () => {
+   const isEcosystemPage = location.pathname.startsWith('/ecosystem');
+ 
+   return (
+-    <header>
+-      <div className="main-nav">
+-        <h1><Link to="/trade" className="logo-link">Cryptosion</Link></h1>
+-        <nav>
+-          <ul>
+-            <li><Link to="/trade" className={`main-link ${isTradePage ? 'active' : ''}`}>Trade</Link></li>
+-            <li><Link to="/portfolio" className={location.pathname === '/portfolio' ? 'active' : ''}>Portfolio</Link></li>
+-            <li><Link to="/trading-dashboard" className={location.pathname === '/trading-dashboard' ? 'active' : ''}>Trading Dashboard</Link></li>
+-            <li><Link to="/token-sniper" className={location.pathname === '/token-sniper' ? 'active' : ''}>Token Sniper</Link></li>
+-            <li><Link to="/ecosystem" className={`main-link ${isEcosystemPage ? 'active' : ''}`}>Ecosystem</Link></li>
+-          </ul>
+-        </nav>
+-        <div className="header-right">
+-          <WalletMultiButton />
+-          <ThemeToggle />
+-        </div>
+-      </div>
+-      {isTradePage && (
+-        <div className="sub-nav">
+-          <nav>
+-            <ul>
+-              <li><Link to="/swap" className={location.pathname === '/swap' ? 'active' : ''}><span className="icon">🔄</span> Swap <span className="description">The Best Price</span></Link></li>
+-              <li><Link to="/limit-order" className={location.pathname === '/limit-order' ? 'active' : ''}><span className="icon">📊</span> Limit Order <span className="description">Set Your Price</span></Link></li>
+-              <li><Link to="/dca" className={location.pathname === '/dca' ? 'active' : ''}><span className="icon">⏳</span> DCA <span className="description">Set and Forget</span></Link></li>
+-              <li><Link to="/perps" className={location.pathname === '/perps' ? 'active' : ''}><span className="icon">💼</span> Perps <span className="description">Perpetual Contracts</span></Link></li>
+-              <li><Link to="/yield-farming" className={location.pathname === '/yield-farming' ? 'active' : ''}><span className="icon">🌾</span> Yield Farming</Link></li>
+-            </ul>
+-          </nav>
+-        </div>
+-      )}
+-      {isEcosystemPage && (
+-        <div className="sub-nav">
++    <>
++      <header>
++        <div className="main-nav">
++          <div className='header-logo'>
++            <img src={logo}/>
++            <h1><Link to="/trade" className="logo-link">Cryptosion</Link></h1>
++          </div>
+           <nav>
+             <ul>
+-              <li><Link to="/ecosystem/gaming" className={location.pathname === '/ecosystem/gaming' ? 'active' : ''}><span className="icon">🎮</span> Gaming</Link></li>
+-              <li><Link to="/ecosystem/lending" className={location.pathname === '/ecosystem/lending' ? 'active' : ''}><span className="icon">💸</span> Lending</Link></li>
+-              <li><Link to="/ecosystem/music" className={location.pathname === '/ecosystem/music' ? 'active' : ''}><span className="icon">🎵</span> Music</Link></li>
+-              <li><Link to="/ecosystem/staking" className={location.pathname === '/ecosystem/staking' ? 'active' : ''}><span className="icon">🔒</span> Staking</Link></li>
+-              <li><Link to="/ecosystem/liquidity" className={location.pathname === '/ecosystem/liquidity' ? 'active' : ''}><span className="icon">💧</span> Liquidity</Link></li>
++              <li><Link to="/trade" className={`main-link ${isTradePage ? 'active' : ''}`}>Trade</Link></li>
++              <li><Link to="/portfolio" className={location.pathname === '/portfolio' ? 'active' : ''}>Portfolio</Link></li>
++              <li><Link to="/trading-dashboard" className={location.pathname === '/trading-dashboard' ? 'active' : ''}>Trading Dashboard</Link></li>
++              <li><Link to="/token-sniper" className={location.pathname === '/token-sniper' ? 'active' : ''}>Token Sniper</Link></li>
++              <li><Link to="/ecosystem" className={`main-link ${isEcosystemPage ? 'active' : ''}`}>Ecosystem</Link></li>
+             </ul>
+           </nav>
++          <div className="header-right">
++            <WalletMultiButton/>
++            <ThemeToggle />
++          </div>
+         </div>
+-      )}
+-    </header>
++      </header>
++      <div className='sub-nav-wrapper'>
++        {isTradePage && (
++          <div classname='sub-nav-swap-wrapper'>
++            <div className="sub-nav">
++              <nav>
++                <ul>
++                  <li><Link to="/swap" className={location.pathname === '/swap' ? 'active' : ''}>Swap</Link></li>
++                  <li><Link to="/limit-order" className={location.pathname === '/limit-order' ? 'active' : ''}>Limit</Link></li>
++                  <li><Link to="/dca" className={location.pathname === '/dca' ? 'active' : ''}>DCA</Link></li>
++                  <li><Link to="/perps" className={location.pathname === '/perps' ? 'active' : ''}>Perps</Link></li>
++                  <li><Link to="/yield-farming" className={location.pathname === '/yield-farming' ? 'active' : ''}>CRPT Presale</Link></li>
++                </ul>
++              </nav>
++            </div>
++            {/* <div className='sub-nav-setting'>
++              <img src={setting}/>
++            </div>
++            <div className='sub-nav-clock'>
++              <img src={clock}/>
++            </div> */}
++          </div>
++        )}
++        {isEcosystemPage && (
++          <div className="sub-nav">
++            <nav>
++              <ul>
++                <li><Link to="/ecosystem/gaming" className={location.pathname === '/ecosystem/gaming' ? 'active' : ''}><span className="icon">🎮</span> Gaming</Link></li>
++                <li><Link to="/ecosystem/lending" className={location.pathname === '/ecosystem/lending' ? 'active' : ''}><span className="icon">💸</span> Lending</Link></li>
++                <li><Link to="/ecosystem/music" className={location.pathname === '/ecosystem/music' ? 'active' : ''}><span className="icon">🎵</span> Music</Link></li>
++                <li><Link to="/ecosystem/staking" className={location.pathname === '/ecosystem/staking' ? 'active' : ''}><span className="icon">🔒</span> Staking</Link></li>
++                <li><Link to="/ecosystem/liquidity" className={location.pathname === '/ecosystem/liquidity' ? 'active' : ''}><span className="icon">💧</span> Liquidity</Link></li>
++              </ul>
++            </nav>
++          </div>
++        )}
++      </div>
++    
++    </>
++    
+   );
+ };
+ 
+diff --git a/solana-dex-frontend/src/components/LimitOrder.js b/solana-dex-frontend/src/components/LimitOrder.js
+index c4a4e4b..8ec6a2b 100644
+--- a/solana-dex-frontend/src/components/LimitOrder.js
++++ b/solana-dex-frontend/src/components/LimitOrder.js
+@@ -5,6 +5,8 @@ import '../styles/limit-order.css';
+ import { Connection, Keypair, Transaction } from '@solana/web3.js';
+ import { useWallet } from '@solana/wallet-adapter-react';
+ import { getSymbolFromMint, getDecimalOfMint } from '../utils/apiService';
++import tokenAmount from '../images/tokenAmount.png';
++
+ const LimitOrder = () => {
+   const wallet = useWallet();
+   const [tokens, setTokens] = useState([]);
+@@ -267,60 +269,112 @@ const LimitOrder = () => {
+   }
+ 
+   return (
+-    <div className="limit-order-page">
+-      <div className="limit-order-container">
+-        <h2>Limit Order</h2>
+-        {orderStatus && <p>{orderStatus}</p>}
+-        <div className="limit-order-section">
+-          <h3>You're Selling</h3>
+-          <div className="limit-order-input-group">
+-            <Dropdown
+-              tokens={tokens}
+-              selectedToken={toToken}
+-              onSelectToken={(token) => handleSelectToken(token, 'to')}
+-              showDropdown={showToDropdown}
+-              setShowDropdown={setShowToDropdown}
+-            />
+-            <input
+-              type="number"
+-              value={totalUSDC}
+-              readOnly
+-              className="limit-order-input"
+-            />
+-          </div>
++    <div>
++      <div className="limit-order-page">
++        <div className="limit-order-price-chart-container">
++          <iframe 
++            title='TradingIFrame'
++            width="100%" 
++            height="600" 
++            src={iframeSrc}
++            allowFullScreen>
++          </iframe>
++            {/* <TradingViewChart symbol={getTradingSymbol()} interval="1" /> */}
+         </div>
+-        <div className="limit-order-section">
+-          <h3>You're buying</h3>
+-          <div className="limit-order-input-group">
+-            <Dropdown
+-              tokens={tokens}
+-              selectedToken={fromToken}
+-              onSelectToken={(token) => handleSelectToken(token, 'from')}
+-              showDropdown={showFromDropdown}
+-              setShowDropdown={setShowFromDropdown}
+-            />
+-            <input
+-              type="number"
+-              value={amount}
+-              onChange={handleAmountChange}
+-              placeholder="Amount"
+-              className="limit-order-input"
+-            />
++        <div className="limit-order-container">
++          {orderStatus && <p>{orderStatus}</p>}
++          <div className="limit-order-section">
++            <div className="limit-order-section-header">
++              <h3>You're Selling</h3>
++              <div className="right-section">
++                <img src={tokenAmount} alt="Token" />
++                <span>{amount == 0 ? 0 : amount} {fromToken}</span>
++              </div>
++            </div>
++            <div className="limit-order-input-group">
++              <Dropdown
++                tokens={tokens}
++                selectedToken={fromToken}
++                onSelectToken={(token) => handleSelectToken(token, 'from')}
++                showDropdown={showFromDropdown}
++                setShowDropdown={setShowFromDropdown}
++                style={{ width: '200px' }} // Adjusted width for the ticker bar
++              />
++              <input
++                type="number"
++                value={amount}
++                onChange={handleAmountChange}
++                placeholder="0.0"
++                style={{ marginLeft: '10px', width: '100px',padding: '10px' }}
++                min={0}
++                step={0.1}
++              />
++            </div>
+           </div>
+-          <div className="limit-order-input-group">
+-            <label>Sell {fromToken} at </label>
+-            <input
+-              type="number"
+-              value={price}
+-              onChange={(e) => setPrice(e.target.value)}
+-              placeholder="Enter price"
+-              className="limit-order-input"
+-            />
++
++          <div className="limit-order-section">
++            <div className="limit-order-section-header">
++              <h3>You're Buying</h3>
++              <div className="right-section">
++                <img src={tokenAmount} alt="Token" />
++                <span>{totalUSDC} {toToken}</span>
++              </div>
++            </div>
++            <div className="limit-order-input-group">
++              <Dropdown
++                tokens={tokens}
++                selectedToken={toToken}
++                onSelectToken={(token) => handleSelectToken(token, 'to')}
++                showDropdown={showToDropdown}
++                setShowDropdown={setShowToDropdown}
++              />
++              <label>${totalUSDC}</label>
++            </div>
++            <div className="limit-order-limit-price-group">
++              <label>Sell {fromToken} at rate</label>
++              <input
++                type="number"
++                value={price}
++                onChange={(e) => setPrice(e.target.value)}
++                placeholder="Enter price"
++                className="limit-order-input"
++                style={{padding: '10px', marginLeft: '0px' }}
++              />
++            </div>
+           </div>
++          <button disabled={!wallet.connected}  onClick={wallet.connected? handlePlaceOrder: handleConnectWallet } className="limit-order-button wallet-adapter-button">
++            {wallet.connected ? 'Place limit order': 'Connect wallet'}
++          </button>
++
++          <div className="limit-order-section">
++            <div className="limit-order-section-header">
++              <h3>Limit Order Summary</h3>
++            </div>
++            <div className="limit-order-input-group">
++              <label>Sell Order</label>
++              <label>{amount} {fromToken}</label>
++            </div>
++            <div className="limit-order-input-group">
++              <label>To buy</label>
++              <label>{totalUSDC} {toToken}</label>
++            </div>
++            <div className="limit-order-input-group">
++              <label>Buy SOL at Rate</label>
++              <label>${parseInt(price)}</label>
++            </div>
++            <div className="limit-order-input-group">
++              <label>Expiry</label>
++              <label>Never</label>
++            </div>
++            <div className="limit-order-input-group">
++              <label>Platform Fee</label>
++              <label>0.10%</label>
++            </div>
++          </div>
++        
+         </div>
+-        <button disabled={!wallet.connected}  onClick={wallet.connected? handlePlaceOrder: handleConnectWallet } className="limit-order-button wallet-adapter-button">
+-          {wallet.connected ? 'Place limit order': 'Connect wallet'}
+-        </button>
++      </div>
++      <div className='limit-orders-hisory'>
+         <div className="tab-container">
+           <div 
+             className={`tab-item ${activeTab === 'openOrders' ? 'active' : ''}`} 
+@@ -376,19 +430,8 @@ const LimitOrder = () => {
+               </table>
+             </div>
+           )}
+-      </div>): (<span>Pease connect wallet</span>) }
+-      </div>
+-      <div className="limit-order-price-chart-container">
+-        <iframe 
+-          title='TradingIFrame'
+-          width="100%" 
+-          height="600" 
+-          src={iframeSrc}
+-          allowFullScreen>
+-        </iframe>
+-          {/* <TradingViewChart symbol={getTradingSymbol()} interval="1" /> */}
++        </div>): (<span>Pease connect wallet</span>) }
+       </div>
+-    
+     </div>
+   );
+ };
+diff --git a/solana-dex-frontend/src/components/Perps.js b/solana-dex-frontend/src/components/Perps.js
+index 9550a6a..6d16106 100644
+--- a/solana-dex-frontend/src/components/Perps.js
++++ b/solana-dex-frontend/src/components/Perps.js
+@@ -4,6 +4,8 @@ import Dropdown from './Dropdown';
+ import TradingViewChart from './TradingViewChart';
+ import '../styles/perps.css';
+ import { fetchChartData } from '../fetchChartData'; // Adjust the import path if necessary
++import '../styles/perps.css';
++import tokenAmount from '../images/tokenAmount.png';
+ 
+ const PerpsOrder = () => {
+   const [tokens, setTokens] = useState([]);
+@@ -103,51 +105,68 @@ const PerpsOrder = () => {
+     : '0.00';
+ 
+   return (
+-    <div className="limit-order-page">
+-      <div className="limit-order-container">
+-        <h2>Perps Order</h2>
++    <div className="perps-page">
++      <div className="perps-price-chart-container">
++        <div className="timeframe-buttons">
++          <button onClick={() => setTimeframe('1m')}>1m</button>
++          <button onClick={() => setTimeframe('5m')}>5m</button>
++          <button onClick={() => setTimeframe('15m')}>15m</button>
++          <button onClick={() => setTimeframe('30m')}>30m</button>
++          <button onClick={() => setTimeframe('1h')}>1h</button>
++          <button onClick={() => setTimeframe('4h')}>4h</button>
++          <button onClick={() => setTimeframe('1d')}>1d</button>
++          <button onClick={() => setTimeframe('1w')}>1w</button>
++        </div>
++        <TradingViewChart data={chartData} setSellPrice={setPrice} />
++      </div>
++      <div className="perps-container">
+         {orderStatus && <p>{orderStatus}</p>}
+-        <div className="limit-order-section">
+-          <h3>You're Paying</h3>
+-          <div className="limit-order-input-group">
+-            <Dropdown
+-              tokens={tokens}
+-              selectedToken={fromToken}
+-              onSelectToken={(token) => handleSelectToken(token, 'from')}
+-              showDropdown={showFromDropdown}
+-              setShowDropdown={setShowFromDropdown}
+-            />
++        <div className="perps-section">
++          <div className="perps-section-header">
++            <h3>You're Paying</h3>
++            <div className="right-section">
++              <img src={tokenAmount} alt="Token" />
++              <span>{amount == 0 ? 0 : amount} {fromToken}</span>
++            </div>
++          </div>
++          <div className="perps-input-group">
++            <select>
++              <option>USDC</option>
++              <option>SOL</option>
++            </select>
+             <input
+               type="number"
+               value={amount}
+               onChange={handleAmountChange}
+-              placeholder="Amount"
+-              className="limit-order-input"
++              placeholder="0.0"
++              className="perps-input"
++              style={{ marginLeft: '10px', width: '100px', padding: '10px' }}
+             />
+           </div>
+-          <div className="limit-order-input-group">
++          {/* <div className="perps-input-group">
+             <label>Sell {fromToken} at </label>
+             <input
+               type="number"
+               value={price}
+               onChange={(e) => setPrice(e.target.value)}
+               placeholder="Enter price"
+-              className="limit-order-input"
++              className="perps-input"
+             />
+-          </div>
++          </div> */}
+         </div>
+-        <div className="limit-order-section">
++        <div className="perps-section">
+           <h3>Size of {position === 'long' ? 'Long' : 'Short'}</h3>
+-          <div className="limit-order-input-group">
++          <div className="perps-input-group right-section">
++            <label>USDC: </label>
+             <input
+               type="number"
+               value={sizeOfPosition}
+               readOnly
+-              className="limit-order-input"
++              className="perps-input "
+             />
+           </div>
+         </div>
+-        <div className="limit-order-section">
++        <div className="perps-section">
+           <h3>Position</h3>
+           <div className="position-toggle">
+             <button className={position === 'long' ? 'active' : ''} onClick={() => setPosition('long')}>
+@@ -158,7 +177,7 @@ const PerpsOrder = () => {
+             </button>
+           </div>
+         </div>
+-        <div className="limit-order-section">
++        <div className="perps-section">
+           <h3>Leverage</h3>
+           <input
+             type="range"
+@@ -170,23 +189,11 @@ const PerpsOrder = () => {
+           />
+           <span>{leverage}x</span>
+         </div>
+-        <button onClick={handlePlaceOrder} className="limit-order-button">
++        <button onClick={handlePlaceOrder} className="perps-button">
+           Place Perps Order
+         </button>
+       </div>
+-      <div className="limit-order-price-chart-container">
+-        <div className="timeframe-buttons">
+-          <button onClick={() => setTimeframe('1m')}>1m</button>
+-          <button onClick={() => setTimeframe('5m')}>5m</button>
+-          <button onClick={() => setTimeframe('15m')}>15m</button>
+-          <button onClick={() => setTimeframe('30m')}>30m</button>
+-          <button onClick={() => setTimeframe('1h')}>1h</button>
+-          <button onClick={() => setTimeframe('4h')}>4h</button>
+-          <button onClick={() => setTimeframe('1d')}>1d</button>
+-          <button onClick={() => setTimeframe('1w')}>1w</button>
+-        </div>
+-        <TradingViewChart data={chartData} setSellPrice={setPrice} />
+-      </div>
++    
+     </div>
+   );
+ };
+diff --git a/solana-dex-frontend/src/components/Slippage.js b/solana-dex-frontend/src/components/Slippage.js
+index 305d3f2..ea06597 100644
+--- a/solana-dex-frontend/src/components/Slippage.js
++++ b/solana-dex-frontend/src/components/Slippage.js
+@@ -2,13 +2,18 @@ import React from 'react';
+ import { FaCog } from 'react-icons/fa';
+ 
+ const Slippage = ({ slippage, setIsSlippageModalOpen }) => (
+-  <div className="slippage-container">
+-    <div className="slippage-label">Slippage</div>
+-    <div className="slippage-info">
+-      <span className="slippage-value">{slippage}%</span>
+-      <FaCog className="cog-icon" onClick={() => setIsSlippageModalOpen(true)} />
+-    </div>
++  <div>
++    <button class="btn dynamic">Dynamic</button>
++    <button class="btn fixed active" onClick={() => setIsSlippageModalOpen(true)}>Fixed</button>
++
+   </div>
++  // <div className="slippage-container">
++  //   <div className="slippage-label">Slippage</div>
++  //   <div className="slippage-info">
++  //     <span className="slippage-value">{slippage}%</span>
++  //     <FaCog className="cog-icon" onClick={() => setIsSlippageModalOpen(true)} />
++  //   </div>
++  // </div>
+ );
+ 
+ export default Slippage;
+diff --git a/solana-dex-frontend/src/components/TokenSwap.js b/solana-dex-frontend/src/components/TokenSwap.js
+index 9a3056e..fba7e64 100644
+--- a/solana-dex-frontend/src/components/TokenSwap.js
++++ b/solana-dex-frontend/src/components/TokenSwap.js
+@@ -10,7 +10,7 @@ import SlippageModal from './SlippageModal';
+ import '../styles/token-swap.css';
+ import { useWallet } from '@solana/wallet-adapter-react';
+ import { VersionedTransaction, Connection } from '@solana/web3.js';
+-
++import toggle from '../images/toggle.png';
+ 
+ 
+ const TokenSwap = () => {
+@@ -159,60 +159,98 @@ const TokenSwap = () => {
+   return (
+     <div className="token-swap-container">
+       <div className="header">
+-        <FaSync className="refresh-icon" onClick={handleRefresh} />
+-        <Slippage slippage={slippage} setIsSlippageModalOpen={setIsSlippageModalOpen} />
++        {/* <FaSync className="refresh-icon" onClick={handleRefresh} />
++        <Slippage slippage={slippage} setIsSlippageModalOpen={setIsSlippageModalOpen} /> */}
+       </div>
+-      <div className="token-swap">
+-        {loading && <p>Loading...</p>}
+-        {error && <p className="error">{error}</p>}
+-        {transactionStatus && <p>{transactionStatus}</p>}
+-        <div className="token-swap-inputs">
+-          <div className="token-swap-input">
+-            <label>From:</label>
+-            <div className="input-group">
+-              <Dropdown
+-                tokens={tokens}
+-                selectedToken={fromToken}
+-                onSelectToken={(token) => handleSelectToken(token, 'from')}
+-                showDropdown={showFromDropdown}
+-                setShowDropdown={setShowFromDropdown}
+-              />
+-              <AmountInput
+-                value={fromAmount}
+-                onChange={(e) => setFromAmount(e.target.value)}
+-                placeholder="Amount"
+-              />
++      <div className='token-swap-body'>
++        <div className="token-swap">
++          {loading && <p>Loading...</p>}
++          {error && <p className="error">{error}</p>}
++          {transactionStatus && <p>{transactionStatus}</p>}
++          <div className="token-swap-inputs">
++            <div className="token-swap-input">
++              <label>You're Selling:</label>
++              <div className="input-group">
++                <Dropdown
++                  tokens={tokens}
++                  selectedToken={fromToken}
++                  onSelectToken={(token) => handleSelectToken(token, 'from')}
++                  showDropdown={showFromDropdown}
++                  setShowDropdown={setShowFromDropdown}
++                />
++                <AmountInput
++                  value={fromAmount}
++                  onChange={(e) => setFromAmount(e.target.value)}
++                  placeholder="0.0"
++                />
++              </div>
++            </div>
++            <div className="flip-button-container">
++              {/* <SwapButton onClick={handleFlip} /> */}
++              <div onClick={handleFlip}>
++                <img src={toggle}/>
++              </div> 
++            </div>
++            
++
++            <div className="token-swap-input">
++              <label>You're Buying:</label>
++              <div className="input-group">
++                <Dropdown
++                  tokens={tokens}
++                  selectedToken={toToken}
++                  onSelectToken={(token) => handleSelectToken(token, 'to')}
++                  showDropdown={showToDropdown}
++                  setShowDropdown={setShowToDropdown}
++                />
++                <AmountInput
++                  value={toAmount}
++                  readOnly
++                  placeholder="0.0"
++                />
++              </div>
+             </div>
+           </div>
+-          <div className="flip-button-container">
+-            <SwapButton onClick={handleFlip} />
++          <div  className='handle-swap-btn'>
++            <button onClick={handleSwap}>Swap</button>
+           </div>
+-          <div className="token-swap-input">
+-            <label>To:</label>
+-            <div className="input-group">
+-              <Dropdown
+-                tokens={tokens}
+-                selectedToken={toToken}
+-                onSelectToken={(token) => handleSelectToken(token, 'to')}
+-                showDropdown={showToDropdown}
+-                setShowDropdown={setShowToDropdown}
+-              />
+-              <AmountInput
+-                value={toAmount}
+-                readOnly
+-                placeholder="Amount"
+-              />
+-            </div>
++          <SlippageModal
++            isOpen={isSlippageModalOpen}
++            onRequestClose={() => setIsSlippageModalOpen(false)}
++            slippage={slippage}
++            setSlippage={setSlippage}
++          />
++          <PriceDisplay fromToken={fromToken} toToken={toToken} prices={prices} />
++        </div>
++        <div class="settings-container">
++          <div class="settings-item">
++              <label class="setting-label">
++                  MEV Protection
++                  <span class="info-icon">i</span>
++              </label>
++              <label class="switch">
++                  <input type="checkbox"/>
++                  <span class="slider round"></span>
++              </label>
++          </div>
++          
++          <div class="settings-item">
++              <label class="setting-label">
++                  Slippage Settings
++                  <span class="info-icon">i</span>
++              </label>
++              <div class="slippage-options">
++                <Slippage slippage={slippage} setIsSlippageModalOpen={setIsSlippageModalOpen} />
++              </div>
+           </div>
++
++          <div class="settings-item">
++              <label class="setting-label">Max Slippage:</label>
++              <input type="text" class="slippage-input" value="3%" readonly/>
++          </div>
++
++          <button class="save-btn">Save Settings</button>
+         </div>
+-        <button onClick={handleSwap}>Swap</button>
+-        <SlippageModal
+-          isOpen={isSlippageModalOpen}
+-          onRequestClose={() => setIsSlippageModalOpen(false)}
+-          slippage={slippage}
+-          setSlippage={setSlippage}
+-        />
+-        <PriceDisplay fromToken={fromToken} toToken={toToken} prices={prices} />
+       </div>
+     </div>
+   );
+diff --git a/solana-dex-frontend/src/images/background.mp4 b/solana-dex-frontend/src/images/background.mp4
+new file mode 100644
+index 0000000..b1560a0
+Binary files /dev/null and b/solana-dex-frontend/src/images/background.mp4 differ
+diff --git a/solana-dex-frontend/src/images/clock.png b/solana-dex-frontend/src/images/clock.png
+new file mode 100644
+index 0000000..00bac4a
+Binary files /dev/null and b/solana-dex-frontend/src/images/clock.png differ
+diff --git a/solana-dex-frontend/src/images/cryptosionLogo.png b/solana-dex-frontend/src/images/cryptosionLogo.png
+new file mode 100644
+index 0000000..a8b451f
+Binary files /dev/null and b/solana-dex-frontend/src/images/cryptosionLogo.png differ
+diff --git a/solana-dex-frontend/src/images/setting.png b/solana-dex-frontend/src/images/setting.png
+new file mode 100644
+index 0000000..b4e689b
+Binary files /dev/null and b/solana-dex-frontend/src/images/setting.png differ
+diff --git a/solana-dex-frontend/src/images/toggle.png b/solana-dex-frontend/src/images/toggle.png
+new file mode 100644
+index 0000000..f3de65f
+Binary files /dev/null and b/solana-dex-frontend/src/images/toggle.png differ
+diff --git a/solana-dex-frontend/src/images/tokenAmount.png b/solana-dex-frontend/src/images/tokenAmount.png
+new file mode 100644
+index 0000000..1710413
+Binary files /dev/null and b/solana-dex-frontend/src/images/tokenAmount.png differ
+diff --git a/solana-dex-frontend/src/styles/GamingPage.css b/solana-dex-frontend/src/styles/GamingPage.css
+index 6b2f919..20e22a4 100644
+--- a/solana-dex-frontend/src/styles/GamingPage.css
++++ b/solana-dex-frontend/src/styles/GamingPage.css
+@@ -3,7 +3,7 @@
+ /* Light mode styles for the gaming page */
+ body.light .gaming-page {
+   padding: 20px;
+-  background: linear-gradient(135deg, #1de9b6, #8e24aa); /* Turquoise to purple gradient */
++  background: linear-gradient(135deg,#00C8FF, #003Fb7); /* Turquoise to purple gradient */
+   color: #333333;
+   border: 1px solid #cccccc;
+   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+diff --git a/solana-dex-frontend/src/styles/LendingPage.css b/solana-dex-frontend/src/styles/LendingPage.css
+index b3e303a..07122f0 100644
+--- a/solana-dex-frontend/src/styles/LendingPage.css
++++ b/solana-dex-frontend/src/styles/LendingPage.css
+@@ -1,7 +1,7 @@
+ /* Light mode styles for the lending page */
+ body.light .lending-page {
+     padding: 20px;
+-    background: linear-gradient(135deg, #1de9b6, #8e24aa); /* Turquoise to purple gradient */
++    background: linear-gradient(135deg,#00C8FF, #003Fb7); /* Turquoise to purple gradient */
+     color: #333333;
+     border: 1px solid #cccccc;
+     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+diff --git a/solana-dex-frontend/src/styles/LiquidityPage.css b/solana-dex-frontend/src/styles/LiquidityPage.css
+index 646307b..317603e 100644
+--- a/solana-dex-frontend/src/styles/LiquidityPage.css
++++ b/solana-dex-frontend/src/styles/LiquidityPage.css
+@@ -1,7 +1,7 @@
+ /* Light mode styles for the liquidity page */
+ body.light .liquidity-page {
+     padding: 20px;
+-    background: linear-gradient(135deg, #1de9b6, #8e24aa); /* Turquoise to purple gradient */
++    background: linear-gradient(135deg,#00C8FF, #003Fb7); /* Turquoise to purple gradient */
+     color: #333333;
+     border: 1px solid #cccccc;
+     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+diff --git a/solana-dex-frontend/src/styles/MusicPage.css b/solana-dex-frontend/src/styles/MusicPage.css
+index 933cb7c..9d25c72 100644
+--- a/solana-dex-frontend/src/styles/MusicPage.css
++++ b/solana-dex-frontend/src/styles/MusicPage.css
+@@ -1,7 +1,7 @@
+ /* Light mode styles for the music page */
+ body.light .music-page {
+     padding: 20px;
+-    background: linear-gradient(135deg, #1de9b6, #8e24aa); /* Turquoise to purple gradient */
++    background: linear-gradient(135deg,#00C8FF, #003Fb7); /* Turquoise to purple gradient */
+     color: #333333;
+     border: 1px solid #cccccc;
+     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+diff --git a/solana-dex-frontend/src/styles/StakingPage.css b/solana-dex-frontend/src/styles/StakingPage.css
+index 929b897..5b0d02e 100644
+--- a/solana-dex-frontend/src/styles/StakingPage.css
++++ b/solana-dex-frontend/src/styles/StakingPage.css
+@@ -1,7 +1,7 @@
+ /* Light mode styles for the staking page */
+ body.light .staking-page {
+     padding: 20px;
+-    background: linear-gradient(135deg, #1de9b6, #8e24aa); /* Turquoise to purple gradient */
++    background: linear-gradient(135deg,#00C8FF, #003Fb7); /* Turquoise to purple gradient */
+     color: #333333;
+     border: 1px solid #cccccc;
+     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+diff --git a/solana-dex-frontend/src/styles/YieldFarmingPage.css b/solana-dex-frontend/src/styles/YieldFarmingPage.css
+index 80bb1ed..52df827 100644
+--- a/solana-dex-frontend/src/styles/YieldFarmingPage.css
++++ b/solana-dex-frontend/src/styles/YieldFarmingPage.css
+@@ -1,8 +1,8 @@
+ /* Light mode styles for the yield farming page */
+ body.light .yield-farming-page {
+   padding: 20px;
+-  background: linear-gradient(135deg, #1de9b6, #8e24aa);
+-  color: #333333;
++  background-color: #1a1a1aa3;
++  color: #ffffff;
+   border: 1px solid #cccccc;
+   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+   margin: 20px;
+diff --git a/solana-dex-frontend/src/styles/dca.css b/solana-dex-frontend/src/styles/dca.css
+index 61b5a56..b0ad24c 100644
+--- a/solana-dex-frontend/src/styles/dca.css
++++ b/solana-dex-frontend/src/styles/dca.css
+@@ -1,52 +1,66 @@
+ .dca-page {
+   display: flex;
+   justify-content: space-between;
+-  margin: 20px;
+-
+-  gap:20px;
++  margin: 50px;
+ }
+-.card {
++
++.dca-page-section{
++  display: flex;
++  flex-direction: column;
++  height: 70vh;
++  width: 65%;
+   padding: 20px;
+-  margin: 20px;
+-  background: #333;
+-  border-radius: 10px;
++  background-color: #1f1f1fa3;
++  border-radius: 8px;
+   color: white;
+ }
+ 
+-.small-card {
+-  width: 100%;
+-  margin: auto;
+-  height: 100%;
++.dca-page-chart {
++  width: 25%;
++  padding: 20px;
++  background-color: #1f1f1fa3;
++  border-radius: 8px;
++  color: white;
+ }
+ 
+ .inline-fields {
+   display: flex;
+   align-items: center;
++  margin-top: 10px;
+ }
+ 
+-.inline-fields .dropdown-container,
+-.inline-fields input[type="number"],
+-.inline-fields span {
+-  margin-left: 10px;
++.inline-fields select {
++  color: white !important;
+ }
+ 
++
+ .form-group {
+-  margin-bottom: 15px;
++  background-color: #1A1A1A;
++  padding: 20px;
++  margin: 10px 0 10px 0;
++  border-radius: 8px;
++  flex-direction: column;
++  display: flex;
+ }
+ 
++.form-group .dropdown-container {
++  margin-top: 10px;
++}
+ form button {
+-  background-color: #28a745;
++  background: linear-gradient(to right, #00C0FF, #003FB7) !important;
+   color: white;
+   border: none;
+   width: 100%;
+   height: 100%;
+-  padding: 10px 15px;
+-  border-radius: 5px;
++  padding: 20px;
++  border-radius: 8px;
+   cursor: pointer;
++  font-size: 16px;
++  font-weight: 700;
+ }
+ 
+ form button:hover {
+-  background-color: #218838;
++  /* background-color: #218838; */
+ }
+ 
+ #amount {
+@@ -95,14 +109,10 @@ input[type="number"] {
+ }
+ 
+ /* Light Mode Specific Styles */
+-body.light .card {
+-  background: linear-gradient(135deg, #1de9b6, #8e24aa) !important;
+-  color: black; /* Ensure text is readable on the new background */
+-}
+ 
+ body.light select,
+ body.light input[type="number"] {
+-  background: linear-gradient(135deg, #1de9b6, #8e24aa) !important;
+-  color: black; /* Ensure text is readable on the new background */
++  background-color: #1A1A1A;
++  /* color: black;  */
+   border: 1px solid #cccccc; /* Lighter border for better visibility */
+ }
+diff --git a/solana-dex-frontend/src/styles/general.css b/solana-dex-frontend/src/styles/general.css
+index 1b44a89..118549f 100644
+--- a/solana-dex-frontend/src/styles/general.css
++++ b/solana-dex-frontend/src/styles/general.css
+@@ -1,6 +1,6 @@
+ /* General Styles */
+ body {
+-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
++  font-family: "Space Grotesk";
+   margin: 0;
+   padding: 0;
+   background-color: #121212; /* Dark background */
+diff --git a/solana-dex-frontend/src/styles/header.css b/solana-dex-frontend/src/styles/header.css
+index 0a3240d..8a54226 100644
+--- a/solana-dex-frontend/src/styles/header.css
++++ b/solana-dex-frontend/src/styles/header.css
+@@ -6,7 +6,7 @@ header {
+ 
+ /* Light and Dark Mode Specific Styles */
+ body.light header {
+-  background: linear-gradient(135deg, #1de9b6, #8e24aa); /* Turquoise to purple gradient for light mode */
++  background: #000000; 
+ }
+ 
+ body.dark header {
+@@ -20,15 +20,23 @@ body.dark header {
+   padding: 1rem 2rem;
+ }
+ 
+-header h1 {
++.header-logo {
++  display: flex;
++  justify-content: center;
++  text-align: center;
++  align-items: ce;
++}
++
++.header-logo h1 {
++  font-weight: 700;
++  font-size: 36px;
++  color: #ffffff;
+   margin: 0;
+-  font-size: 1.5rem;
+-  color: inherit; /* Inherit color from body */
+ }
+ 
+-header h1 a {
+-  text-decoration: none; /* Remove underline */
+-  color: inherit; /* Inherit color from header h1 */
++.header-logo a {
++  text-decoration: none;
++  color: inherit; /* Inherit the text color */
+ }
+ 
+ nav ul {
+@@ -48,13 +56,14 @@ nav ul li {
+ nav ul li a {
+   color: inherit; /* Inherit color from body */
+   text-decoration: none; /* Remove underline */
+-  font-weight: bold;
++  font-weight: 400;
+   transition: color 0.3s; /* Transition for color */
+   display: flex;
+   flex-direction: column; /* Stack icon and text vertically */
+   align-items: center;
+   padding: 0.25rem 0.5rem; /* Add padding for better click area */
+   border-radius: 0.25rem; /* Border radius for smoother look */
++  color: #ffffff;
+ }
+ 
+ nav ul li a:hover,
+@@ -65,7 +74,7 @@ nav ul li a:focus {
+ 
+ body.light nav ul li a:hover,
+ body.light nav ul li a:focus {
+-  color: #0d47a1; /* Dark blue accent color for light mode hover and focus */
++  color: #00c8ff; /* Dark blue accent color for light mode hover and focus */
+   text-decoration: none; /* Ensure no underline on hover */
+ }
+ 
+@@ -75,7 +84,7 @@ nav ul li a.active {
+ }
+ 
+ body.light nav ul li a.active {
+-  color: #0d47a1; /* Dark blue accent color for light mode active link */
++  color: #00c8ff; /* Dark blue accent color for light mode active link */
+   text-decoration: none; /* Ensure no underline for active link */
+ }
+ 
+@@ -85,6 +94,18 @@ body.light nav ul li a.active {
+   gap: 1rem; /* Add gap between notifications and wallet button */
+ }
+ 
++.wallet-adapter-button-trigger {
++  background-color: #000000 !important;
++  background: linear-gradient(to right, #00C0FF, #003FB7) !important;
++  padding: 20px;
++  border: 8px !important;
++  color: #ffffff !important;
++  Font: Grotesk;
++  font-weight: 700;
++  font-size: 16px;
++  line-height: 20.42px;
++}
++
+ .theme-switcher {
+   background-color: transparent; /* Transparent background */
+   border: none; /* No border */
+@@ -102,18 +123,28 @@ body.light .theme-switcher {
+   color: #333333; /* Dark color for light mode */
+ }
+ 
+-.sub-nav {
+-  padding: 0.5rem 2rem;
++/* sub nav (swap, limit Order, DCA, Perps, Yield Farming */
++.sub-nav-wrapper {
+   display: flex;
+   justify-content: center; /* Center the sub-nav content */
++  max-width: 1280px;
++  margin: auto;
+ }
+ 
+-body.light .sub-nav {
+-  background: linear-gradient(135deg, #1de9b6, #8e24aa); /* Turquoise to purple gradient for light mode sub-nav */
++.sub-nav-swap-wrapper {
++  display: flex;
++  justify-content: space-between;
++  align-items: center;
++  flex-direction: row;
+ }
+ 
+-body.dark .sub-nav {
+-  background-color: #1f1f1f; /* Slightly lighter dark for sub-nav */
++.sub-nav {
++  padding: 0.5rem 2rem;
++  display: flex;
++  justify-content: center; /* Center the sub-nav content */
++  background-color: #1A1A1A;
++  margin-top: 50px;
++  border-radius: 8px;
+ }
+ 
+ .sub-nav ul {
+@@ -138,6 +169,7 @@ body.dark .sub-nav {
+   align-items: center;
+   padding: 0.25rem 0.5rem; /* Reduce padding for more compact look */
+   border-radius: 0.25rem;
++  
+ }
+ 
+ .sub-nav ul li a:hover,
+@@ -145,6 +177,15 @@ body.dark .sub-nav {
+   background-color: #39FF14; /* Neon green color for dark mode hover and focus */
+   color: white; /* White text color on hover */
+   text-decoration: none; /* Ensure no underline on hover */
++  font-size: 16px;
++  font-weight: 700;
++}
++
++body.light .sub-nav ul li a{
++  font-size: 16px;
++  font-weight: 400;
++  padding: 10px 25px 10px 25px;
++  color: rgb(255, 255, 255);
+ }
+ 
+ body.light .sub-nav ul li a:hover,
+@@ -152,6 +193,9 @@ body.light .sub-nav ul li a:focus {
+   background-color: #1e88e5; /* Bright blue color for light mode hover and focus */
+   color: white; /* White text color on hover */
+   text-decoration: none; /* Ensure no underline on hover */
++  font-size: 16px;
++  font-weight: 700;
++  background: linear-gradient(to right, #00C0FF, #003FB7) ;
+ }
+ 
+ .sub-nav ul li a.active {
+@@ -181,3 +225,12 @@ body.light .sub-nav ul li a.active {
+   font-size: 0.8rem;
+   color: inherit; /* Inherit color from body */
+ }
++
++.sub-nav-setting, .sub-nav-clock {
++  border-radius: 8px;
++  display: flex;
++  justify-content: center; 
++  background-color: #1A1A1A;
++  margin-top: 50px;
++  margin-left: 10px;
++}
+diff --git a/solana-dex-frontend/src/styles/limit-order.css b/solana-dex-frontend/src/styles/limit-order.css
+index d77280b..3cef8dd 100644
+--- a/solana-dex-frontend/src/styles/limit-order.css
++++ b/solana-dex-frontend/src/styles/limit-order.css
+@@ -2,13 +2,13 @@
+ .limit-order-page {
+   display: flex;
+   justify-content: space-between;
+-  margin: 20px;
++  margin: 50px;
+ }
+ 
+ .limit-order-container {
+-  width: 45%;
++  width: 25%;
+   padding: 20px;
+-  background-color: #2c2c2c;
++  background-color: #1f1f1fa3;
+   border-radius: 8px;
+   color: white;
+ }
+@@ -17,47 +17,84 @@
+   display: flex;
+   flex-direction: column;
+   height: 70vh;
+-  width: 45%;
++  width: 65%;
+   padding: 20px;
+-  background-color: #2c2c2c;
++  background-color: #1f1f1fa3;
+   border-radius: 8px;
+   color: white;
+ }
+ 
+ .limit-order-section {
++  background-color: #1f1f1fa3;
++  border-radius: 12px;
++  padding: 20px;
+   margin-bottom: 20px;
++  color: white;
++  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+ }
+ 
+-.limit-order-input-group {
++.limit-order-section-header {
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+   margin-bottom: 10px;
+ }
+ 
+-.limit-order-input {
+-  flex: 1;
+-  margin-left: 10px;
+-  padding: 10px;
+-  border: 1px solid #4c4c4c;
+-  border-radius: 4px;
+-  background-color: #1c1c1c;
+-  color: white;
++.limit-order-section-header h3 {
++  margin: 0;
++  font-size: 18px;
++}
++
++.right-section {
++  display: flex;
++  align-items: center;
++}
++
++.right-section img {
++  margin-right: 8px;
++}
++
++.balance {
++  font-size: 14px;
++  font-weight: 500;
++}
++
++.limit-order-input-group {
++  display: flex;
++  justify-content: space-between;
++  align-items: center;
++  margin-bottom: 15px;
++}
++
++.limit-order-input-group .dropdown-container {
++  margin-right: 40px;
++}
++
++.limit-order-input-group label {
++  font-size: 14px;
++  color: #b0b0b0;
++}
++
++.limit-order-limit-price-group {
++  display: flex;
++  flex-direction: column;
++}
++
++.limit-order-limit-price-group input {
++  margin-top: 10px;
+ }
+ 
+ .limit-order-button {
++  width: 100%;
+   margin-top: 20px;
+-  padding: 10px;
++  padding: 12px;
+   border: none;
+-  border-radius: 4px;
++  border-radius: 8px;
+   background-color: #00b300;
+   color: white;
+   cursor: pointer;
+ }
+ 
+-.limit-order-button:hover {
+-  background-color: #009900;
+-}
+ 
+ .limit-order-dropdown-container {
+   position: relative;
+@@ -110,7 +147,7 @@
+ /* Light Mode Specific Styles */
+ body.light .limit-order-container,
+ body.light .limit-order-price-chart-container {
+-  background: linear-gradient(135deg, #1de9b6, #8e24aa) !important;
++  background-color: #1A1A1Af0 !important;
+   color: black; /* Ensure text is readable on the new background */
+ }
+ 
+@@ -118,10 +155,22 @@ body.light .limit-order-input,
+ body.light .limit-order-dropdown-selected,
+ body.light .limit-order-dropdown-menu,
+ body.light .limit-order-dropdown-search {
+-  background: linear-gradient(135deg, #1de9b6, #8e24aa) !important;
++  background: linear-gradient(90deg, #00C8FF, #003Fb7) !important;
+   color: black; /* Ensure text is readable on the new background */
+   border: 1px solid #cccccc; /* Lighter border for better visibility */
+ }
++
++.limit-orders-hisory {
++  display: flex;
++  flex-direction: column;
++  justify-content: space-between;
++  margin: 50px;
++  width: 65%;
++  background-color: #1A1A1A;
++  border-radius: 8px;
++}
++
++
+ .tab-container {
+   display: flex;
+   justify-content: flex-start;
+@@ -135,7 +184,6 @@ body.light .limit-order-dropdown-search {
+   cursor: pointer;
+   font-weight: bold;
+   color: white;
+-  border: 2px solid transparent;
+ }
+ 
+ /* .tab-item:hover {
+@@ -143,12 +191,14 @@ body.light .limit-order-dropdown-search {
+ } */
+ 
+ .tab-item.active {
+-  border-bottom: 2px solid #3a6df0;
++  background: linear-gradient(to right, #00C0FF, #003FB7) !important;
++  border-radius: 8px;
+ }
+ 
+ /* Tab content styling */
+ .tab-content {
+   margin-top: 20px;
++  border-radius: 8px;
+ }
+ 
+ .order-table {
+@@ -211,17 +261,21 @@ td{
+ 
+ /* General button styles, unchanged */
+ .limit-order-button {
+-  background-color: #3a6df0;
++  background: linear-gradient(to right, #00C0FF, #003FB7) !important;
+   color: white;
+   padding: 10px 20px;
+   border: none;
+   cursor: pointer;
+   font-size: 16px;
+   margin-top: 20px;
++  margin-bottom: 20px;
+   border-radius: 5px;
+   transition: background-color 0.3s;
+ }
+ 
+ .limit-order-button:hover {
+   background-color: #3054d1;
+-}
+\ No newline at end of file
++}
++
++
++
+diff --git a/solana-dex-frontend/src/styles/perps.css b/solana-dex-frontend/src/styles/perps.css
+index 5a17cfb..715ac26 100644
+--- a/solana-dex-frontend/src/styles/perps.css
++++ b/solana-dex-frontend/src/styles/perps.css
+@@ -1,7 +1,7 @@
+ .perps-page {
+-    padding: 20px;
+-    background-color: #1e1e1e;
+-    color: #fff;
++    display: flex;
++    justify-content: space-between;
++    margin: 50px;
+   }
+   
+   .perps-header {
+@@ -9,6 +9,18 @@
+     justify-content: space-between;
+     align-items: center;
+   }
++
++  .perps-section-header {
++    display: flex;
++    justify-content: space-between;
++    align-items: center;
++    margin-bottom: 10px;
++  }
++  .right-section {
++    display: flex;
++    align-items: center;
++  }
++  
+   
+   .position-toggle {
+     display: flex;
+@@ -25,7 +37,7 @@
+   }
+   
+   .position-toggle button.active {
+-    background-color: #4caf50;
++    background: linear-gradient(to right, #00C0FF, #003FB7) !important;
+   }
+   
+   .perps-content {
+@@ -34,49 +46,67 @@
+   }
+   
+   .perps-container {
+-    background-color: #2b2b2b;
++    width: 25%;
+     padding: 20px;
++    background-color: #1f1f1fa3;
+     border-radius: 8px;
+-    flex: 1;
+-    min-width: 300px; /* Adjust as needed */
+-    margin: 10px;
++    color: white;
+   }
+   
+   .perps-section {
+-    margin-bottom: 20px;
++    background-color: #1A1A1A;
++    padding: 20px;
++    margin: 10px 0 10px 0;
++    border-radius: 8px;
++    flex-direction: column;
++    display: flex;
+   }
+   
+   .perps-input-group {
++    align-items: center;
++    margin-bottom: 10px;
++  }
++
++  .perps-input-group select {
++    background: linear-gradient(to right, #00C0FF, #003FB7) !important;
++    width: 50%;
+     margin-bottom: 10px;
++    padding: 10px;
++    border-radius: 8px;
+   }
+   
+-  .perps-input {
+-    width: 100%;
++  .perps-input-group .perps-input {
++    width: 100px;
+     padding: 10px;
+-    margin-top: 5px;
+-    background-color: #333;
+     border: none;
+-    border-radius: 4px;
++    border-radius: 8px;
+     color: #fff;
++    margin-left: 20px;
++    background-color: #1f1f1f;
++    border: 1px solid white;
+   }
+   
+   .perps-button {
+-    padding: 10px 20px;
+-    background-color: #4caf50;
++    padding: 20px;
++    background: linear-gradient(to right, #00C0FF, #003FB7) !important;
+     border: none;
+-    border-radius: 4px;
++    border-radius: 8px;
+     color: #fff;
+     cursor: pointer;
+     width: 100%;
++    font-size: 16px;
++    font-weight: 700;
+   }
+   
+   .perps-price-chart-container {
+-    background-color: #2b2b2b;
++    display: flex;
++    flex-direction: column;
++    height: 70vh;
++    width: 65%;
+     padding: 20px;
++    background-color: #1f1f1fa3;
+     border-radius: 8px;
+-    flex: 2;
+-    min-width: 300px; /* Adjust as needed */
+-    margin: 10px;
++    color: white;
+   }
+   
+   .timeframe-buttons {
+diff --git a/solana-dex-frontend/src/styles/slippage.css b/solana-dex-frontend/src/styles/slippage.css
+index c247229..1ede04f 100644
+--- a/solana-dex-frontend/src/styles/slippage.css
++++ b/solana-dex-frontend/src/styles/slippage.css
+@@ -25,7 +25,8 @@
+ }
+ 
+ .slippage-option.selected {
+-  background-color: #1db954;
++  background: linear-gradient(90deg, #00C8FF, #003Fb7); /* Turquoise to purple gradient */
++
+ }
+ 
+ .slippage-option:hover {
+@@ -52,7 +53,8 @@
+ }
+ 
+ .save-button {
+-  background-color: #1db954;
++  background: linear-gradient(90deg, #00C8FF, #003Fb7); /* Turquoise to purple gradient */
++
+   color: white;
+   border: none;
+   padding: 0.75rem 1rem;
+diff --git a/solana-dex-frontend/src/styles/sniping.css b/solana-dex-frontend/src/styles/sniping.css
+index 2500448..0134e2a 100644
+--- a/solana-dex-frontend/src/styles/sniping.css
++++ b/solana-dex-frontend/src/styles/sniping.css
+@@ -6,7 +6,7 @@ body.light .budget-container input,
+ body.light .filter-widget,
+ body.light .filter-item input,
+ body.light .filter-item select {
+-    background: linear-gradient(135deg, #1de9b6, #8e24aa); /* Turquoise to purple gradient */
++    background: linear-gradient(135deg,#00C8FF, #003Fb7); /* Turquoise to purple gradient */
+     color: white;
+     border-radius: 8px;
+     padding: 20px;
+@@ -16,7 +16,7 @@ body.light .filter-item select {
+ }
+ 
+ body.light .budget-container input {
+-    background: linear-gradient(135deg, #1de9b6, #8e24aa); /* Turquoise to purple gradient */
++    background: linear-gradient(135deg,#00C8FF, #003Fb7); /* Turquoise to purple gradient */
+     color: white;
+     border-radius: 4px;
+     padding: 8px;
+@@ -24,7 +24,7 @@ body.light .budget-container input {
+ }
+ 
+ body.light .filter-widget {
+-    background: linear-gradient(135deg, #1de9b6, #8e24aa); /* Turquoise to purple gradient */
++    background: linear-gradient(135deg,#00C8FF, #003Fb7); /* Turquoise to purple gradient */
+     color: white;
+     border-radius: 8px;
+     padding: 15px;
+@@ -33,7 +33,7 @@ body.light .filter-widget {
+ 
+ body.light .filter-item input,
+ body.light .filter-item select {
+-    background: linear-gradient(135deg, #1de9b6, #8e24aa); /* Turquoise to purple gradient */
++    background: linear-gradient(135deg,#00C8FF, #003Fb7); /* Turquoise to purple gradient */
+     color: white;
+     border-radius: 4px;
+     padding: 8px;
+diff --git a/solana-dex-frontend/src/styles/swap-button.css b/solana-dex-frontend/src/styles/swap-button.css
+index 1a048c7..ac06978 100644
+--- a/solana-dex-frontend/src/styles/swap-button.css
++++ b/solana-dex-frontend/src/styles/swap-button.css
+@@ -13,7 +13,7 @@
+   }
+   
+   .flip-button:hover {
+-    background-color: #1976d2; /* Slightly darker blue on hover */
++    background-color: #0b1825; /* Slightly darker blue on hover */
+     color: black; /* Ensure the text color stays black */
+   }
+   
+diff --git a/solana-dex-frontend/src/styles/theme.css b/solana-dex-frontend/src/styles/theme.css
+index 5f129a8..d72395c 100644
+--- a/solana-dex-frontend/src/styles/theme.css
++++ b/solana-dex-frontend/src/styles/theme.css
+@@ -1,6 +1,6 @@
+ /* Light mode styles */
+ body.light {
+-  background: linear-gradient(135deg, #1de9b6, #8e24aa) !important; /* Turquoise to purple gradient */
++  background: linear-gradient(90deg, #00C8FF, #003Fb7) !important; /* Turquoise to purple gradient */
+   color: #333333;
+ }
+ 
+@@ -83,4 +83,12 @@ body.dark .card {
+   color: #ffffff;
+   border: 1px solid #444444;
+   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
++}
++
++.bg-vid {
++  position: fixed;
++  width: 100%;
++  height: 100%;
++  object-fit: cover;
++  z-index: -1;
+ }
+\ No newline at end of file
+diff --git a/solana-dex-frontend/src/styles/token-swap.css b/solana-dex-frontend/src/styles/token-swap.css
+index 38f5784..8ff434c 100644
+--- a/solana-dex-frontend/src/styles/token-swap.css
++++ b/solana-dex-frontend/src/styles/token-swap.css
+@@ -8,12 +8,17 @@
+   margin-top: 20px;
+ }
+ 
++.token-swap-body {
++  display: flex;
++  justify-content: center;
++}
++
+ .token-swap {
+   padding: 2rem;
+   border-radius: 0.5rem;
+   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+   width: 360px; /* Reduced width */
+-  margin: auto;
++  margin-right: 50px;
+ }
+ 
+ .header {
+@@ -61,15 +66,32 @@
+   gap: 1rem;
+ }
+ 
++.token-swap-input label {
++  font-size: 24px;
++  font-weight: 700;
++  color: white !important;
++}
++
+ .token-swap-input .input-group {
+   display: flex;
+   gap: 1rem;
+   align-items: center;
++  background-color: #000000;
++  border-radius: 8px;
++  max-height: 138px;
++  justify-content: space-between;
++  padding: 24px;
++}
++
++.handle-swap-btn{
++  margin-top: 20px;
+ }
+ 
+ .dropdown-container {
+   position: relative;
+   flex: 1;
++  color: white !important;
++
+ }
+ 
+ .dropdown-selected {
+@@ -77,6 +99,8 @@
+   border-radius: 0.25rem;
+   border: 1px solid;
+   cursor: pointer;
++  color: white !important;
++
+ }
+ 
+ .dropdown-menu {
+@@ -89,6 +113,8 @@
+   max-height: 200px;
+   overflow-y: auto;
+   z-index: 1000;
++  color: white !important;
++
+ }
+ 
+ .dropdown-item {
+@@ -206,7 +232,8 @@ body.dark .refresh-icon {
+ 
+ /* Light Mode Specific Styles */
+ body.light .token-swap {
+-  background: linear-gradient(135deg, #1de9b6, #8e24aa) !important; /* Turquoise to purple gradient */
++  /* background: linear-gradient(90deg, #00C8FF, #003Fb7) !important;  */
++  background-color: #1A1A1A;
+   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Slightly larger shadow for depth */
+ }
+ 
+@@ -218,22 +245,22 @@ body.light .dropdown-item,
+ body.light .amount-input,
+ body.light .price-token,
+ body.light .price-value {
+-  color: #333333; /* Dark text color */
++  color: #ffffff; /* Dark text color */
+ }
+ 
+ body.light .dropdown-selected,
+ body.light .amount-input {
+-  background: linear-gradient(135deg, #1de9b6, #8e24aa); /* Turquoise to purple gradient */
++  background: linear-gradient(90deg, #00C8FF, #003Fb7); /* Turquoise to purple gradient */
+   border: 1px solid #cccccc; /* Lighter border */
+ }
+ 
+ body.light .dropdown-menu {
+-  background: linear-gradient(135deg, #1de9b6, #8e24aa); /* Turquoise to purple gradient */
++  background: linear-gradient(90deg, #00C8FF, #003Fb7); /* Turquoise to purple gradient */
+   border: 1px solid #cccccc; /* Lighter border */
+ }
+ 
+ body.light .dropdown-item {
+-  background: linear-gradient(135deg, #1de9b6, #8e24aa); /* Turquoise to purple gradient */
++  background: linear-gradient(90deg, #00C8FF, #003Fb7); /* Turquoise to purple gradient */
+ }
+ 
+ body.light .flip-button {
+@@ -261,3 +288,133 @@ body.light .price-chart {
+ body.light .refresh-icon {
+   color: #000000; /* Black color in light mode */
+ }
++
++
++
++/* CSS for Token Swap Setting */
++
++.settings-container {
++  background-color: #1A1A1A;
++  padding: 20px;
++  border-radius: 10px;
++  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
++  width: 300px;
++  color: white;
++}
++
++.settings-container .settings-item {
++  display: flex;
++  justify-content: space-between;
++  align-items: center;
++  margin-bottom: 20px;
++}
++
++.settings-container .setting-label {
++  display: flex;
++  align-items: center;
++  font-size: 14px;
++}
++
++.settings-container .info-icon {
++  margin-left: 5px;
++  background-color: #3a3a46;
++  color: #c0c0c0;
++  border-radius: 50%;
++  width: 18px;
++  height: 18px;
++  display: flex;
++  justify-content: center;
++  align-items: center;
++  font-size: 12px;
++}
++
++.settings-container .switch {
++  position: relative;
++  display: inline-block;
++  width: 40px;
++  height: 20px;
++}
++
++.settings-container .switch input {
++  opacity: 0;
++  width: 0;
++  height: 0;
++}
++
++.settings-container .slider {
++  position: absolute;
++  cursor: pointer;
++  top: 0;
++  left: 0;
++  right: 0;
++  bottom: 0;
++  background-color: #ccc;
++  transition: .4s;
++  border-radius: 50px;
++}
++
++.settings-container .slider:before {
++  position: absolute;
++  content: "";
++  height: 14px;
++  width: 14px;
++  border-radius: 50%;
++  background-color: white;
++  transition: .4s;
++  left: 3px;
++  bottom: 3px;
++}
++
++.settings-container input:checked + .slider {
++  background-color: #3a89ff;
++}
++
++.settings-container input:checked + .slider:before {
++  transform: translateX(18px);
++}
++
++.settings-container .slippage-options {
++  display: flex;
++}
++
++.settings-container .btn {
++  padding: 5px 10px;
++  background-color: #3a3a46;
++  border: none;
++  border-radius: 10px;
++  color: white;
++  font-size: 14px;
++  cursor: pointer;
++  margin-right: 10px;
++}
++
++.settings-container .btn.active {
++  background: linear-gradient(90deg, #00C8FF, #003Fb7); /* Turquoise to purple gradient */
++}
++
++.settings-container .slippage-input {
++  background-color: #2b2b39;
++  border: none;
++  border-radius: 10px;
++  padding: 5px;
++  width: 50px;
++  color: white;
++  text-align: center;
++}
++
++.settings-container .save-btn {
++  width: 100%;
++  padding: 10px;
++  background: linear-gradient(90deg, #00C8FF, #003Fb7); /* Turquoise to purple gradient */
++  border: none;
++  border-radius: 10px;
++  color: white;
++  font-size: 14px;
++  cursor: pointer;
++  text-align: center;
++  transition: background-color 0.3s ease;
++}
++
++.settings-container .save-btn:hover {
++  background: linear-gradient(90deg, #00C8FF, #003Fb7); /* Turquoise to purple gradient */
++}
+diff --git a/solana-dex-frontend/yarn.lock b/solana-dex-frontend/yarn.lock
+index 605b0e6..9e86579 100644
+--- a/solana-dex-frontend/yarn.lock
++++ b/solana-dex-frontend/yarn.lock
+@@ -1906,6 +1906,11 @@
+     "@emurgo/cardano-serialization-lib-browser" "^11.5.0"
+     "@emurgo/cardano-serialization-lib-nodejs" "11.5.0"
+ 
++"@fontsource/space-grotesk@^5.1.0":
++  version "5.1.0"
++  resolved "https://registry.yarnpkg.com/@fontsource/space-grotesk/-/space-grotesk-5.1.0.tgz#de50c2fbc00d11d1373db5b8004eb856cf8ab848"
++  integrity sha512-+3p3YMn8BN7phXpKwuuAjoE8F8kpwT8kxVtL+ze9YkeRpsBIqDoCwO9pN64VPTvzYoKN+UeQ7wuesMJhqii86g==
++
+ "@fortawesome/fontawesome-common-types@6.5.2":
+   version "6.5.2"
+   resolved "https://registry.yarnpkg.com/@fortawesome/fontawesome-common-types/-/fontawesome-common-types-6.5.2.tgz#eaf2f5699f73cef198454ebc0c414e3688898179"

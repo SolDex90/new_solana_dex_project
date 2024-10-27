@@ -1906,6 +1906,11 @@
     "@emurgo/cardano-serialization-lib-browser" "^11.5.0"
     "@emurgo/cardano-serialization-lib-nodejs" "11.5.0"
 
+"@fontsource/space-grotesk@^5.1.0":
+  version "5.1.0"
+  resolved "https://registry.yarnpkg.com/@fontsource/space-grotesk/-/space-grotesk-5.1.0.tgz#de50c2fbc00d11d1373db5b8004eb856cf8ab848"
+  integrity sha512-+3p3YMn8BN7phXpKwuuAjoE8F8kpwT8kxVtL+ze9YkeRpsBIqDoCwO9pN64VPTvzYoKN+UeQ7wuesMJhqii86g==
+
 "@fortawesome/fontawesome-common-types@6.5.2":
   version "6.5.2"
   resolved "https://registry.yarnpkg.com/@fortawesome/fontawesome-common-types/-/fontawesome-common-types-6.5.2.tgz#eaf2f5699f73cef198454ebc0c414e3688898179"

@@ -1,8 +1,8 @@
 /* Light mode styles for the yield farming page */
 body.light .yield-farming-page {
   padding: 20px;
-  background: linear-gradient(135deg, #1de9b6, #8e24aa);
-  color: #333333;
+  background-color: #1a1a1aa3;
+  color: #ffffff;
   border: 1px solid #cccccc;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   margin: 20px;

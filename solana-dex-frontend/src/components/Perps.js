@@ -4,7 +4,6 @@ import Dropdown from './Dropdown';
 import TradingViewChart from './TradingViewChart';
 import '../styles/perps.css';
 import { fetchChartData } from '../fetchChartData'; // Adjust the import path if necessary
-import '../styles/perps.css';
 import tokenAmount from '../images/tokenAmount.png';
 
 const PerpsOrder = () => {
@@ -17,8 +16,8 @@ const PerpsOrder = () => {
   const [showFromDropdown, setShowFromDropdown] = useState(false);
   const [chartData, setChartData] = useState([]);
   const [timeframe, setTimeframe] = useState('15m'); // Default timeframe
-  const [position, setPosition] = useState('long'); // Add state for position
-  const [leverage, setLeverage] = useState(1); // Add state for leverage
+  const [position, setPosition] = useState('long'); // Position state
+  const [leverage, setLeverage] = useState(1); // Leverage state
 
   useEffect(() => {
     const fetchTokens = async () => {
@@ -40,7 +39,7 @@ const PerpsOrder = () => {
         const response = await axios.get(`https://price.jup.ag/v6/price?ids=${fromToken},${toToken}`);
         const pricesData = response.data.data;
 
-        if (pricesData[fromToken].price && !price) {
+        if (pricesData[fromToken]?.price && !price) {
           setPrice(pricesData[fromToken].price);
         }
       } catch (error) {
@@ -57,7 +56,7 @@ const PerpsOrder = () => {
   useEffect(() => {
     const loadChartData = async () => {
       try {
-        const data = await fetchChartData('SOL', timeframe); // Fetch SOL chart data
+        const data = await fetchChartData(fromToken, timeframe);
         setChartData(data);
       } catch (error) {
         console.error('Error fetching chart data:', error);
@@ -66,7 +65,7 @@ const PerpsOrder = () => {
     };
 
     loadChartData();
-  }, [timeframe]);
+  }, [timeframe, fromToken]);
 
   const handlePlaceOrder = async () => {
     setOrderStatus('Placing order...');
@@ -126,33 +125,25 @@ const PerpsOrder = () => {
             <h3>You're Paying</h3>
             <div className="right-section">
               <img src={tokenAmount} alt="Token" />
-              <span>{amount == 0 ? 0 : amount} {fromToken}</span>
+              <span>{amount === 0 ? 0 : amount} {fromToken}</span>
             </div>
           </div>
           <div className="perps-input-group">
-            <select>
-              <option>USDC</option>
-              <option>SOL</option>
-            </select>
+            <Dropdown
+              tokens={tokens}
+              selectedToken={fromToken}
+              onSelectToken={(token) => handleSelectToken(token, 'from')}
+              showDropdown={showFromDropdown}
+              setShowDropdown={setShowFromDropdown}
+            />
             <input
               type="number"
               value={amount}
               onChange={handleAmountChange}
               placeholder="0.0"
               className="perps-input"
-              style={{ marginLeft: '10px', width: '100px', padding: '10px' }}
             />
           </div>
-          {/* <div className="perps-input-group">
-            <label>Sell {fromToken} at </label>
-            <input
-              type="number"
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
-              placeholder="Enter price"
-              className="perps-input"
-            />
-          </div> */}
         </div>
         <div className="perps-section">
           <h3>Size of {position === 'long' ? 'Long' : 'Short'}</h3>
@@ -162,7 +153,7 @@ const PerpsOrder = () => {
               type="number"
               value={sizeOfPosition}
               readOnly
-              className="perps-input "
+              className="perps-input"
             />
           </div>
         </div>
@@ -193,7 +184,6 @@ const PerpsOrder = () => {
           Place Perps Order
         </button>
       </div>
-    
     </div>
   );
 };

@@ -10,6 +10,7 @@ import SlippageModal from './SlippageModal';
 import '../styles/token-swap.css';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { VersionedTransaction, Connection } from '@solana/web3.js';
+import toggle from '../images/toggle.png'; // Merged in from the feature/ui branch
 
 const TokenSwap = () => {
   const [tokens, setTokens] = useState([]);
@@ -165,60 +166,92 @@ const TokenSwap = () => {
   return (
     <div className="token-swap-container">
       <div className="header">
-        <FaSync className="refresh-icon" onClick={handleRefresh} />
-        <Slippage slippage={slippage} setIsSlippageModalOpen={setIsSlippageModalOpen} />
+        {/* <FaSync className="refresh-icon" onClick={handleRefresh} />
+        <Slippage slippage={slippage} setIsSlippageModalOpen={setIsSlippageModalOpen} /> */}
       </div>
-      <div className="token-swap">
-        {loading && <p>Loading...</p>}
-        {error && <p className="error">{error}</p>}
-        {transactionStatus && <p>{transactionStatus}</p>}
-        <div className="token-swap-inputs">
-          <div className="token-swap-input">
-            <label>From:</label>
-            <div className="input-group">
-              <Dropdown
-                tokens={tokens}
-                selectedToken={fromToken}
-                onSelectToken={(token) => handleSelectToken(token, 'from')}
-                showDropdown={showFromDropdown}
-                setShowDropdown={setShowFromDropdown}
-              />
-              <AmountInput
-                value={fromAmount}
-                onChange={(e) => setFromAmount(e.target.value)}
-                placeholder="Amount"
-              />
+      <div className='token-swap-body'>
+        <div className="token-swap">
+          {loading && <p>Loading...</p>}
+          {error && <p className="error">{error}</p>}
+          {transactionStatus && <p>{transactionStatus}</p>}
+          <div className="token-swap-inputs">
+            <div className="token-swap-input">
+              <label>You're Selling:</label>
+              <div className="input-group">
+                <Dropdown
+                  tokens={tokens}
+                  selectedToken={fromToken}
+                  onSelectToken={(token) => handleSelectToken(token, 'from')}
+                  showDropdown={showFromDropdown}
+                  setShowDropdown={setShowFromDropdown}
+                />
+                <AmountInput
+                  value={fromAmount}
+                  onChange={(e) => setFromAmount(e.target.value)}
+                  placeholder="0.0"
+                />
+              </div>
+            </div>
+            <div className="flip-button-container">
+              <div onClick={handleFlip}>
+                <img src={toggle} alt="Toggle" />
+              </div> 
+            </div>
+            <div className="token-swap-input">
+              <label>You're Buying:</label>
+              <div className="input-group">
+                <Dropdown
+                  tokens={tokens}
+                  selectedToken={toToken}
+                  onSelectToken={(token) => handleSelectToken(token, 'to')}
+                  showDropdown={showToDropdown}
+                  setShowDropdown={setShowToDropdown}
+                />
+                <AmountInput
+                  value={toAmount}
+                  readOnly
+                  placeholder="0.0"
+                />
+              </div>
             </div>
           </div>
-          <div className="flip-button-container">
-            <SwapButton onClick={handleFlip} />
+          <div className='handle-swap-btn'>
+            <button onClick={handleSwap}>Swap</button>
           </div>
-          <div className="token-swap-input">
-            <label>To:</label>
-            <div className="input-group">
-              <Dropdown
-                tokens={tokens}
-                selectedToken={toToken}
-                onSelectToken={(token) => handleSelectToken(token, 'to')}
-                showDropdown={showToDropdown}
-                setShowDropdown={setShowToDropdown}
-              />
-              <AmountInput
-                value={toAmount}
-                readOnly
-                placeholder="Amount"
-              />
-            </div>
-          </div>
+          <SlippageModal
+            isOpen={isSlippageModalOpen}
+            onRequestClose={() => setIsSlippageModalOpen(false)}
+            slippage={slippage}
+            setSlippage={setSlippage}
+          />
+          <PriceDisplay fromToken={fromToken} toToken={toToken} prices={prices} />
         </div>
-        <button onClick={handleSwap}>Swap</button>
-        <SlippageModal
-          isOpen={isSlippageModalOpen}
-          onRequestClose={() => setIsSlippageModalOpen(false)}
-          slippage={slippage}
-          setSlippage={setSlippage}
-        />
-        <PriceDisplay fromToken={fromToken} toToken={toToken} prices={prices} />
+        <div className="settings-container">
+          <div className="settings-item">
+              <label className="setting-label">
+                  MEV Protection
+                  <span className="info-icon">i</span>
+              </label>
+              <label className="switch">
+                  <input type="checkbox"/>
+                  <span className="slider round"></span>
+              </label>
+          </div>
+          <div className="settings-item">
+              <label className="setting-label">
+                  Slippage Settings
+                  <span className="info-icon">i</span>
+              </label>
+              <div className="slippage-options">
+                <Slippage slippage={slippage} setIsSlippageModalOpen={setIsSlippageModalOpen} />
+              </div>
+          </div>
+          <div className="settings-item">
+              <label className="setting-label">Max Slippage:</label>
+              <input type="text" className="slippage-input" value="3%" readOnly/>
+          </div>
+          <button className="save-btn">Save Settings</button>
+        </div>
       </div>
     </div>
   );

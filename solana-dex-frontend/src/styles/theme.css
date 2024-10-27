@@ -1,6 +1,6 @@
 /* Light mode styles */
 body.light {
-  background: linear-gradient(135deg, #1de9b6, #8e24aa) !important; /* Turquoise to purple gradient */
+  background: linear-gradient(90deg, #00C8FF, #003Fb7) !important; /* Turquoise to purple gradient */
   color: #333333;
 }
 
@@ -83,4 +83,12 @@ body.dark .card {
   color: #ffffff;
   border: 1px solid #444444;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.bg-vid {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -1;
 }

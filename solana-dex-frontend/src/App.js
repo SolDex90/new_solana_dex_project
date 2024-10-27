@@ -10,8 +10,12 @@ import ProtectedRoute from './components/ProtectedRoute';
 import './styles/styles.css'; // Ensure the global styles are imported
 import './styles/theme.css'; // Import the theme styles
 import './chartSetup'; // Import the chart setup file
+import "@fontsource/space-grotesk"; // Defaults to weight 400
+// import "@fontsource/space-grotesk/400.css"; // Specify weight
+// import "@fontsource/space-grotesk/400-italic.css";
 
 import BalanceChecker from './components/BalanceChecker'; // Import BalanceChecker
+import bgVideo from './images/background.mp4';
 
 // Lazy load components
 const Trade = lazy(() => import('./pages/Trade'));
@@ -51,6 +55,9 @@ const App = () => {
     <GlobalProvider>
       <WalletProvider>
         <ThemeProvider>
+        <video autoPlay loop muted className="bg-vid">
+          <source src={bgVideo} type="video/mp4" />
+        </video>
           <Router>
             <Header />
             <ErrorBoundary>

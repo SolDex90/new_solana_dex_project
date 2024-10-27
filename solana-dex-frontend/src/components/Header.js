@@ -2,6 +2,7 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import '../styles/header.css';
+import logo from '../images/cryptosionLogo.png';
 
 const Header = () => {
   const location = useLocation();
@@ -14,49 +15,58 @@ const Header = () => {
   const isEcosystemPage = location.pathname.startsWith('/ecosystem');
 
   return (
-    <header>
-      <div className="main-nav">
-        <h1><Link to="/trade" className="logo-link">Cryptosion</Link></h1>
-        <nav>
-          <ul>
-            <li><Link to="/trade" className={`main-link ${isTradePage ? 'active' : ''}`}>Trade</Link></li>
-            <li><Link to="/portfolio" className={location.pathname === '/portfolio' ? 'active' : ''}>Portfolio</Link></li>
-            <li><Link to="/trading-dashboard" className={location.pathname === '/trading-dashboard' ? 'active' : ''}>Trading Dashboard</Link></li>
-            <li><Link to="/token-sniper" className={location.pathname === '/token-sniper' ? 'active' : ''}>Token Sniper</Link></li>
-            <li><Link to="/ecosystem" className={`main-link ${isEcosystemPage ? 'active' : ''}`}>Ecosystem</Link></li>
-          </ul>
-        </nav>
-        <div className="header-right">
-          <WalletMultiButton />
+    <>
+      <header>
+        <div className="main-nav">
+          <div className='header-logo'>
+            <img src={logo} alt="Cryptosion Logo"/>
+            <h1><Link to="/trade" className="logo-link">Cryptosion</Link></h1>
+          </div>
+          <nav>
+            <ul>
+              <li><Link to="/trade" className={`main-link ${isTradePage ? 'active' : ''}`}>Trade</Link></li>
+              <li><Link to="/portfolio" className={location.pathname === '/portfolio' ? 'active' : ''}>Portfolio</Link></li>
+              <li><Link to="/trading-dashboard" className={location.pathname === '/trading-dashboard' ? 'active' : ''}>Trading Dashboard</Link></li>
+              <li><Link to="/token-sniper" className={location.pathname === '/token-sniper' ? 'active' : ''}>Token Sniper</Link></li>
+              <li><Link to="/ecosystem" className={`main-link ${isEcosystemPage ? 'active' : ''}`}>Ecosystem</Link></li>
+            </ul>
+          </nav>
+          <div className="header-right">
+            <WalletMultiButton/>
+          </div>
         </div>
+      </header>
+      <div className='sub-nav-wrapper'>
+        {isTradePage && (
+          <div className='sub-nav-swap-wrapper'>
+            <div className="sub-nav">
+              <nav>
+                <ul>
+                  <li><Link to="/swap" className={location.pathname === '/swap' ? 'active' : ''}>Swap</Link></li>
+                  <li><Link to="/limit-order" className={location.pathname === '/limit-order' ? 'active' : ''}>Limit</Link></li>
+                  <li><Link to="/dca" className={location.pathname === '/dca' ? 'active' : ''}>DCA</Link></li>
+                  <li><Link to="/perps" className={location.pathname === '/perps' ? 'active' : ''}>Perps</Link></li>
+                  <li><Link to="/yield-farming" className={location.pathname === '/yield-farming' ? 'active' : ''}>CRPT Presale</Link></li>
+                </ul>
+              </nav>
+            </div>
+          </div>
+        )}
+        {isEcosystemPage && (
+          <div className="sub-nav">
+            <nav>
+              <ul>
+                <li><Link to="/ecosystem/gaming" className={location.pathname === '/ecosystem/gaming' ? 'active' : ''}><span className="icon">🎮</span> Gaming</Link></li>
+                <li><Link to="/ecosystem/lending" className={location.pathname === '/ecosystem/lending' ? 'active' : ''}><span className="icon">💸</span> Lending</Link></li>
+                <li><Link to="/ecosystem/music" className={location.pathname === '/ecosystem/music' ? 'active' : ''}><span className="icon">🎵</span> Music</Link></li>
+                <li><Link to="/ecosystem/staking" className={location.pathname === '/ecosystem/staking' ? 'active' : ''}><span className="icon">🔒</span> Staking</Link></li>
+                <li><Link to="/ecosystem/liquidity" className={location.pathname === '/ecosystem/liquidity' ? 'active' : ''}><span className="icon">💧</span> Liquidity</Link></li>
+              </ul>
+            </nav>
+          </div>
+        )}
       </div>
-      {isTradePage && (
-        <div className="sub-nav">
-          <nav>
-            <ul>
-              <li><Link to="/swap" className={location.pathname === '/swap' ? 'active' : ''}><span className="icon">🔄</span> Swap <span className="description">The Best Price</span></Link></li>
-              <li><Link to="/limit-order" className={location.pathname === '/limit-order' ? 'active' : ''}><span className="icon">📊</span> Limit Order <span className="description">Set Your Price</span></Link></li>
-              <li><Link to="/dca" className={location.pathname === '/dca' ? 'active' : ''}><span className="icon">⏳</span> DCA <span className="description">Set and Forget</span></Link></li>
-              <li><Link to="/perps" className={location.pathname === '/perps' ? 'active' : ''}><span className="icon">💼</span> Perps <span className="description">Perpetual Contracts</span></Link></li>
-              <li><Link to="/yield-farming" className={location.pathname === '/yield-farming' ? 'active' : ''}><span className="icon">🌾</span> Yield Farming</Link></li>
-            </ul>
-          </nav>
-        </div>
-      )}
-      {isEcosystemPage && (
-        <div className="sub-nav">
-          <nav>
-            <ul>
-              <li><Link to="/ecosystem/gaming" className={location.pathname === '/ecosystem/gaming' ? 'active' : ''}><span className="icon">🎮</span> Gaming</Link></li>
-              <li><Link to="/ecosystem/lending" className={location.pathname === '/ecosystem/lending' ? 'active' : ''}><span className="icon">💸</span> Lending</Link></li>
-              <li><Link to="/ecosystem/music" className={location.pathname === '/ecosystem/music' ? 'active' : ''}><span className="icon">🎵</span> Music</Link></li>
-              <li><Link to="/ecosystem/staking" className={location.pathname === '/ecosystem/staking' ? 'active' : ''}><span className="icon">🔒</span> Staking</Link></li>
-              <li><Link to="/ecosystem/liquidity" className={location.pathname === '/ecosystem/liquidity' ? 'active' : ''}><span className="icon">💧</span> Liquidity</Link></li>
-            </ul>
-          </nav>
-        </div>
-      )}
-    </header>
+    </>
   );
 };
 

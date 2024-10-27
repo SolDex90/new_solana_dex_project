@@ -121,12 +121,19 @@ const DCA = () => {
 
   return (
     <div className = 'dca-page'>
-      <div className="card small-card">
-        <h2>Dollar Cost Averaging (DCA)</h2>
+      <div className='dca-page-section'>
+        <iframe 
+          title='DCA Trading IFrame'
+          width="100%" 
+          height="600" 
+          src={iframeSrc}>
+        </iframe>
+      </div>
+      <div className="dca-page-chart">
         {orderStatus && <p>{orderStatus}</p>}
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="from-token">I want to sell:</label>
+            <label htmlFor="from-token">I Want To Allocate</label>
             <div className="inline-fields">
               <Dropdown
                 tokens={tokens}
@@ -141,17 +148,16 @@ const DCA = () => {
                 id="amount"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
-                placeholder="Amount to Invest"
+                placeholder="0.2"
+                min={0}
+                step={0.1}
                 required
-                style={{ marginLeft: '10px', width: '100px' }}
+                style={{ marginLeft: '10px', width: '100px',  padding: '10px', marginTop: '10px' }}
               />
-              <span style={{ marginLeft: '10px', color: '#bbb' }}>
-                ≈ ${equivalentUsdc}
-              </span>
             </div>
           </div>
           <div className="form-group">
-            <label htmlFor="to-token">To buy:</label>
+            <label htmlFor="to-token">To buy</label>
             <Dropdown
               tokens={tokens}
               selectedToken={toToken}
@@ -170,7 +176,7 @@ const DCA = () => {
                 value={interval}
                 onChange={(e) => setInterval(e.target.value)}
                 required
-                style={{ marginRight: '10px', width: '50px' }}
+                style={{ marginRight: '10px', width: '50px', color: 'white' }}
               />
               <select
                 id="frequency"
@@ -196,22 +202,13 @@ const DCA = () => {
                 value={numOrders}
                 onChange={(e) => setNumOrders(e.target.value)}
                 required
-                style={{ marginRight: '10px', width: '50px' }}
+                style={{ marginRight: '10px', width: '50px', color: 'white' }}
               />
               <span>orders</span>
             </div>
           </div>
           <button type="submit">Start DCA</button>
         </form>
-        
-      </div>
-      <div className='card small-card'>
-        <iframe 
-          title='DCA Trading IFrame'
-          width="100%" 
-          height="600" 
-          src={iframeSrc}>
-        </iframe>
       </div>
     </div>
   );

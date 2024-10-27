@@ -4,6 +4,8 @@ import Dropdown from './Dropdown';
 import TradingViewChart from './TradingViewChart';
 import '../styles/perps.css';
 import { fetchChartData } from '../fetchChartData'; // Adjust the import path if necessary
+import '../styles/perps.css';
+import tokenAmount from '../images/tokenAmount.png';
 
 const PerpsOrder = () => {
   const [tokens, setTokens] = useState([]);
@@ -103,78 +105,8 @@ const PerpsOrder = () => {
     : '0.00';
 
   return (
-    <div className="limit-order-page">
-      <div className="limit-order-container">
-        <h2>Perps Order</h2>
-        {orderStatus && <p>{orderStatus}</p>}
-        <div className="limit-order-section">
-          <h3>You're Paying</h3>
-          <div className="limit-order-input-group">
-            <Dropdown
-              tokens={tokens}
-              selectedToken={fromToken}
-              onSelectToken={(token) => handleSelectToken(token, 'from')}
-              showDropdown={showFromDropdown}
-              setShowDropdown={setShowFromDropdown}
-            />
-            <input
-              type="number"
-              value={amount}
-              onChange={handleAmountChange}
-              placeholder="Amount"
-              className="limit-order-input"
-            />
-          </div>
-          <div className="limit-order-input-group">
-            <label>Sell {fromToken} at </label>
-            <input
-              type="number"
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
-              placeholder="Enter price"
-              className="limit-order-input"
-            />
-          </div>
-        </div>
-        <div className="limit-order-section">
-          <h3>Size of {position === 'long' ? 'Long' : 'Short'}</h3>
-          <div className="limit-order-input-group">
-            <input
-              type="number"
-              value={sizeOfPosition}
-              readOnly
-              className="limit-order-input"
-            />
-          </div>
-        </div>
-        <div className="limit-order-section">
-          <h3>Position</h3>
-          <div className="position-toggle">
-            <button className={position === 'long' ? 'active' : ''} onClick={() => setPosition('long')}>
-              Long
-            </button>
-            <button className={position === 'short' ? 'active' : ''} onClick={() => setPosition('short')}>
-              Short
-            </button>
-          </div>
-        </div>
-        <div className="limit-order-section">
-          <h3>Leverage</h3>
-          <input
-            type="range"
-            min="1"
-            max="100"
-            value={leverage}
-            onChange={(e) => setLeverage(e.target.value)}
-            className="leverage-slider"
-          />
-          <span>{leverage}x</span>
-        </div>
-        <button onClick={handlePlaceOrder} className="limit-order-button">
-          Place Perps Order
-        </button>
-      </div>
-      <div className="limit-order-price-chart-container">
+    <div className="perps-page">
+      <div className="perps-price-chart-container">
         <div className="timeframe-buttons">
           <button onClick={() => setTimeframe('1m')}>1m</button>
           <button onClick={() => setTimeframe('5m')}>5m</button>
@@ -187,6 +119,81 @@ const PerpsOrder = () => {
         </div>
         <TradingViewChart data={chartData} setSellPrice={setPrice} />
       </div>
+      <div className="perps-container">
+        {orderStatus && <p>{orderStatus}</p>}
+        <div className="perps-section">
+          <div className="perps-section-header">
+            <h3>You're Paying</h3>
+            <div className="right-section">
+              <img src={tokenAmount} alt="Token" />
+              <span>{amount == 0 ? 0 : amount} {fromToken}</span>
+            </div>
+          </div>
+          <div className="perps-input-group">
+            <select>
+              <option>USDC</option>
+              <option>SOL</option>
+            </select>
+            <input
+              type="number"
+              value={amount}
+              onChange={handleAmountChange}
+              placeholder="0.0"
+              className="perps-input"
+              style={{ marginLeft: '10px', width: '100px', padding: '10px' }}
+            />
+          </div>
+          {/* <div className="perps-input-group">
+            <label>Sell {fromToken} at </label>
+            <input
+              type="number"
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
+              placeholder="Enter price"
+              className="perps-input"
+            />
+          </div> */}
+        </div>
+        <div className="perps-section">
+          <h3>Size of {position === 'long' ? 'Long' : 'Short'}</h3>
+          <div className="perps-input-group right-section">
+            <label>USDC: </label>
+            <input
+              type="number"
+              value={sizeOfPosition}
+              readOnly
+              className="perps-input "
+            />
+          </div>
+        </div>
+        <div className="perps-section">
+          <h3>Position</h3>
+          <div className="position-toggle">
+            <button className={position === 'long' ? 'active' : ''} onClick={() => setPosition('long')}>
+              Long
+            </button>
+            <button className={position === 'short' ? 'active' : ''} onClick={() => setPosition('short')}>
+              Short
+            </button>
+          </div>
+        </div>
+        <div className="perps-section">
+          <h3>Leverage</h3>
+          <input
+            type="range"
+            min="1"
+            max="100"
+            value={leverage}
+            onChange={(e) => setLeverage(e.target.value)}
+            className="leverage-slider"
+          />
+          <span>{leverage}x</span>
+        </div>
+        <button onClick={handlePlaceOrder} className="perps-button">
+          Place Perps Order
+        </button>
+      </div>
+    
     </div>
   );
 };

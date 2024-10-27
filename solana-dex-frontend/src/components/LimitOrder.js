@@ -5,6 +5,7 @@ import '../styles/limit-order.css';
 import { Connection, Keypair, Transaction } from '@solana/web3.js';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { getSymbolFromMint, getDecimalOfMint } from '../utils/apiService';
+import tokenAmount from '../images/tokenAmount.png'; // Added image
 
 const LimitOrder = () => {
   const wallet = useWallet();
@@ -246,60 +247,112 @@ const LimitOrder = () => {
   };
 
   return (
-    <div className="limit-order-page">
-      <div className="limit-order-container">
-        <h2>Limit Order</h2>
-        {orderStatus && <p>{orderStatus}</p>}
+    <div>
+      <div className="limit-order-page">
+        <div className="limit-order-price-chart-container">
+          <iframe 
+            title='TradingIFrame'
+            width="100%" 
+            height="600" 
+            src={iframeSrc}
+            allowFullScreen>
+          </iframe>
+        </div>
+        <div className="limit-order-container">
+          {orderStatus && <p>{orderStatus}</p>}
+          <div className="limit-order-section">
+            <div className="limit-order-section-header">
+              <h3>You're Selling</h3>
+              <div className="right-section">
+                <img src={tokenAmount} alt="Token" />
+                <span>{amount == 0 ? 0 : amount} {fromToken}</span>
+              </div>
+            </div>
+            <div className="limit-order-input-group">
+              <Dropdown
+                tokens={tokens}
+                selectedToken={fromToken}
+                onSelectToken={(token) => handleSelectToken(token, 'from')}
+                showDropdown={showFromDropdown}
+                setShowDropdown={setShowFromDropdown}
+                style={{ width: '200px' }}
+              />
+              <input
+                type="number"
+                value={amount}
+                onChange={handleAmountChange}
+                placeholder="0.0"
+                style={{ marginLeft: '10px', width: '100px', padding: '10px' }}
+                min={0}
+                step={0.1}
+              />
+            </div>
+          </div>
 
-        <div className="limit-order-section">
-          <h3>You're Selling</h3>
-          <div className="limit-order-input-group">
-            <Dropdown
-              tokens={tokens}
-              selectedToken={toToken}
-              onSelectToken={(token) => handleSelectToken(token, 'to')}
-              showDropdown={showToDropdown}
-              setShowDropdown={setShowToDropdown}
-            />
-            <input type="number" value={totalUSDC} readOnly className="limit-order-input" />
+          <div className="limit-order-section">
+            <div className="limit-order-section-header">
+              <h3>You're Buying</h3>
+              <div className="right-section">
+                <img src={tokenAmount} alt="Token" />
+                <span>{totalUSDC} {toToken}</span>
+              </div>
+            </div>
+            <div className="limit-order-input-group">
+              <Dropdown
+                tokens={tokens}
+                selectedToken={toToken}
+                onSelectToken={(token) => handleSelectToken(token, 'to')}
+                showDropdown={showToDropdown}
+                setShowDropdown={setShowToDropdown}
+              />
+              <label>${totalUSDC}</label>
+            </div>
+            <div className="limit-order-limit-price-group">
+              <label>Sell {fromToken} at rate</label>
+              <input
+                type="number"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+                placeholder="Enter price"
+                className="limit-order-input"
+                style={{ padding: '10px', marginLeft: '0px' }}
+              />
+            </div>
+          </div>
+
+          <button disabled={!wallet.connected} onClick={wallet.connected ? handlePlaceOrder : handleConnectWallet} className="limit-order-button wallet-adapter-button">
+            {wallet.connected ? 'Place limit order' : 'Connect wallet'}
+          </button>
+
+          <div className="limit-order-section">
+            <div className="limit-order-section-header">
+              <h3>Limit Order Summary</h3>
+            </div>
+            <div className="limit-order-input-group">
+              <label>Sell Order</label>
+              <label>{amount} {fromToken}</label>
+            </div>
+            <div className="limit-order-input-group">
+              <label>To buy</label>
+              <label>{totalUSDC} {toToken}</label>
+            </div>
+            <div className="limit-order-input-group">
+              <label>Buy SOL at Rate</label>
+              <label>${parseInt(price)}</label>
+            </div>
+            <div className="limit-order-input-group">
+              <label>Expiry</label>
+              <label>Never</label>
+            </div>
+            <div className="limit-order-input-group">
+              <label>Platform Fee</label>
+              <label>0.10%</label>
+            </div>
           </div>
         </div>
+      </div>
 
-        <div className="limit-order-section">
-          <h3>You're Buying</h3>
-          <div className="limit-order-input-group">
-            <Dropdown
-              tokens={tokens}
-              selectedToken={fromToken}
-              onSelectToken={(token) => handleSelectToken(token, 'from')}
-              showDropdown={showFromDropdown}
-              setShowDropdown={setShowFromDropdown}
-            />
-            <input
-              type="number"
-              value={amount}
-              onChange={handleAmountChange}
-              placeholder="Amount"
-              className="limit-order-input"
-            />
-          </div>
-
-          <div className="limit-order-input-group">
-            <label>Sell {fromToken} at </label>
-            <input
-              type="number"
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
-              placeholder="Enter price"
-              className="limit-order-input"
-            />
-          </div>
-        </div>
-
-        <button disabled={!wallet.connected} onClick={wallet.connected ? handlePlaceOrder : handleConnectWallet} className="limit-order-button wallet-adapter-button">
-          {wallet.connected ? 'Place limit order' : 'Connect wallet'}
-        </button>
-
+      <div className='limit-orders-hisory'>
         <div className="tab-container">
           <div className={`tab-item ${activeTab === 'openOrders' ? 'active' : ''}`} onClick={() => setActiveTab('openOrders')}>Open Orders</div>
           <div className={`tab-item ${activeTab === 'history' ? 'active' : ''}`} onClick={() => setActiveTab('history')}>History</div>
@@ -312,9 +365,11 @@ const LimitOrder = () => {
                 <table>
                   <thead>
                     <tr>
+                      <th style={{ display: 'none' }}>Order id</th>
                       <th>Order Info</th>
                       <th>Price</th>
                       <th>Expiry</th>
+                      <th>Filled Size</th>
                       <th>Action</th>
                     </tr>
                   </thead>
@@ -328,6 +383,7 @@ const LimitOrder = () => {
                 <table>
                   <thead>
                     <tr>
+                      <th style={{ display: 'none' }}>Order ID</th>
                       <th>Pair</th>
                       <th>Sell</th>
                       <th>Buy</th>
@@ -343,10 +399,6 @@ const LimitOrder = () => {
         ) : (
           <span>Please connect wallet</span>
         )}
-      </div>
-
-      <div className="limit-order-price-chart-container">
-        <iframe title="TradingIFrame" width="100%" height="600" src={iframeSrc} allowFullScreen></iframe>
       </div>
     </div>
   );

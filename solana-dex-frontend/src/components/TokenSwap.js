@@ -10,7 +10,7 @@ import SlippageModal from './SlippageModal';
 import '../styles/token-swap.css';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { VersionedTransaction, Connection } from '@solana/web3.js';
-import toggle from '../images/toggle.png'; // Merged in from the feature/ui branch
+import toggle from '../images/toggle.png';
 
 const TokenSwap = () => {
   const [tokens, setTokens] = useState([]);
@@ -28,7 +28,7 @@ const TokenSwap = () => {
   const [isSlippageModalOpen, setIsSlippageModalOpen] = useState(false);
   const wallet = useWallet();
 
-  const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000'; // Adjust base URL if needed
+  const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000';
 
   useEffect(() => {
     const fetchTokens = async () => {
@@ -166,8 +166,8 @@ const TokenSwap = () => {
   return (
     <div className="token-swap-container">
       <div className="header">
-        {/* <FaSync className="refresh-icon" onClick={handleRefresh} />
-        <Slippage slippage={slippage} setIsSlippageModalOpen={setIsSlippageModalOpen} /> */}
+        <FaSync className="refresh-icon" onClick={handleRefresh} />
+        <Slippage slippage={slippage} setIsSlippageModalOpen={setIsSlippageModalOpen} />
       </div>
       <div className='token-swap-body'>
         <div className="token-swap">
@@ -216,7 +216,7 @@ const TokenSwap = () => {
             </div>
           </div>
           <div className='handle-swap-btn'>
-            <button onClick={handleSwap}>Swap</button>
+            <SwapButton onClick={handleSwap} />
           </div>
           <SlippageModal
             isOpen={isSlippageModalOpen}

@@ -265,8 +265,8 @@ const LimitOrder = () => {
               <h3>You're Selling</h3>
               <div className="right-section">
                 <img src={tokenAmount} alt="Token" />
-                <span>{amount == 0 ? 0 : amount} {fromToken}</span>
-              </div>
+                <span>{amount === 0 ? 0 : amount} {fromToken}</span>
+                </div>
             </div>
             <div className="limit-order-input-group">
               <Dropdown

@@ -94,8 +94,16 @@ body.light nav ul li a.active {
   gap: 1rem; /* Add gap between notifications and wallet button */
 }
 
+.header-right button{
+  background: linear-gradient(to right, #00C0FF, #003FB7) !important;
+  padding: 10px;
+  Font: Grotesk;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 20.42px;
+}
+
 .wallet-adapter-button-trigger {
-  background-color: #000000 !important;
   background: linear-gradient(to right, #00C0FF, #003FB7) !important;
   padding: 20px;
   border: 8px !important;

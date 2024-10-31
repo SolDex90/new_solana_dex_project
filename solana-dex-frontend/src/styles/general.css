@@ -14,14 +14,14 @@ button {
   padding: 0.5rem 1rem;
   border: none;
   cursor: pointer;
-  background-color: #1db954; /* Accent color */
+  /* background: linear-gradient(90deg, #00C8FF, #003Fb7); */
   color: white;
   border-radius: 0.25rem;
   transition: background-color 0.3s;
 }
 
 button:hover {
-  background-color: #1ed760;
+  background: linear-gradient(90deg, #00C8FF, #003Fb7);
 }
 
 h2 {

@@ -11,14 +11,13 @@ import {
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
 
 const WalletProvider = ({ children }) => {
-  const endpoint = useMemo(() => 'https://hidden-patient-slug.solana-mainnet.quiknode.pro/d8cb6d9a7b156d44efaca020f46f9196d20bc926', []);
-  //const endpoint = useMemo(()=>'https://api.devnet.solana.com',[]);
+  const endpoint = useMemo(() => 'https://billowing-palpable-sun.solana-mainnet.quiknode.pro/dcb07b108ec63c565d92b65b25d61508ff58eb05', []);
   const wallets = useMemo(
     () => [
       // Remove PhantomWalletAdapter if it's registered automatically
       new SolflareWalletAdapter(),
       new LedgerWalletAdapter(),
-      
+      new PhantomWalletAdapter(),
     ],
     []
   );

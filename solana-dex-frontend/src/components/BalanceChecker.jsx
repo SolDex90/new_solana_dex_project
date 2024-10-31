@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Connection, PublicKey } from '@solana/web3.js';
+import { connection } from '../config';
 
 const BalanceChecker = () => {
   const [balance, setBalance] = useState(null);
@@ -8,7 +9,6 @@ const BalanceChecker = () => {
   useEffect(() => {
     const fetchBalance = async () => {
       try {
-        const connection = new Connection(process.env.REACT_APP_SOLANA_RPC_URL, 'confirmed');
         const publicKey = new PublicKey('2MTDZGGZ7kU8tnscXjZ8LTAiE1F8hmxmhiNEnff6i3kh');
         const balance = await connection.getBalance(publicKey);
         setBalance(balance / 1000000000); // Convert lamports to SOL

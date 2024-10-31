@@ -24,8 +24,8 @@ const LimitOrder = () => {
   const [openOrders, setOpenOrders] = useState([]);
   const [allVerifiedTokens, setAllVerifiedTokens] = useState([]);
   const [iframeSrc, setIframeSrc] = useState('https://birdeye.so/tv-widget/So11111111111111111111111111111111111111112/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v?chain=solana&viewMode=base%2Fquote&chartInterval=1D&chartType=AREA&chartTimezone=America%2FLos_Angeles&chartLeftToolbar=show&theme=dark')
-  const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000';
-  const END_POINT = process.env.RPC_END_POINT || 'https://hidden-patient-slug.solana-mainnet.quiknode.pro/d8cb6d9a7b156d44efaca020f46f9196d20bc926';
+  const API_BASE_URL = process.env.VITE_APP_API_BASE_URL || 'http://localhost:5000';
+  const END_POINT = process.env.VITE_APP_RPC_END_POINT || 'https://api.mainnet-beta.solana.com';
   const base = Keypair.generate();
   // Fetch tokens
   useEffect(() => {

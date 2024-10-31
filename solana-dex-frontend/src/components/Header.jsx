@@ -1,7 +1,10 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
-import ThemeToggle from './ThemeToggle';
+import { WalletMultiButton  } from '@solana/wallet-adapter-react-ui';
+import { PhantomWalletName } from '@solana/wallet-adapter-wallets';
+import { useWallet } from '@solana/wallet-adapter-react';
+
+// import ThemeToggle from './ThemeToggle';
 import '../styles/header.css';
 import logo from '../images/cryptosionLogo.png';
 import setting from '../images/setting.png';
@@ -16,6 +19,12 @@ const Header = () => {
                       location.pathname === '/perps' ||
                       location.pathname === '/yield-farming';
   const isEcosystemPage = location.pathname.startsWith('/ecosystem');
+  const { publicKey, autoConnect, connect, disconnect, connected, select, wallet } = useWallet();
+  
+  const handleConnect = async() => {
+    select(PhantomWalletName)
+    await connect();
+  }
 
   return (
     <>
@@ -35,8 +44,18 @@ const Header = () => {
             </ul>
           </nav>
           <div className="header-right">
-            <WalletMultiButton/>
-            <ThemeToggle />
+              {/* <WalletMultiButton/> */}
+              {connected ? (
+                    <div className="swap">
+                        <button onClick={() => disconnect()}>Disconnect</button>
+                        <br></br>
+                    </div>
+                ) : (
+                    <div className="swap">
+                        <button onClick={() => handleConnect()}>Connect Wallet</button>
+                    </div>
+                )}
+            {/* <ThemeToggle /> */}
           </div>
         </div>
       </header>
@@ -54,12 +73,7 @@ const Header = () => {
                 </ul>
               </nav>
             </div>
-            {/* <div className='sub-nav-setting'>
-              <img src={setting}/>
-            </div>
-            <div className='sub-nav-clock'>
-              <img src={clock}/>
-            </div> */}
+         
           </div>
         )}
         {isEcosystemPage && (
@@ -76,7 +90,6 @@ const Header = () => {
           </div>
         )}
       </div>
-    
     </>
     
   );

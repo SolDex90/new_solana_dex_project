@@ -1,0 +1,168 @@
+/* Universal reset and base styling */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+/* Light mode styles for the yield farming page */
+body.light .yield-farming-page {
+  padding: 30px;
+  background-color: #f3f3f3;
+  color: #333;
+  border: 1px solid #dddddd;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin: 20px auto;
+  max-width: 80%;
+  border-radius: 10px;
+  text-align: center;
+}
+
+/* Dark mode styles for the yield farming page */
+body.dark .yield-farming-page {
+  padding: 30px;
+  background-color: #2a2a2a;
+  color: #ffffff;
+  border: 1px solid #444444;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+  margin: 20px auto;
+  max-width: 600px;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.yield-farming-page h1 {
+  font-size: 2rem;
+  margin-bottom: 10px;
+  font-weight: 700;
+  color: #00C8FF;
+}
+
+.yield-farming-page p {
+  font-size: 1rem;
+  color: #999999;
+  margin-bottom: 20px;
+}
+
+/* Presale form styling */
+.presale {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #333333;
+  padding: 20px;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.presale label {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #bbbbbb;
+  margin-bottom: 10px;
+  text-align: left;
+  width: 100%;
+}
+
+/* Enhanced Input Field Styling */
+.presale-amount {
+  font-size: 1rem;
+  font-weight: 500;
+  padding: 12px;
+  width: 100%;
+  max-width: 100%;
+  border-radius: 6px;
+  border: 1px solid #555555;
+  background-color: #1e1e1e;
+  color: #eaeaea;
+  margin-bottom: 20px;
+  outline: none;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+}
+
+/* Focus and Hover Effects for Input */
+.presale-amount:focus, .presale-amount:hover {
+  border-color: #00C8FF;
+  background-color: #2a2a2a;
+  box-shadow: 0px 0px 8px rgba(0, 200, 255, 0.4);
+}
+
+.presale-staking-period{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.presale-staking-period{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.presale-staking-period-btn {
+  color: #ffffff;
+  background-color: #1a1a1a;
+}
+
+.presale-staking-period-btn-active {
+  background: linear-gradient(90deg, #00C8FF, #003Fb7);
+}
+
+/* Button styling */
+.presale-btn {
+  padding: 12px 25px;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #ffffff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  background: linear-gradient(90deg, #00C8FF, #003Fb7);
+  transition: transform 0.3s ease, background 0.3s ease;
+  width: 100%;
+}
+
+.presale-btn:hover {
+  background: linear-gradient(90deg, #003Fb7, #00C8FF);
+  transform: translateY(-3px);
+}
+
+.presale-btn:active {
+  transform: translateY(1px);
+  background: linear-gradient(90deg, #00C8FF, #0051FF);
+}
+
+.staking-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.staking-table th, .staking-table td {
+  padding: 10px;
+  text-align: center;
+  border: 1px solid #ddd;
+}
+
+.staking-table th {
+  background-color: #f4f4f4;
+  font-weight: bold;
+}
+
+.staking-period-details td {
+  font-size: 14px;
+}
+
+.staking-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.staking-period-details button {
+  background: linear-gradient(90deg, #00C8FF, #0051FF);
+}

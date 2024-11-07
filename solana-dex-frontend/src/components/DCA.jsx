@@ -5,6 +5,7 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import '../styles/dca.css';
 import { Connection } from '@solana/web3.js';
 import { DCA as MyDCA, Network } from '@jup-ag/dca-sdk';
+import { connection } from '../config';
 
 const DCA = () => {
   const [tokens, setTokens] = useState([]);
@@ -25,7 +26,7 @@ const DCA = () => {
     'https://birdeye.so/tv-widget/So11111111111111111111111111111111111111112/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v?chain=solana&viewMode=base%2Fquote&chartInterval=1D&chartType=AREA&chartTimezone=America%2FLos_Angeles&chartLeftToolbar=show&theme=dark'
   );
 
-  const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:3000';
+  const API_BASE_URL = process.env.VITE_APP_API_BASE_URL || 'http://localhost:3000';
 
   useEffect(() => {
     const fetchTokens = async () => {
@@ -76,9 +77,6 @@ const DCA = () => {
       });
       setOrderStatus('DCA ordering...!');
 
-      const connection = new Connection(
-        'https://hidden-patient-slug.solana-mainnet.quiknode.pro/d8cb6d9a7b156d44efaca020f46f9196d20bc926'
-      );
       const dca = new MyDCA(connection, Network.MAINNET);
       console.log('WalletPubKey', wallet.publicKey);
 

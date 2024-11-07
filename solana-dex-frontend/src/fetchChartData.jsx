@@ -10,7 +10,9 @@ export const fetchChartData = async (symbol) => {
       throw new Error(`Token with symbol ${symbol} not found`);
     }
 
-    const apiKey = '7707fff5284b4debbdc6487845ea9218';
+    const apiKey = import.meta.env.VITE_APP_BIRDEYE_API_KEY;
+    console.log(apiKey);
+
     const headers = {
       'X-API-KEY': apiKey,
       'x-chain': 'solana',

@@ -214,12 +214,12 @@ body.dark .flip-button:hover {
 }
 
 body.dark .token-swap button {
-  background-color: #1db954;
+  background: linear-gradient(90deg, #00C8FF, #003Fb7);
   color: white;
 }
 
 body.dark .token-swap button:hover {
-  background-color: #1ed760;
+  background: linear-gradient(90deg, #00C8FF, #003Fb7);
 }
 
 body.dark .price-chart {

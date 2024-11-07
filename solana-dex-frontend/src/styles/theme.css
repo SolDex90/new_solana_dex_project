@@ -32,9 +32,8 @@ body.light .theme-switcher {
 }
 
 body.dark .theme-switcher {
-  background-color: #1db954; /* Neon green background in dark mode */
+  background: linear-gradient(90deg, #00C8FF, #003Fb7); /* Neon green background in dark mode */
   color: #ffffff;
-  border: 1px solid #1db954; /* Neon green border in dark mode */
 }
 
 /* Gear icon */

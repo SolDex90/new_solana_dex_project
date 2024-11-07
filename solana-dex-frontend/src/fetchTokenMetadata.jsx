@@ -2,7 +2,7 @@ import axios from 'axios';
 
 export const fetchTokenMetadata = async () => {
   try {
-    const apiKey = '7707fff5284b4debbdc6487845ea9218';
+    const apiKey = import.meta.env.VITE_APP_BIRDEYE_API_KEY;
     const headers = {
       'X-API-KEY': apiKey,
       'x-chain': 'solana'

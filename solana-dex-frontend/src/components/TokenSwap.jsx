@@ -11,6 +11,7 @@ import '../styles/token-swap.css';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { VersionedTransaction, Connection } from '@solana/web3.js';
 import toggle from '../images/toggle.png';
+import { connection } from '../config';
 
 const TokenSwap = () => {
   const [tokens, setTokens] = useState([]);
@@ -28,7 +29,7 @@ const TokenSwap = () => {
   const [isSlippageModalOpen, setIsSlippageModalOpen] = useState(false);
   const wallet = useWallet();
 
-  const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000';
+  const API_BASE_URL = process.env.VITE_APP_API_BASE_URL || 'http://localhost:3000';
 
   useEffect(() => {
     const fetchTokens = async () => {
@@ -106,7 +107,7 @@ const TokenSwap = () => {
   };
 
   const handleSwap = async () => {
-    const connection = new Connection('https://hidden-patient-slug.solana-mainnet.quiknode.pro/d8cb6d9a7b156d44efaca020f46f9196d20bc926');
+    console.log(connection);
     setTransactionStatus('Initiating transaction...');
 
     try {

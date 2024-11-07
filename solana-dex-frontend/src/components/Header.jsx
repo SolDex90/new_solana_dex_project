@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
+import { PhantomWalletName } from '@solana/wallet-adapter-wallets';
+import { useWallet } from '@solana/wallet-adapter-react';
 import '../styles/header.css';
 import logo from '../images/cryptosionLogo.png';
 
@@ -13,13 +15,19 @@ const Header = () => {
                       location.pathname === '/perps' ||
                       location.pathname === '/yield-farming';
   const isEcosystemPage = location.pathname.startsWith('/ecosystem');
+  const { publicKey, autoConnect, connect, disconnect, connected, select, wallet } = useWallet();
+  
+  const handleConnect = async () => {
+    select(PhantomWalletName);
+    await connect();
+  };
 
   return (
     <>
       <header>
         <div className="main-nav">
           <div className='header-logo'>
-            <img src={logo} alt="Cryptosion Logo"/>
+            <img src={logo} alt="Cryptosion Logo" />
             <h1><Link to="/trade" className="logo-link">Cryptosion</Link></h1>
           </div>
           <nav>
@@ -32,7 +40,15 @@ const Header = () => {
             </ul>
           </nav>
           <div className="header-right">
-            <WalletMultiButton/>
+            {connected ? (
+              <div className="swap">
+                <button onClick={() => disconnect()}>Disconnect</button>
+              </div>
+            ) : (
+              <div className="swap">
+                <button onClick={() => handleConnect()}>Connect Wallet</button>
+              </div>
+            )}
           </div>
         </div>
       </header>

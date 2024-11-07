@@ -29,7 +29,6 @@ const PerpsOrder = () => {
         setOrderStatus('Failed to fetch tokens');
       }
     };
-
     fetchTokens();
   }, []);
 
@@ -99,8 +98,8 @@ const PerpsOrder = () => {
     setAmount(e.target.value);
   };
 
-  const sizeOfPosition = (amount && price && leverage)
-    ? (amount * price * leverage).toFixed(2)
+  const sizeOfPosition = (parseFloat(amount) && parseFloat(price) && parseInt(leverage))
+    ? (parseFloat(amount) * parseFloat(price) * parseInt(leverage)).toFixed(2)
     : '0.00';
 
   return (

@@ -9,8 +9,8 @@ import PriceDisplay from './PriceDisplay';
 import SlippageModal from './SlippageModal';
 import '../styles/token-swap.css';
 import { useWallet } from '@solana/wallet-adapter-react';
-import { VersionedTransaction, Connection } from '@solana/web3.js';
-import toggle from '../images/toggle.png';
+import { VersionedTransaction } from '@solana/web3.js';
+import toggleIcon from '../images/toggle.png';
 import { connection } from '../config';
 
 const TokenSwap = () => {
@@ -25,7 +25,7 @@ const TokenSwap = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [transactionStatus, setTransactionStatus] = useState('');
-  const [slippage, setSlippage] = useState(0.5); // Default slippage tolerance
+  const [slippage, setSlippage] = useState(0.5);
   const [isSlippageModalOpen, setIsSlippageModalOpen] = useState(false);
   const wallet = useWallet();
 
@@ -40,7 +40,6 @@ const TokenSwap = () => {
         if (!Array.isArray(tokenData)) {
           throw new Error('Expected an array of tokens but received something else');
         }
-
         setTokens(tokenData);
       } catch (error) {
         console.error('Error fetching tokens:', error);
@@ -55,13 +54,13 @@ const TokenSwap = () => {
     setLoading(true);
     setError(null);
     try {
-      const jupiterResponse = await axios.get(`https://price.jup.ag/v6/price?ids=${tokenIds.join(',')}`);
-      const jupiterPrices = Object.keys(jupiterResponse.data.data).reduce((acc, key) => {
-        acc[jupiterResponse.data.data[key].mintSymbol] = jupiterResponse.data.data[key].price;
+      const response = await axios.get(`https://price.jup.ag/v6/price?ids=${tokenIds.join(',')}`);
+      const priceData = Object.keys(response.data.data).reduce((acc, key) => {
+        acc[response.data.data[key].mintSymbol] = response.data.data[key].price;
         return acc;
       }, {});
 
-      setPrices(jupiterPrices);
+      setPrices(priceData);
     } catch (error) {
       console.error('Error fetching prices from Jupiter API:', error);
       setError('Failed to fetch prices');
@@ -71,43 +70,35 @@ const TokenSwap = () => {
   };
 
   useEffect(() => {
-    if (fromToken && toToken) {
-      fetchPrices([fromToken, toToken]);
-    }
+    if (fromToken && toToken) fetchPrices([fromToken, toToken]);
   }, [fromToken, toToken]);
 
   useEffect(() => {
     if (fromAmount && prices[fromToken] && prices[toToken]) {
       const fromPrice = prices[fromToken];
       const toPrice = prices[toToken];
-      const convertedAmount = (fromAmount * fromPrice / toPrice).toFixed(6); // Limit decimals
-      setToAmount(convertedAmount);
+      setToAmount((fromAmount * fromPrice / toPrice).toFixed(6));
     } else {
       setToAmount('');
     }
   }, [fromAmount, prices, fromToken, toToken]);
 
   const handleSelectToken = (token, type) => {
-    if (type === 'from') {
-      setFromToken(token);
-    } else {
-      setToToken(token);
-    }
+    if (type === 'from') setFromToken(token);
+    else setToToken(token);
+
     setShowFromDropdown(false);
     setShowToDropdown(false);
   };
 
   const handleFlip = () => {
-    const tempToken = fromToken;
-    const tempAmount = fromAmount;
     setFromToken(toToken);
-    setToToken(tempToken);
+    setToToken(fromToken);
     setFromAmount(toAmount);
-    setToAmount(tempAmount);
+    setToAmount(fromAmount);
   };
 
   const handleSwap = async () => {
-    console.log(connection);
     setTransactionStatus('Initiating transaction...');
 
     try {
@@ -116,7 +107,7 @@ const TokenSwap = () => {
         return;
       }
 
-      const walletAddress = wallet.publicKey.toString(); // Convert wallet address to string
+      const walletAddress = wallet.publicKey.toString();
 
       const res = await axios.post(`${API_BASE_URL}/api/swap`, {
         fromToken,
@@ -134,9 +125,13 @@ const TokenSwap = () => {
         throw new Error('Swap transaction not found in response');
       }
 
-      const swapTransactionBuf = Buffer.from(swapResult, 'base64');
-      const transaction = VersionedTransaction.deserialize(swapTransactionBuf);
+      const binaryString = atob(swapResult);
+      const transactionBytes = new Uint8Array(binaryString.length);
+      for (let i = 0; i < binaryString.length; i++) {
+        transactionBytes[i] = binaryString.charCodeAt(i);
+      }
 
+      const transaction = VersionedTransaction.deserialize(transactionBytes);
       const signedTransaction = await wallet.signTransaction(transaction);
       setTransactionStatus('Sending signed transaction to Solana Network');
 
@@ -159,9 +154,7 @@ const TokenSwap = () => {
   };
 
   const handleRefresh = () => {
-    if (fromToken && toToken) {
-      fetchPrices([fromToken, toToken]);
-    }
+    if (fromToken && toToken) fetchPrices([fromToken, toToken]);
   };
 
   return (
@@ -170,7 +163,7 @@ const TokenSwap = () => {
         <FaSync className="refresh-icon" onClick={handleRefresh} />
         <Slippage slippage={slippage} setIsSlippageModalOpen={setIsSlippageModalOpen} />
       </div>
-      <div className='token-swap-body'>
+      <div className="token-swap-body">
         <div className="token-swap">
           {loading && <p>Loading...</p>}
           {error && <p className="error">{error}</p>}
@@ -193,10 +186,8 @@ const TokenSwap = () => {
                 />
               </div>
             </div>
-            <div className="flip-button-container">
-              <div onClick={handleFlip}>
-                <img src={toggle} alt="Toggle" />
-              </div> 
+            <div className="flip-button-container" onClick={handleFlip}>
+              <img src={toggleIcon} alt="Toggle" />
             </div>
             <div className="token-swap-input">
               <label>You're Buying:</label>
@@ -208,15 +199,11 @@ const TokenSwap = () => {
                   showDropdown={showToDropdown}
                   setShowDropdown={setShowToDropdown}
                 />
-                <AmountInput
-                  value={toAmount}
-                  readOnly
-                  placeholder="0.0"
-                />
+                <AmountInput value={toAmount} readOnly placeholder="0.0" />
               </div>
             </div>
           </div>
-          <div className='handle-swap-btn'>
+          <div className="handle-swap-btn">
             <SwapButton onClick={handleSwap} />
           </div>
           <SlippageModal
@@ -229,27 +216,25 @@ const TokenSwap = () => {
         </div>
         <div className="settings-container">
           <div className="settings-item">
-              <label className="setting-label">
-                  MEV Protection
-                  <span className="info-icon">i</span>
-              </label>
-              <label className="switch">
-                  <input type="checkbox"/>
-                  <span className="slider round"></span>
-              </label>
+            <label className="setting-label">
+              MEV Protection <span className="info-icon">i</span>
+            </label>
+            <label className="switch">
+              <input type="checkbox" />
+              <span className="slider round"></span>
+            </label>
           </div>
           <div className="settings-item">
-              <label className="setting-label">
-                  Slippage Settings
-                  <span className="info-icon">i</span>
-              </label>
-              <div className="slippage-options">
-                <Slippage slippage={slippage} setIsSlippageModalOpen={setIsSlippageModalOpen} />
-              </div>
+            <label className="setting-label">
+              Slippage Settings <span className="info-icon">i</span>
+            </label>
+            <div className="slippage-options">
+              <Slippage slippage={slippage} setIsSlippageModalOpen={setIsSlippageModalOpen} />
+            </div>
           </div>
           <div className="settings-item">
-              <label className="setting-label">Max Slippage:</label>
-              <input type="text" className="slippage-input" value="3%" readOnly/>
+            <label className="setting-label">Max Slippage:</label>
+            <input type="text" className="slippage-input" value="3%" readOnly />
           </div>
           <button className="save-btn">Save Settings</button>
         </div>

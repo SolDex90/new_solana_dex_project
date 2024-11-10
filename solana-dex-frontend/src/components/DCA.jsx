@@ -6,6 +6,7 @@ import '../styles/dca.css';
 import { Connection } from '@solana/web3.js';
 import { DCA as MyDCA, Network } from '@jup-ag/dca-sdk';
 import { connection } from '../config';
+import { Buffer } from 'buffer'; // Polyfill for Buffer
 
 const DCA = () => {
   const [tokens, setTokens] = useState([]);
@@ -26,13 +27,14 @@ const DCA = () => {
     'https://birdeye.so/tv-widget/So11111111111111111111111111111111111111112/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v?chain=solana&viewMode=base%2Fquote&chartInterval=1D&chartType=AREA&chartTimezone=America%2FLos_Angeles&chartLeftToolbar=show&theme=dark'
   );
 
-  const API_BASE_URL = process.env.VITE_APP_API_BASE_URL || 'http://localhost:3000';
+  const API_BASE_URL = import.meta.env.VITE_APP_API_BASE_URL || 'http://localhost:3000';
 
   useEffect(() => {
     const fetchTokens = async () => {
       try {
         const response = await axios.get(`${API_BASE_URL}/api/tokens`);
         setTokens(response.data);
+
         const fromTokenMint = response.data.find(token => token.symbol === fromToken)?.address;
         const toTokenMint = response.data.find(token => token.symbol === toToken)?.address;
 
@@ -52,7 +54,8 @@ const DCA = () => {
     const fetchSolToUsdcRate = async () => {
       try {
         const response = await axios.get(`https://price.jup.ag/v6/price?ids=${fromToken}`);
-        setSolToUsdc(response.data.data[fromToken].price);
+        const price = response.data?.data?.[fromToken]?.price;
+        setSolToUsdc(price || 0);
       } catch (error) {
         console.error('Error fetching SOL to USDC rate:', error);
       }
@@ -70,6 +73,11 @@ const DCA = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!wallet || !wallet.connected) {
+      setOrderStatus('Please connect your wallet first.');
+      return;
+    }
+
     try {
       const res = await axios.post(`${API_BASE_URL}/api/dca-order`, {
         fromToken,
@@ -78,13 +86,11 @@ const DCA = () => {
       setOrderStatus('DCA ordering...!');
 
       const dca = new MyDCA(connection, Network.MAINNET);
-      console.log('WalletPubKey', wallet.publicKey);
-
       const params = {
         payer: wallet.publicKey,
         user: wallet.publicKey,
-        inAmount: numOrders * amount * Math.pow(10, res.data.orderResult.inputDecimal),
-        inAmountPerCycle: amount * Math.pow(10, res.data.orderResult.inputDecimal),
+        inAmount: parseInt(numOrders) * parseFloat(amount) * Math.pow(10, res.data.orderResult.inputDecimal),
+        inAmountPerCycle: parseFloat(amount) * Math.pow(10, res.data.orderResult.inputDecimal),
         cycleSecondsApart: parseInt(frequency),
         inputMint: res.data.orderResult.inputMint,
         outputMint: res.data.orderResult.outputMint,
@@ -93,10 +99,7 @@ const DCA = () => {
         startAt: null,
       };
 
-      console.log(params);
       const { tx } = await dca.createDcaV2(params);
-      console.log(tx);
-
       const latestBlockHash = await connection.getLatestBlockhash();
       tx.recentBlockhash = latestBlockHash.blockhash;
       const txid = await wallet.sendTransaction(tx, connection);
@@ -201,7 +204,7 @@ const DCA = () => {
                 <option value="3600">Hour</option>
                 <option value="86400">Day</option>
                 <option value="604800">Week</option>
-                <option value="77760000">Month</option>
+                <option value="2592000">Month</option>
               </select>
             </div>
           </div>

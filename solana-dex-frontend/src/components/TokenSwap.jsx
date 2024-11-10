@@ -9,27 +9,32 @@ import PriceDisplay from './PriceDisplay';
 import SlippageModal from './SlippageModal';
 import '../styles/token-swap.css';
 import { useWallet } from '@solana/wallet-adapter-react';
-import { VersionedTransaction } from '@solana/web3.js';
-import toggleIcon from '../images/toggle.png';
+import { VersionedTransaction, Connection } from '@solana/web3.js';
+import toggle from '../images/toggle.png';
 import { connection } from '../config';
 
+// Base URL for API calls
+const API_BASE_URL = import.meta.env.VITE_APP_API_BASE_URL || 'http://localhost:3000';
+
 const TokenSwap = () => {
+  const wallet = useWallet();
+
+  // Token selection and amounts
   const [tokens, setTokens] = useState([]);
   const [fromToken, setFromToken] = useState('SOL');
   const [toToken, setToToken] = useState('USDC');
   const [fromAmount, setFromAmount] = useState('');
   const [toAmount, setToAmount] = useState('');
-  const [showFromDropdown, setShowFromDropdown] = useState(false);
-  const [showToDropdown, setShowToDropdown] = useState(false);
   const [prices, setPrices] = useState({});
+
+  // UI and Error states
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [transactionStatus, setTransactionStatus] = useState('');
+  const [showFromDropdown, setShowFromDropdown] = useState(false);
+  const [showToDropdown, setShowToDropdown] = useState(false);
   const [slippage, setSlippage] = useState(0.5);
   const [isSlippageModalOpen, setIsSlippageModalOpen] = useState(false);
-  const wallet = useWallet();
-
-  const API_BASE_URL = process.env.VITE_APP_API_BASE_URL || 'http://localhost:3000';
 
   useEffect(() => {
     const fetchTokens = async () => {
@@ -37,9 +42,8 @@ const TokenSwap = () => {
         const response = await axios.get(`${API_BASE_URL}/api/tokens`);
         const tokenData = Array.isArray(response.data) ? response.data : response.data.tokens;
 
-        if (!Array.isArray(tokenData)) {
-          throw new Error('Expected an array of tokens but received something else');
-        }
+        if (!Array.isArray(tokenData)) throw new Error('Expected an array of tokens but received something else');
+
         setTokens(tokenData);
       } catch (error) {
         console.error('Error fetching tokens:', error);
@@ -48,19 +52,19 @@ const TokenSwap = () => {
     };
 
     fetchTokens();
-  }, [API_BASE_URL]);
+  }, []);
 
   const fetchPrices = async (tokenIds) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.get(`https://price.jup.ag/v6/price?ids=${tokenIds.join(',')}`);
-      const priceData = Object.keys(response.data.data).reduce((acc, key) => {
-        acc[response.data.data[key].mintSymbol] = response.data.data[key].price;
+      const jupiterResponse = await axios.get(`https://price.jup.ag/v6/price?ids=${tokenIds.join(',')}`);
+      const jupiterPrices = Object.keys(jupiterResponse.data?.data || {}).reduce((acc, key) => {
+        acc[jupiterResponse.data.data[key].mintSymbol] = jupiterResponse.data.data[key].price;
         return acc;
       }, {});
 
-      setPrices(priceData);
+      setPrices(jupiterPrices);
     } catch (error) {
       console.error('Error fetching prices from Jupiter API:', error);
       setError('Failed to fetch prices');
@@ -77,16 +81,15 @@ const TokenSwap = () => {
     if (fromAmount && prices[fromToken] && prices[toToken]) {
       const fromPrice = prices[fromToken];
       const toPrice = prices[toToken];
-      setToAmount((fromAmount * fromPrice / toPrice).toFixed(6));
+      const convertedAmount = (fromAmount * fromPrice / toPrice).toFixed(6);
+      setToAmount(convertedAmount);
     } else {
       setToAmount('');
     }
   }, [fromAmount, prices, fromToken, toToken]);
 
   const handleSelectToken = (token, type) => {
-    if (type === 'from') setFromToken(token);
-    else setToToken(token);
-
+    type === 'from' ? setFromToken(token) : setToToken(token);
     setShowFromDropdown(false);
     setShowToDropdown(false);
   };
@@ -121,17 +124,11 @@ const TokenSwap = () => {
       setTransactionStatus('Signing transaction...');
       const { swapResult } = res.data;
 
-      if (!swapResult) {
-        throw new Error('Swap transaction not found in response');
-      }
+      if (!swapResult) throw new Error('Swap transaction not found in response');
 
-      const binaryString = atob(swapResult);
-      const transactionBytes = new Uint8Array(binaryString.length);
-      for (let i = 0; i < binaryString.length; i++) {
-        transactionBytes[i] = binaryString.charCodeAt(i);
-      }
+      const swapTransactionBuf = Buffer.from(swapResult, 'base64');
+      const transaction = VersionedTransaction.deserialize(swapTransactionBuf);
 
-      const transaction = VersionedTransaction.deserialize(transactionBytes);
       const signedTransaction = await wallet.signTransaction(transaction);
       setTransactionStatus('Sending signed transaction to Solana Network');
 
@@ -172,33 +169,19 @@ const TokenSwap = () => {
             <div className="token-swap-input">
               <label>You're Selling:</label>
               <div className="input-group">
-                <Dropdown
-                  tokens={tokens}
-                  selectedToken={fromToken}
-                  onSelectToken={(token) => handleSelectToken(token, 'from')}
-                  showDropdown={showFromDropdown}
-                  setShowDropdown={setShowFromDropdown}
-                />
-                <AmountInput
-                  value={fromAmount}
-                  onChange={(e) => setFromAmount(e.target.value)}
-                  placeholder="0.0"
-                />
+                <Dropdown tokens={tokens} selectedToken={fromToken} onSelectToken={(token) => handleSelectToken(token, 'from')} showDropdown={showFromDropdown} setShowDropdown={setShowFromDropdown} />
+                <AmountInput value={fromAmount} onChange={(e) => setFromAmount(e.target.value)} placeholder="0.0" />
               </div>
             </div>
-            <div className="flip-button-container" onClick={handleFlip}>
-              <img src={toggleIcon} alt="Toggle" />
+            <div className="flip-button-container">
+              <div onClick={handleFlip}>
+                <img src={toggle} alt="Toggle" />
+              </div>
             </div>
             <div className="token-swap-input">
               <label>You're Buying:</label>
               <div className="input-group">
-                <Dropdown
-                  tokens={tokens}
-                  selectedToken={toToken}
-                  onSelectToken={(token) => handleSelectToken(token, 'to')}
-                  showDropdown={showToDropdown}
-                  setShowDropdown={setShowToDropdown}
-                />
+                <Dropdown tokens={tokens} selectedToken={toToken} onSelectToken={(token) => handleSelectToken(token, 'to')} showDropdown={showToDropdown} setShowDropdown={setShowToDropdown} />
                 <AmountInput value={toAmount} readOnly placeholder="0.0" />
               </div>
             </div>
@@ -206,37 +189,8 @@ const TokenSwap = () => {
           <div className="handle-swap-btn">
             <SwapButton onClick={handleSwap} />
           </div>
-          <SlippageModal
-            isOpen={isSlippageModalOpen}
-            onRequestClose={() => setIsSlippageModalOpen(false)}
-            slippage={slippage}
-            setSlippage={setSlippage}
-          />
+          <SlippageModal isOpen={isSlippageModalOpen} onRequestClose={() => setIsSlippageModalOpen(false)} slippage={slippage} setSlippage={setSlippage} />
           <PriceDisplay fromToken={fromToken} toToken={toToken} prices={prices} />
-        </div>
-        <div className="settings-container">
-          <div className="settings-item">
-            <label className="setting-label">
-              MEV Protection <span className="info-icon">i</span>
-            </label>
-            <label className="switch">
-              <input type="checkbox" />
-              <span className="slider round"></span>
-            </label>
-          </div>
-          <div className="settings-item">
-            <label className="setting-label">
-              Slippage Settings <span className="info-icon">i</span>
-            </label>
-            <div className="slippage-options">
-              <Slippage slippage={slippage} setIsSlippageModalOpen={setIsSlippageModalOpen} />
-            </div>
-          </div>
-          <div className="settings-item">
-            <label className="setting-label">Max Slippage:</label>
-            <input type="text" className="slippage-input" value="3%" readOnly />
-          </div>
-          <button className="save-btn">Save Settings</button>
         </div>
       </div>
     </div>

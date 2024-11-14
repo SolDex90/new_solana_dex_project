@@ -3,6 +3,9 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "engines": {
+    "node": "20.x"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -10,7 +13,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@drift-labs/sdk": "^2.98.0-beta.8",
+    "@drift-labs/sdk": "^2.98.0-beta.20",
     "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
     "@fontsource/space-grotesk": "^5.1.0",
     "@fortawesome/fontawesome-svg-core": "^6.6.0",
@@ -58,5 +61,8 @@
     "vite": "^5.4.10",
     "vite-plugin-env-compatible": "^2.0.1",
     "vite-plugin-node-polyfills": "^0.22.0"
+  },
+  "optionalDependencies": {
+    "@rollup/rollup-linux-x64-gnu": "4.6.1"
   }
 }

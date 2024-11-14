@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "engines": {
-    "node": "16.x"
+    "node": "20.x"
   },
   "scripts": {
     "dev": "vite",
@@ -13,7 +13,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@drift-labs/sdk": "^2.98.0-beta.8",
+    "@drift-labs/sdk": "^2.98.0-beta.20",
     "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
     "@fontsource/space-grotesk": "^5.1.0",
     "@fortawesome/fontawesome-svg-core": "^6.6.0",

@@ -17,7 +17,7 @@ const YieldFarmingPage = () => {
     const fetchPools = async () => {
       try {
         const res = await axios.get('https://docs-demo.stellar-mainnet.quiknode.pro/liquidity_pools');
-        setPools(res.data);
+        setPools(Array.isArray(res.data) ? res.data : []);
         setError(null);
       } catch (error) {
         console.error('Error fetching pools:', error);
@@ -95,10 +95,10 @@ const YieldFarmingPage = () => {
             <tbody>
               {pools.map((pool, index) => (
                 <tr key={index} onClick={() => setSelectedPool(pool)}>
-                  <td>{pool.name}</td>
-                  <td>{pool.tvl}</td>
-                  <td>{pool.apr}</td>
-                  <td>{pool.volume}</td>
+                  <td>{pool?.name || 'N/A'}</td>
+                  <td>{pool?.tvl || 'N/A'}</td>
+                  <td>{pool?.apr || 'N/A'}</td>
+                  <td>{pool?.volume || 'N/A'}</td>
                 </tr>
               ))}
             </tbody>
@@ -110,7 +110,7 @@ const YieldFarmingPage = () => {
         <div className="modal-overlay" onClick={handleOutsideClick}>
           <div className="modal" onClick={handleModalClick}>
             <span className="close" onClick={closeModal}>&times;</span>
-            <h2>{selectedPool.name}</h2>
+            <h2>{selectedPool?.name}</h2>
 
             {actionStatus && <p>{actionStatus}</p>}
 

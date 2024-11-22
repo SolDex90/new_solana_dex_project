@@ -24,8 +24,8 @@ const DCA = () => {
   const [outputMintToken, setOutputMintToken] = useState([]);
   const [iframeSrc, setIframeSrc] = useState('https://birdeye.so/tv-widget/So11111111111111111111111111111111111111112/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v?chain=solana&viewMode=base%2Fquote&chartInterval=1D&chartType=AREA&chartTimezone=America%2FLos_Angeles&chartLeftToolbar=show&theme=dark');
 
-  const API_BASE_URL = process.env.VITE_APP_API_BASE_URL || 'http://localhost:3000';
-
+  const API_BASE_URL = import.meta.env.VITE_APP_API_BASE_URL || 'http://localhost:3000';
+  
   useEffect(() => {
     const fetchTokens = async () => {
       try {

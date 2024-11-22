@@ -23,9 +23,11 @@ const LimitOrder = () => {
   const [activeTab, setActiveTab] = useState('openOrders'); 
   const [openOrders, setOpenOrders] = useState([]);
   const [allVerifiedTokens, setAllVerifiedTokens] = useState([]);
-  const [iframeSrc, setIframeSrc] = useState('https://birdeye.so/tv-widget/So11111111111111111111111111111111111111112/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v?chain=solana&viewMode=base%2Fquote&chartInterval=1D&chartType=AREA&chartTimezone=America%2FLos_Angeles&chartLeftToolbar=show&theme=dark')
-  const API_BASE_URL = process.env.VITE_APP_API_BASE_URL || 'http://localhost:5000';
-  const END_POINT = process.env.VITE_APP_RPC_END_POINT || 'https://api.mainnet-beta.solana.com';
+  const [iframeSrc, setIframeSrc] = useState('https://birdeye.so/tv-widget/So11111111111111111111111111111111111111112/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v?chain=solana&viewMode=base%2Fquote&chartInterval=1D&chartType=AREA&chartTimezone=America%2FLos_Angeles&chartLeftToolbar=show&theme=dark');
+  
+  const API_BASE_URL = import.meta.env.VITE_APP_API_BASE_URL || 'http://localhost:5000';
+  const END_POINT = import.meta.env.VITE_APP_RPC_END_POINT || 'https://api.mainnet-beta.solana.com';
+
   const base = Keypair.generate();
   // Fetch tokens
   useEffect(() => {
@@ -64,8 +66,9 @@ const LimitOrder = () => {
   useEffect(() => {
     const fetchPrices = async () => {
       try {
-        const response = await axios.get(`https://price.jup.ag/v6/price?ids=${fromToken},${toToken}`);
+        const response = await axios.get(`https://price.jup.ag/v6/price?ids=${fromToken}&vsToken=${toToken}`);
         const pricesData = response.data?.data;
+
         if (pricesData) {
           const fromTokenPrice = pricesData[fromToken]?.price;
           const toTokenPrice = toToken === 'USDC' ? 1 : pricesData[toToken]?.price; // Set USDC price to $1 if not available

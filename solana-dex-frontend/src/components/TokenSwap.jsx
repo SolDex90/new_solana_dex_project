@@ -29,7 +29,7 @@ const TokenSwap = () => {
   const [isSlippageModalOpen, setIsSlippageModalOpen] = useState(false);
   const wallet = useWallet();
 
-  const API_BASE_URL = process.env.VITE_APP_API_BASE_URL || 'http://localhost:3000';
+  const API_BASE_URL = import.meta.env.VITE_APP_API_BASE_URL || 'http://localhost:3000';
 
   useEffect(() => {
     const fetchTokens = async () => {

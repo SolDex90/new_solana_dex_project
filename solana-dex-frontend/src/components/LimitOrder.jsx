@@ -5,7 +5,7 @@ import '../styles/limit-order.css';
 import { Connection, Keypair, Transaction } from '@solana/web3.js';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { getSymbolFromMint, getDecimalOfMint } from '../utils/apiService';
-import tokenAmount from '../images/tokenAmount.png'; // Added image
+import tokenAmount from '../images/tokenAmount.png';
 
 const LimitOrder = () => {
   const wallet = useWallet();
@@ -23,26 +23,21 @@ const LimitOrder = () => {
   const [activeTab, setActiveTab] = useState('openOrders'); 
   const [openOrders, setOpenOrders] = useState([]);
   const [allVerifiedTokens, setAllVerifiedTokens] = useState([]);
-  const [iframeSrc, setIframeSrc] = useState(
-    'https://birdeye.so/tv-widget/So11111111111111111111111111111111111111112/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v?chain=solana&viewMode=base%2Fquote&chartInterval=1D&chartType=AREA&chartTimezone=America%2FLos_Angeles&chartLeftToolbar=show&theme=dark'
-  );
+  const [iframeSrc, setIframeSrc] = useState('https://birdeye.so/tv-widget/So11111111111111111111111111111111111111112/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v?chain=solana&viewMode=base%2Fquote&chartInterval=1D&chartType=AREA&chartTimezone=America%2FLos_Angeles&chartLeftToolbar=show&theme=dark')
   const API_BASE_URL = process.env.VITE_APP_API_BASE_URL || 'http://localhost:5000';
   const END_POINT = process.env.VITE_APP_RPC_END_POINT || 'https://api.mainnet-beta.solana.com';
   const base = Keypair.generate();
-
   // Fetch tokens
   useEffect(() => {
     const fetchTokens = async () => {
       try {
         const response = await axios.get(`${API_BASE_URL}/api/tokens`);
         setTokens(response.data);
-
         const res = await axios.get(`https://tokens.jup.ag/tokens?tags=verified`);
         setAllVerifiedTokens(res.data);
-
         const fromTokenMint = response.data.find(token => token.symbol === fromToken)?.address;
         const toTokenMint = response.data.find(token => token.symbol === toToken)?.address;
-
+        
         if (fromTokenMint && toTokenMint) {
           setInputMintToken(fromTokenMint);
           setOutputMintToken(toTokenMint);
@@ -55,27 +50,17 @@ const LimitOrder = () => {
     };
     fetchTokens();
   }, [API_BASE_URL, fromToken, toToken]);
-
-  // Fetch open orders
   useEffect(() => {
-    const fetchOpenOrders = async (walletAddress) => {
-      try {
-        const response = await axios.post(`${API_BASE_URL}/api/limit-order-history`, {
-          walletAddress: walletAddress,
-        });
-        return response.data.fetchResult;
-      } catch (error) {
-        console.error('Error fetching open orders:', error);
-        return [];
+    const fetchOrders = async () => {
+      if (wallet.connected && wallet.publicKey) {
+        const orders = await fetchOpenOrders(wallet.publicKey.toString());
+        setOpenOrders(orders);
       }
     };
 
-    if (wallet.connected && wallet.publicKey) {
-      fetchOpenOrders(wallet.publicKey.toString()).then(setOpenOrders);
-    }
-  }, [wallet.connected, wallet.publicKey, API_BASE_URL]);
-
-  // Fetch prices
+    fetchOrders();
+  }, [wallet.connected, wallet.publicKey]);
+  // Fetch prices whenever fromToken, toToken, or price changes
   useEffect(() => {
     const fetchPrices = async () => {
       try {
@@ -83,14 +68,29 @@ const LimitOrder = () => {
         const pricesData = response.data?.data;
         if (pricesData) {
           const fromTokenPrice = pricesData[fromToken]?.price;
-          const toTokenPrice = toToken === 'USDC' ? 1 : pricesData[toToken]?.price;
+          const toTokenPrice = toToken === 'USDC' ? 1 : pricesData[toToken]?.price; // Set USDC price to $1 if not available
 
           if (fromTokenPrice && toTokenPrice) {
-            setPrices({ [fromToken]: fromTokenPrice, [toToken]: toTokenPrice });
-            if (!price) setPrice(fromTokenPrice);
+            setPrices({
+              [fromToken]: fromTokenPrice,
+              [toToken]: toTokenPrice,
+            });
+
+            if (!price) {
+              setPrice(fromTokenPrice);
+            }
           } else {
+            if (!fromTokenPrice) {
+              console.error(`Price data for ${fromToken} is missing.`);
+            }
+            if (!toTokenPrice) {
+              console.error(`Price data for ${toToken} is missing.`);
+            }
             setOrderStatus('Failed to fetch prices. Some data is missing.');
           }
+        } else {
+          console.error('Invalid API response format:', pricesData);
+          setOrderStatus('Failed to fetch prices. Invalid API response.');
         }
       } catch (error) {
         console.error('Error fetching prices:', error);
@@ -101,22 +101,22 @@ const LimitOrder = () => {
   }, [fromToken, toToken, price]);
 
   useEffect(() => {
+    // Update iframeSrc when fromToken or toToken changes
     setIframeSrc(`https://birdeye.so/tv-widget/${inputMintToken}/${outputMintToken}?chain=solana&viewMode=base%2Fquote&chartInterval=1D&chartType=AREA&chartTimezone=America%2FLos_Angeles&chartLeftToolbar=show&theme=dark`);
   }, [inputMintToken, outputMintToken]);
 
   // Handle placing the order
   const handlePlaceOrder = async () => {
-    if (!wallet) {
+    if (!wallet){
       setOrderStatus('Please Connect Wallet!');
       return;
     }
     try {
-      setOrderStatus('Initiating transaction...');
+      setOrderStatus('initiating transaction...');
       const connection = new Connection(END_POINT);
-      const walletAddress = wallet.publicKey.toString();
+      const walletAddress = wallet.publicKey;
       const sendingBase = base.publicKey.toString();
-      
-      const res = await axios.post(`${API_BASE_URL}/api/limit-order`, {
+      const res = await axios.post(`${API_BASE_URL}/api/limit-order`,{
         fromToken,
         walletAddress,
         amount,
@@ -125,81 +125,92 @@ const LimitOrder = () => {
         toToken,
         sendingBase,
       });
-
+      
       setOrderStatus('Sending transaction...');
       const tx = res.data.orderResult.tx;
       const transactionBuf = Buffer.from(tx, 'base64');
-      const transaction = Transaction.from(transactionBuf);
-      const signedTransaction = await wallet.signTransaction(transaction);
+      var transaction = Transaction.from(transactionBuf);
+      const signedTransaction = await wallet.signTransaction(transaction)
       signedTransaction.partialSign(base);
 
       const latestBlockhash = await connection.getLatestBlockhash();
-      const txid = await connection.sendRawTransaction(signedTransaction.serialize(), {
-        skipPreflight: true,
-        maxRetries: 2,
+      console.log('LATEST BLOCKHASH:', latestBlockhash);
+      
+      const txid = await connection.sendRawTransaction(signedTransaction.serialize(),{
+        skipPreflight:true,
+        maxRetries:2,
       });
-
       await connection.confirmTransaction({
-        blockhash: latestBlockhash.blockhash,
-        lastValidBlockHeight: latestBlockhash.lastValidBlockHeight,
-        signature: txid,
-      });
-
-      setOrderStatus(`Transaction succeeded! Transaction ID: ${txid}`);
+        blockhash:latestBlockhash,
+        lastValidBlockHeight:latestBlockhash.lastValidBlockHeight,
+        signature:txid
+      })
+      setOrderStatus(`Transaction succeed! Transaction ID: ${txid}`);  
     } catch (error) {
       console.error('Error during order placement:', error);
       setOrderStatus('Order placement failed. Please try again.');
     }
   };
 
-  // Handle canceling the order
-  const handleCancelOrder = async (orderId) => {
-    if (!orderId) return;
-    try {
-      const response = await axios.post(`${API_BASE_URL}/api/cancel-order`, { orderId });
-      const tx = response.data.tx;
-      const connection = new Connection(END_POINT);
-      const transactionBuf = Buffer.from(tx, 'base64');
-      const transaction = Transaction.from(transactionBuf);
-      const signedTransaction = await wallet.signTransaction(transaction);
+  const handleCancelOrder = async (orderId)=>{
+    if (!orderId){
+      return
+    }
+    const response = axios.post(`${API_BASE_URL}/api/limit-order`,{
+      orderId: orderId
+    });
+    const connection=  new Connection(END_POINT);
+    const tx = response.data.tx;
+    const transactionBuf = Buffer.from(tx, 'base64');
+      var transaction = Transaction.from(transactionBuf);
+      const signedTransaction = await wallet.signTransaction(transaction)
       signedTransaction.partialSign(base);
 
       const latestBlockhash = await connection.getLatestBlockhash();
-      const txid = await connection.sendRawTransaction(signedTransaction.serialize(), {
-        skipPreflight: true,
-        maxRetries: 2,
+      console.log('LATEST BLOCKHASH:', latestBlockhash);
+      
+      const txid = await connection.sendRawTransaction(signedTransaction.serialize(),{
+        skipPreflight:true,
+        maxRetries:2,
       });
-
       await connection.confirmTransaction({
-        blockhash: latestBlockhash.blockhash,
-        lastValidBlockHeight: latestBlockhash.lastValidBlockHeight,
-        signature: txid,
-      });
-      console.log(`Order ${orderId} canceled with txid ${txid}`);
-    } catch (error) {
-      console.error('Error canceling order:', error);
-    }
+        blockhash:latestBlockhash,
+        lastValidBlockHeight:latestBlockhash.lastValidBlockHeight,
+        signature:txid
+      })
   };
 
+  const fetchOpenOrders = async (walletAddress)=>{
+    try {
+      const response = await axios.post(`${API_BASE_URL}/api/limit-order-history`, {
+        walletAddress: walletAddress
+      });
+      return response.data.fetchResult;
+    } catch (error) {
+      console.error('Error fetching open orders:', error);
+      return [];
+    }
+  }
+  //const iframeSrc = `https://birdeye.so/tv-widget/${inputMintToken}/${outputMintToken}?chain=solana&viewMode=base%2Fquote&chartInterval=1D&chartType=AREA&chartTimezone=America%2FLos_Angeles&chartLeftToolbar=show&theme=dark`;
+  const handleTabClick = (tab) => {
+    setActiveTab(tab);
+  };
+  
   const handleSelectToken = (token, type) => {
     if (type === 'from') {
       setFromToken(token);
       setShowFromDropdown(false);
       setPrice(''); // Reset price when changing fromToken
-      const tokenMint = tokens.find(t => t.symbol === token);
+      const tokenMint = tokens.find(tokenMint=> tokenMint.symbol === token);
       setInputMintToken(tokenMint.address);
     } else {
       setToToken(token);
       setShowToDropdown(false);
-      const tokenMint = tokens.find(t => t.symbol === token);
+      const tokenMint = tokens.find(tokenMint=> tokenMint.symbol === token);
       setOutputMintToken(tokenMint.address);
     }
-  };
 
-  const handleAmountChange = (e) => {
-    setAmount(e.target.value);
   };
-
   const handleConnectWallet = async () => {
     try {
       if (!wallet.connected) {
@@ -207,45 +218,55 @@ const LimitOrder = () => {
       }
     } catch (error) {
       console.error('Error connecting wallet:', error);
-      setOrderStatus('Failed to connect wallet. Please try again.');
+      setOrderStatus('Failed to connect wallet. Please select a wallet.');
     }
+  };
+
+  const handleAmountChange = (e) => {
+    setAmount(e.target.value);
   };
 
   const totalUSDC = (amount && price && prices[toToken])
     ? ((amount * price) / prices[toToken]).toFixed(2)
     : '0.00';
 
-  const renderHistoryTable = (orders) => {
+  const renderHistoryTable= (orders)=>{
     const historyData = orders.orderHistory;
-    return historyData.map((history) => (
-      <tr key={history.id}>
-        <td style={{ display: 'none' }}>{history.orderKey}</td>
-        <td>{getSymbolFromMint(history.inputMint, tokens)} ➡️ {getSymbolFromMint(history.outputMint, tokens)}</td>
-        <td>{(parseFloat(history.oriInAmount) / Math.pow(10, getDecimalOfMint(history.inputMint, allVerifiedTokens)))} {getSymbolFromMint(history.inputMint, tokens)}</td>
-        <td>{(parseFloat(history.oriOutAmount) / Math.pow(10, getDecimalOfMint(history.outputMint, allVerifiedTokens)))} {getSymbolFromMint(history.outputMint, tokens)}</td>
+    return historyData.map((history)=>(
+      <tr key = {history.id} >
+        <td style={{display:'none'}}>{history.orderKey}</td>
+        <td>{getSymbolFromMint(history.inputMint, tokens)} ➡️ {getSymbolFromMint( history.outputMint, tokens)}</td>
+        <td>{parseFloat(history.oriInAmount) / Math.pow(10, getDecimalOfMint(history.inputMint, allVerifiedTokens))}{" "}
+          {getSymbolFromMint(history.inputMint, tokens)}
+        </td>
+        <td>{parseFloat(history.oriOutAmount) / Math.pow(10, getDecimalOfMint(history.outputMint, allVerifiedTokens))}{" "}
+          {getSymbolFromMint(history.outputMint, tokens)}
+        </td>
         <td>{history.createdAt}</td>
         <td>{history.state}</td>
       </tr>
     ));
-  };
+  }
 
-  const renderOpenOrdersTable = (orders) => {
+  const renderOpenOrdersTable= (orders)=>{
     const openOrderData = orders.openOrders;
-    if (!openOrderData) return;
-    return openOrderData.map((history) => (
-      <tr key={history.id}>
-        <td style={{ display: 'none' }}>{history.orderKey}</td>
+    if (!openOrderData){
+      return;
+    }
+    return openOrderData.map((history)=>(
+      <tr key = {history.id} >
+        <td style={{display:'none'}}>{history.orderKey}</td>
         <td>
-          {parseFloat(history.oriInAmount) / Math.pow(10, getDecimalOfMint(history.inputMint, allVerifiedTokens))}
-          {` ${getSymbolFromMint(history.inputMint, tokens)} ➡️ `}
-          {parseFloat(history.oriOutAmount) / Math.pow(10, getDecimalOfMint(history.outputMint, allVerifiedTokens))}
-          {` ${getSymbolFromMint(history.outputMint, tokens)}`}
+          {(parseFloat(history.oriInAmount) / Math.pow(10, getDecimalOfMint(history.inputMint, allVerifiedTokens)))}
+          {" "}  {getSymbolFromMint(history.inputMint, tokens)} ➡️ 
+          {(parseFloat(history.oriOutAmount) / Math.pow(10, getDecimalOfMint(history.outputMint, allVerifiedTokens)))/ (parseFloat(history.oriInAmount) / Math.pow(10, getDecimalOfMint(history.inputMint, allVerifiedTokens)))}
+          {" "} {getSymbolFromMint( history.outputMint, tokens)}
         </td>
         <td>{history.expiredAt}</td>
-        <td><button onClick={() => handleCancelOrder(history.id)}>Cancel</button></td>
+        <td><button onclick ={handleCancelOrder(history.id)}>Cancel</button></td>
       </tr>
     ));
-  };
+  }
 
   return (
     <div>
@@ -258,6 +279,7 @@ const LimitOrder = () => {
             src={iframeSrc}
             allowFullScreen>
           </iframe>
+            {/* <TradingViewChart symbol={getTradingSymbol()} interval="1" /> */}
         </div>
         <div className="limit-order-container">
           {orderStatus && <p>{orderStatus}</p>}
@@ -266,7 +288,7 @@ const LimitOrder = () => {
               <h3>You're Selling</h3>
               <div className="right-section">
                 <img src={tokenAmount} alt="Token" />
-                <span>{amount === 0 ? 0 : amount} {fromToken}</span>
+                <span>{amount == 0 ? 0 : amount} {fromToken}</span>
               </div>
             </div>
             <div className="limit-order-input-group">
@@ -276,14 +298,14 @@ const LimitOrder = () => {
                 onSelectToken={(token) => handleSelectToken(token, 'from')}
                 showDropdown={showFromDropdown}
                 setShowDropdown={setShowFromDropdown}
-                style={{ width: '200px' }}
+                style={{ width: '200px' }} // Adjusted width for the ticker bar
               />
               <input
                 type="number"
                 value={amount}
                 onChange={handleAmountChange}
                 placeholder="0.0"
-                style={{ marginLeft: '10px', width: '100px', padding: '10px' }}
+                style={{ marginLeft: '10px', width: '100px',padding: '10px' }}
                 min={0}
                 step={0.1}
               />
@@ -316,13 +338,12 @@ const LimitOrder = () => {
                 onChange={(e) => setPrice(e.target.value)}
                 placeholder="Enter price"
                 className="limit-order-input"
-                style={{ padding: '10px', marginLeft: '0px' }}
+                style={{padding: '10px', marginLeft: '0px' }}
               />
             </div>
           </div>
-
-          <button disabled={!wallet.connected} onClick={wallet.connected ? handlePlaceOrder : handleConnectWallet} className="limit-order-button wallet-adapter-button">
-            {wallet.connected ? 'Place limit order' : 'Connect wallet'}
+          <button disabled={!wallet.connected}  onClick={wallet.connected? handlePlaceOrder: handleConnectWallet } className="limit-order-button wallet-adapter-button">
+            {wallet.connected ? 'Place limit order': 'Connect wallet'}
           </button>
 
           <div className="limit-order-section">
@@ -350,56 +371,66 @@ const LimitOrder = () => {
               <label>0.10%</label>
             </div>
           </div>
+        
         </div>
       </div>
-
       <div className='limit-orders-hisory'>
         <div className="tab-container">
-          <div className={`tab-item ${activeTab === 'openOrders' ? 'active' : ''}`} onClick={() => setActiveTab('openOrders')}>Open Orders</div>
-          <div className={`tab-item ${activeTab === 'history' ? 'active' : ''}`} onClick={() => setActiveTab('history')}>History</div>
-        </div>
-
-        {wallet.connected ? (
-          <div className="tab-content">
-            {activeTab === 'openOrders' && (
-              <div className="order-table">
-                <table>
-                  <thead>
-                    <tr>
-                      <th style={{ display: 'none' }}>Order id</th>
-                      <th>Order Info</th>
-                      <th>Price</th>
-                      <th>Expiry</th>
-                      <th>Filled Size</th>
-                      <th>Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>{renderOpenOrdersTable(openOrders)}</tbody>
-                </table>
-              </div>
-            )}
-
-            {activeTab === 'history' && (
-              <div className="order-table">
-                <table>
-                  <thead>
-                    <tr>
-                      <th style={{ display: 'none' }}>Order ID</th>
-                      <th>Pair</th>
-                      <th>Sell</th>
-                      <th>Buy</th>
-                      <th>Date</th>
-                      <th>State</th>
-                    </tr>
-                  </thead>
-                  <tbody>{renderHistoryTable(openOrders)}</tbody>
-                </table>
-              </div>
-            )}
+          <div 
+            className={`tab-item ${activeTab === 'openOrders' ? 'active' : ''}`} 
+            onClick={() => handleTabClick('openOrders')}
+          >
+            Open Orders
           </div>
-        ) : (
-          <span>Please connect wallet</span>
-        )}
+          <div 
+            className={`tab-item ${activeTab === 'history' ? 'active' : ''}`} 
+            onClick={() => handleTabClick('history')}
+          >
+            History
+          </div>
+        </div>
+        {wallet.connected? (
+          <div className="tab-content">
+          {activeTab === 'openOrders' && (
+            <div className="order-table">
+              <table>
+                <thead>
+                  <tr>
+                    <th style={{display:'none'}}>Order id</th>
+                    <th>Order Info</th>
+                    <th>Price</th>
+                    <th>Expiry</th>
+                    <th>Filled Size</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {renderOpenOrdersTable(openOrders)}
+                </tbody>
+              </table>
+            </div>
+          )}
+          {activeTab === 'history' && (
+            <div className="order-table">
+              <table>
+                <thead>
+                  <tr>
+                    <th style={{display:'none'}} >Order ID</th>
+                    <th>Pair</th>
+                    <th>Sell</th>
+                    <th>Buy</th>
+                    <th>Date</th>
+                    <th>State</th>
+                    <th style={{display:'none'}}></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {renderHistoryTable(openOrders)}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>): (<span>Pease connect wallet</span>) }
       </div>
     </div>
   );

@@ -1,10 +1,14 @@
-import React, { useEffect } from 'react';
+import React, {useEffect} from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
+import { WalletMultiButton  } from '@solana/wallet-adapter-react-ui';
 import { PhantomWalletName } from '@solana/wallet-adapter-wallets';
 import { useWallet } from '@solana/wallet-adapter-react';
+
+// import ThemeToggle from './ThemeToggle';
 import '../styles/header.css';
 import logo from '../images/cryptosionLogo.png';
+import setting from '../images/setting.png';
+import clock from '../images/clock.png';
 
 const Header = () => {
   const location = useLocation();
@@ -17,17 +21,17 @@ const Header = () => {
   const isEcosystemPage = location.pathname.startsWith('/ecosystem');
   const { publicKey, autoConnect, connect, disconnect, connected, select, wallet } = useWallet();
   
-  const handleConnect = async () => {
-    select(PhantomWalletName);
+  const handleConnect = async() => {
+    select(PhantomWalletName)
     await connect();
-  };
+  }
 
   return (
     <>
       <header>
         <div className="main-nav">
           <div className='header-logo'>
-            <img src={logo} alt="Cryptosion Logo" />
+            <img src={logo}/>
             <h1><Link to="/trade" className="logo-link">Cryptosion</Link></h1>
           </div>
           <nav>
@@ -40,21 +44,24 @@ const Header = () => {
             </ul>
           </nav>
           <div className="header-right">
-            {connected ? (
-              <div className="swap">
-                <button onClick={() => disconnect()}>Disconnect</button>
-              </div>
-            ) : (
-              <div className="swap">
-                <button onClick={() => handleConnect()}>Connect Wallet</button>
-              </div>
-            )}
+              {/* <WalletMultiButton/> */}
+              {connected ? (
+                    <div className="swap">
+                        <button onClick={() => disconnect()}>Disconnect</button>
+                        <br></br>
+                    </div>
+                ) : (
+                    <div className="swap">
+                        <button onClick={() => handleConnect()}>Connect Wallet</button>
+                    </div>
+                )}
+            {/* <ThemeToggle /> */}
           </div>
         </div>
       </header>
       <div className='sub-nav-wrapper'>
         {isTradePage && (
-          <div className='sub-nav-swap-wrapper'>
+          <div classname='sub-nav-swap-wrapper'>
             <div className="sub-nav">
               <nav>
                 <ul>
@@ -66,6 +73,7 @@ const Header = () => {
                 </ul>
               </nav>
             </div>
+         
           </div>
         )}
         {isEcosystemPage && (
@@ -83,6 +91,7 @@ const Header = () => {
         )}
       </div>
     </>
+    
   );
 };
 

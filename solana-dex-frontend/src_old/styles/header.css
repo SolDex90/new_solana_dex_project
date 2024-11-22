@@ -1,0 +1,244 @@
+/* Header and Navigation Styles */
+header {
+  color: inherit; /* Inherit color from body */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Light and Dark Mode Specific Styles */
+body.light header {
+  background: #000000; 
+}
+
+body.dark header {
+  background-color: #1f1f1f; /* Slightly lighter dark for header */
+}
+
+.main-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+}
+
+.header-logo {
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  align-items: ce;
+}
+
+.header-logo h1 {
+  font-weight: 700;
+  font-size: 36px;
+  color: #ffffff;
+  margin: 0;
+}
+
+.header-logo a {
+  text-decoration: none;
+  color: inherit; /* Inherit the text color */
+}
+
+nav ul {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  gap: 1rem; /* Reduce gap between main nav items */
+}
+
+nav ul li {
+  margin: 0;
+  padding: 0;
+}
+
+nav ul li a {
+  color: inherit; /* Inherit color from body */
+  text-decoration: none; /* Remove underline */
+  font-weight: 400;
+  transition: color 0.3s; /* Transition for color */
+  display: flex;
+  flex-direction: column; /* Stack icon and text vertically */
+  align-items: center;
+  padding: 0.25rem 0.5rem; /* Add padding for better click area */
+  border-radius: 0.25rem; /* Border radius for smoother look */
+  color: #ffffff;
+}
+
+nav ul li a:hover,
+nav ul li a:focus {
+  color: #1db954; /* Accent color for hover and focus */
+  text-decoration: none; /* Ensure no underline on hover */
+}
+
+body.light nav ul li a:hover,
+body.light nav ul li a:focus {
+  color: #00c8ff; /* Dark blue accent color for light mode hover and focus */
+  text-decoration: none; /* Ensure no underline on hover */
+}
+
+nav ul li a.active {
+  color: #1db954; /* Accent color for active link */
+  text-decoration: none; /* Ensure no underline for active link */
+}
+
+body.light nav ul li a.active {
+  color: #00c8ff; /* Dark blue accent color for light mode active link */
+  text-decoration: none; /* Ensure no underline for active link */
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem; /* Add gap between notifications and wallet button */
+}
+
+.header-right button{
+  background: linear-gradient(to right, #00C0FF, #003FB7) !important;
+  padding: 10px;
+  Font: Grotesk;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 20.42px;
+}
+
+.wallet-adapter-button-trigger {
+  background: linear-gradient(to right, #00C0FF, #003FB7) !important;
+  padding: 20px;
+  border: 8px !important;
+  color: #ffffff !important;
+  Font: Grotesk;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 20.42px;
+}
+
+.theme-switcher {
+  background-color: transparent; /* Transparent background */
+  border: none; /* No border */
+  cursor: pointer;
+  font-size: 1.5rem; /* Adjust icon size */
+  padding: 0; /* Remove padding */
+  border-radius: 50%; /* Make the button round */
+}
+
+body.dark .theme-switcher {
+  color: #1db954; /* Neon green for dark mode */
+}
+
+body.light .theme-switcher {
+  color: #333333; /* Dark color for light mode */
+}
+
+/* sub nav (swap, limit Order, DCA, Perps, Yield Farming */
+.sub-nav-wrapper {
+  display: flex;
+  justify-content: center; /* Center the sub-nav content */
+  max-width: 1280px;
+  margin: auto;
+}
+
+.sub-nav-swap-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-direction: row;
+}
+
+.sub-nav {
+  padding: 0.5rem 2rem;
+  display: flex;
+  justify-content: center; /* Center the sub-nav content */
+  background-color: #1A1A1A;
+  margin-top: 50px;
+  border-radius: 8px;
+}
+
+.sub-nav ul {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  gap: 0.5rem; /* Reduce gap between sub-nav items */
+}
+
+.sub-nav ul li {
+  margin: 0;
+  padding: 0;
+}
+
+.sub-nav ul li a {
+  color: inherit; /* Inherit color from body */
+  text-decoration: none; /* Remove underline */
+  display: flex;
+  flex-direction: column; /* Stack icon and text vertically */
+  align-items: center;
+  padding: 0.25rem 0.5rem; /* Reduce padding for more compact look */
+  border-radius: 0.25rem;
+  
+}
+
+.sub-nav ul li a:hover,
+.sub-nav ul li a:focus {
+  background-color: #39FF14; /* Neon green color for dark mode hover and focus */
+  color: white; /* White text color on hover */
+  text-decoration: none; /* Ensure no underline on hover */
+  font-size: 16px;
+  font-weight: 700;
+}
+
+body.light .sub-nav ul li a{
+  font-size: 16px;
+  font-weight: 400;
+  padding: 10px 25px 10px 25px;
+  color: rgb(255, 255, 255);
+}
+
+body.light .sub-nav ul li a:hover,
+body.light .sub-nav ul li a:focus {
+  background-color: #1e88e5; /* Bright blue color for light mode hover and focus */
+  color: white; /* White text color on hover */
+  text-decoration: none; /* Ensure no underline on hover */
+  font-size: 16px;
+  font-weight: 700;
+  background: linear-gradient(to right, #00C0FF, #003FB7) ;
+}
+
+.sub-nav ul li a.active {
+  background-color: #1db954; /* Bright green color used for the swap button */
+  color: white; /* Text color for active link */
+  text-decoration: none; /* Ensure no underline for active link */
+}
+
+body.dark .sub-nav ul li a.active {
+  background-color: #1db954; /* Neon green for active link in dark mode */
+  color: white; /* Text color for active link */
+  text-decoration: none; /* Ensure no underline for active link */
+}
+
+body.light .sub-nav ul li a.active {
+  background-color: #1e88e5; /* Bright blue color used for the swap button */
+  color: white; /* Text color for active link */
+  text-decoration: none; /* Ensure no underline for active link */
+}
+
+.sub-nav ul li a .icon {
+  margin-bottom: 0.25rem; /* Add margin below the icon for spacing */
+  font-size: 1.2rem;
+}
+
+.sub-nav ul li a .description {
+  font-size: 0.8rem;
+  color: inherit; /* Inherit color from body */
+}
+
+.sub-nav-setting, .sub-nav-clock {
+  border-radius: 8px;
+  display: flex;
+  justify-content: center; 
+  background-color: #1A1A1A;
+  margin-top: 50px;
+  margin-left: 10px;
+}

@@ -1,0 +1,420 @@
+/* Token Swap Styles */
+.token-swap-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+  margin-top: 20px;
+}
+
+.token-swap-body {
+  display: flex;
+  justify-content: center;
+}
+
+.token-swap {
+  padding: 2rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  width: 360px; /* Reduced width */
+  margin-right: 50px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 360px; /* Match token swap width */
+  margin-bottom: 10px; /* Adjusted spacing */
+}
+
+.slippage-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.slippage-label {
+  font-size: 0.8rem;
+  margin-bottom: 0.25rem;
+}
+
+.slippage-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.slippage-value {
+  font-size: 1rem;
+}
+
+.cog-icon {
+  cursor: pointer;
+  font-size: 1rem; /* Adjusted size */
+}
+
+.token-swap label {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.token-swap-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.token-swap-input label {
+  font-size: 24px;
+  font-weight: 700;
+  color: white !important;
+}
+
+.token-swap-input .input-group {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  background-color: #000000;
+  border-radius: 8px;
+  max-height: 138px;
+  justify-content: space-between;
+  padding: 24px;
+}
+
+.handle-swap-btn{
+  margin-top: 20px;
+}
+
+.dropdown-container {
+  position: relative;
+  flex: 1;
+  color: white !important;
+
+}
+
+.dropdown-selected {
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  border: 1px solid;
+  cursor: pointer;
+  color: white !important;
+
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  border-radius: 0.25rem;
+  margin-top: 0.5rem;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1000;
+  color: white !important;
+
+}
+
+.dropdown-item {
+  padding: 0.5rem;
+  cursor: pointer;
+}
+
+.dropdown-item:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.amount-input {
+  width: 100px;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+}
+
+.flip-button-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 10px 0;
+}
+
+.flip-button {
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.token-swap button {
+  width: 100%;
+  border: none;
+  padding: 0.75rem;
+  font-size: 1rem;
+  border-radius: 0.25rem;
+  transition: background-color 0.3s;
+}
+
+.price-chart {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid;
+}
+
+.refresh-icon {
+  cursor: pointer;
+  font-size: 1rem; /* Adjusted size */
+}
+
+.price-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+}
+
+/* Dark Mode Specific Styles */
+body.dark .token-swap {
+  background-color: #1f1f1f;
+}
+
+body.dark .slippage-label,
+body.dark .slippage-value,
+body.dark .token-swap label,
+body.dark .dropdown-selected,
+body.dark .dropdown-item,
+body.dark .amount-input,
+body.dark .price-token,
+body.dark .price-value {
+  color: #b3b3b3;
+}
+
+body.dark .dropdown-selected,
+body.dark .amount-input {
+  background-color: #121212;
+  border: 1px solid #333;
+}
+
+body.dark .dropdown-menu {
+  background-color: #1f1f1f;
+  border: 1px solid #333;
+}
+
+body.dark .flip-button {
+  background-color: #333;
+  color: #fff;
+}
+
+body.dark .flip-button:hover {
+  background-color: #555;
+}
+
+body.dark .token-swap button {
+  background: linear-gradient(90deg, #00C8FF, #003Fb7);
+  color: white;
+}
+
+body.dark .token-swap button:hover {
+  background: linear-gradient(90deg, #00C8FF, #003Fb7);
+}
+
+body.dark .price-chart {
+  border-top: 1px solid #333;
+}
+
+body.dark .refresh-icon {
+  color: #1db954;
+}
+
+/* Light Mode Specific Styles */
+body.light .token-swap {
+  /* background: linear-gradient(90deg, #00C8FF, #003Fb7) !important;  */
+  background-color: #1A1A1A;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Slightly larger shadow for depth */
+}
+
+body.light .slippage-label,
+body.light .slippage-value,
+body.light .token-swap label,
+body.light .dropdown-selected,
+body.light .dropdown-item,
+body.light .amount-input,
+body.light .price-token,
+body.light .price-value {
+  color: #ffffff; /* Dark text color */
+}
+
+body.light .dropdown-selected,
+body.light .amount-input {
+  background: linear-gradient(90deg, #00C8FF, #003Fb7); /* Turquoise to purple gradient */
+  border: 1px solid #cccccc; /* Lighter border */
+}
+
+body.light .dropdown-menu {
+  background: linear-gradient(90deg, #00C8FF, #003Fb7); /* Turquoise to purple gradient */
+  border: 1px solid #cccccc; /* Lighter border */
+}
+
+body.light .dropdown-item {
+  background: linear-gradient(90deg, #00C8FF, #003Fb7); /* Turquoise to purple gradient */
+}
+
+body.light .flip-button {
+  background-color: #cccccc; /* Light grey background */
+  color: #333333; /* Dark text color */
+}
+
+body.light .flip-button:hover {
+  background-color: #aaaaaa; /* Slightly darker grey */
+}
+
+body.light .token-swap button {
+  background-color: #1e88e5; /* Bright blue */
+  color: white;
+}
+
+body.light .token-swap button:hover {
+  background-color: #1976d2; /* Slightly darker blue */
+}
+
+body.light .price-chart {
+  border-top: 1px solid #cccccc; /* Lighter border */
+}
+
+body.light .refresh-icon {
+  color: #000000; /* Black color in light mode */
+}
+
+
+
+/* CSS for Token Swap Setting */
+
+.settings-container {
+  background-color: #1A1A1A;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  width: 300px;
+  color: white;
+}
+
+.settings-container .settings-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.settings-container .setting-label {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+}
+
+.settings-container .info-icon {
+  margin-left: 5px;
+  background-color: #3a3a46;
+  color: #c0c0c0;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 12px;
+}
+
+.settings-container .switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 20px;
+}
+
+.settings-container .switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.settings-container .slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+  border-radius: 50px;
+}
+
+.settings-container .slider:before {
+  position: absolute;
+  content: "";
+  height: 14px;
+  width: 14px;
+  border-radius: 50%;
+  background-color: white;
+  transition: .4s;
+  left: 3px;
+  bottom: 3px;
+}
+
+.settings-container input:checked + .slider {
+  background-color: #3a89ff;
+}
+
+.settings-container input:checked + .slider:before {
+  transform: translateX(18px);
+}
+
+.settings-container .slippage-options {
+  display: flex;
+}
+
+.settings-container .btn {
+  padding: 5px 10px;
+  background-color: #3a3a46;
+  border: none;
+  border-radius: 10px;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.settings-container .btn.active {
+  background: linear-gradient(90deg, #00C8FF, #003Fb7); /* Turquoise to purple gradient */
+}
+
+.settings-container .slippage-input {
+  background-color: #2b2b39;
+  border: none;
+  border-radius: 10px;
+  padding: 5px;
+  width: 50px;
+  color: white;
+  text-align: center;
+}
+
+.settings-container .save-btn {
+  width: 100%;
+  padding: 10px;
+  background: linear-gradient(90deg, #00C8FF, #003Fb7); /* Turquoise to purple gradient */
+  border: none;
+  border-radius: 10px;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  text-align: center;
+  transition: background-color 0.3s ease;
+}
+
+.settings-container .save-btn:hover {
+  background: linear-gradient(90deg, #00C8FF, #003Fb7); /* Turquoise to purple gradient */
+}

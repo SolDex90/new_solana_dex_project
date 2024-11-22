@@ -1,18 +1,27 @@
-import React, { createContext, useContext, useEffect } from 'react'; // Removed useState
+import React, { createContext, useState, useContext, useEffect } from 'react';
 
 const ThemeContext = createContext();
 
 export const ThemeProvider = ({ children }) => {
-  const theme = 'dark'; // Hardcode the theme as 'dark'
+  const [theme, setTheme] = useState('light');
 
-  // Apply dark theme on mount
   useEffect(() => {
-    console.log('Applying theme: dark');
-    document.body.className = 'dark'; // Always apply dark theme
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    setTheme(savedTheme);
   }, []);
 
+  useEffect(() => {
+    console.log('Applying theme:', theme); // Add this line to debug
+    document.body.className = theme;
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme((prevTheme) => (prevTheme === 'light' ? 'dark' : 'light'));
+  };
+
   return (
-    <ThemeContext.Provider value={{ theme }}>
+    <ThemeContext.Provider value={{ theme, toggleTheme }}>
       {children}
     </ThemeContext.Provider>
   );

@@ -6,19 +6,18 @@ import {
 import {
   SolflareWalletAdapter,
   LedgerWalletAdapter,
+  PhantomWalletAdapter
 } from '@solana/wallet-adapter-wallets';
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
 
 const WalletProvider = ({ children }) => {
-  const endpoint = useMemo(
-    () => 'https://billowing-palpable-sun.solana-mainnet.quiknode.pro/dcb07b108ec63c565d92b65b25d61508ff58eb05',
-    []
-  );
-
+  const endpoint = useMemo(() => 'https://billowing-palpable-sun.solana-mainnet.quiknode.pro/dcb07b108ec63c565d92b65b25d61508ff58eb05', []);
   const wallets = useMemo(
     () => [
+      // Remove PhantomWalletAdapter if it's registered automatically
       new SolflareWalletAdapter(),
       new LedgerWalletAdapter(),
+      new PhantomWalletAdapter(),
     ],
     []
   );

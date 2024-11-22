@@ -3,10 +3,9 @@ import axios from 'axios';
 import Dropdown from './Dropdown';
 import { useWallet } from '@solana/wallet-adapter-react';
 import '../styles/dca.css';
-import { Connection } from '@solana/web3.js';
-import { DCA as MyDCA, Network } from '@jup-ag/dca-sdk';
+import { Connection} from '@solana/web3.js';
+import {DCA as MyDCA, Network } from '@jup-ag/dca-sdk';
 import { connection } from '../config';
-import { Buffer } from 'buffer'; // Polyfill for Buffer
 
 const DCA = () => {
   const [tokens, setTokens] = useState([]);
@@ -23,27 +22,22 @@ const DCA = () => {
   const wallet = useWallet();
   const [inputMintToken, setInputMintToken] = useState([]);
   const [outputMintToken, setOutputMintToken] = useState([]);
-  const [iframeSrc, setIframeSrc] = useState(
-    'https://birdeye.so/tv-widget/So11111111111111111111111111111111111111112/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v?chain=solana&viewMode=base%2Fquote&chartInterval=1D&chartType=AREA&chartTimezone=America%2FLos_Angeles&chartLeftToolbar=show&theme=dark'
-  );
+  const [iframeSrc, setIframeSrc] = useState('https://birdeye.so/tv-widget/So11111111111111111111111111111111111111112/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v?chain=solana&viewMode=base%2Fquote&chartInterval=1D&chartType=AREA&chartTimezone=America%2FLos_Angeles&chartLeftToolbar=show&theme=dark');
 
-  const API_BASE_URL = import.meta.env.VITE_APP_API_BASE_URL || 'http://localhost:3000';
+  const API_BASE_URL = process.env.VITE_APP_API_BASE_URL || 'http://localhost:3000';
 
   useEffect(() => {
     const fetchTokens = async () => {
       try {
         const response = await axios.get(`${API_BASE_URL}/api/tokens`);
         setTokens(response.data);
-
         const fromTokenMint = response.data.find(token => token.symbol === fromToken)?.address;
         const toTokenMint = response.data.find(token => token.symbol === toToken)?.address;
-
+        
         if (fromTokenMint && toTokenMint) {
           setInputMintToken(fromTokenMint);
           setOutputMintToken(toTokenMint);
-          setIframeSrc(
-            `https://birdeye.so/tv-widget/${fromTokenMint}/${toTokenMint}?chain=solana&viewMode=base%2Fquote&chartInterval=1D&chartType=AREA&chartTimezone=America%2FLos_Angeles&chartLeftToolbar=show&theme=dark`
-          );
+          setIframeSrc(`https://birdeye.so/tv-widget/${fromTokenMint}/${toTokenMint}?chain=solana&viewMode=base%2Fquote&chartInterval=1D&chartType=AREA&chartTimezone=America%2FLos_Angeles&chartLeftToolbar=show&theme=dark`);
         }
       } catch (error) {
         console.error('Error fetching tokens:', error);
@@ -54,8 +48,7 @@ const DCA = () => {
     const fetchSolToUsdcRate = async () => {
       try {
         const response = await axios.get(`https://price.jup.ag/v6/price?ids=${fromToken}`);
-        const price = response.data?.data?.[fromToken]?.price;
-        setSolToUsdc(price || 0);
+        setSolToUsdc(response.data.data[fromToken].price);
       } catch (error) {
         console.error('Error fetching SOL to USDC rate:', error);
       }
@@ -66,18 +59,13 @@ const DCA = () => {
   }, [fromToken, API_BASE_URL, toToken]);
 
   useEffect(() => {
-    setIframeSrc(
-      `https://birdeye.so/tv-widget/${inputMintToken}/${outputMintToken}?chain=solana&viewMode=base%2Fquote&chartInterval=1D&chartType=AREA&chartTimezone=America%2FLos_Angeles&chartLeftToolbar=show&theme=dark`
-    );
+    // Update iframeSrc when fromToken or toToken changes
+    setIframeSrc(`https://birdeye.so/tv-widget/${inputMintToken}/${outputMintToken}?chain=solana&viewMode=base%2Fquote&chartInterval=1D&chartType=AREA&chartTimezone=America%2FLos_Angeles&chartLeftToolbar=show&theme=dark`);
   }, [inputMintToken, outputMintToken]);
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!wallet || !wallet.connected) {
-      setOrderStatus('Please connect your wallet first.');
-      return;
-    }
-
     try {
       const res = await axios.post(`${API_BASE_URL}/api/dca-order`, {
         fromToken,
@@ -85,32 +73,34 @@ const DCA = () => {
       });
       setOrderStatus('DCA ordering...!');
 
-      const dca = new MyDCA(connection, Network.MAINNET);
+      const dca =  new MyDCA(connection, Network.MAINNET);
+      console.log('WalletPubKey',wallet.publicKey);
       const params = {
         payer: wallet.publicKey,
         user: wallet.publicKey,
-        inAmount: parseInt(numOrders) * parseFloat(amount) * Math.pow(10, res.data.orderResult.inputDecimal),
-        inAmountPerCycle: parseFloat(amount) * Math.pow(10, res.data.orderResult.inputDecimal),
+        inAmount: numOrders * amount * Math.pow(10, res.data.orderResult.inputDecimal),
+        inAmountPerCycle: amount * Math.pow(10, res.data.orderResult.inputDecimal),
         cycleSecondsApart: parseInt(frequency),
         inputMint: res.data.orderResult.inputMint,
         outputMint: res.data.orderResult.outputMint,
-        minOutAmountPerCycle: null,
-        maxOutAmountPerCycle: null,
-        startAt: null,
+        minOutAmountPerCycle:null,
+        maxOutAmountPerCycle:null,
+        startAt:null,
       };
-
-      const { tx } = await dca.createDcaV2(params);
-      const latestBlockHash = await connection.getLatestBlockhash();
-      tx.recentBlockhash = latestBlockHash.blockhash;
+      console.log(params);
+      const {tx} = await dca.createDcaV2(params);
+      console.log(tx);
+      const latestBlockHash =await connection.getLatestBlockhash();
+      tx.recentBlockhash = latestBlockHash.blockhashblockhash;
       const txid = await wallet.sendTransaction(tx, connection);
-
       setOrderStatus(`Transaction sent. Confirming...`);
       await connection.confirmTransaction({
-        blockhash: latestBlockHash.blockhash,
+        blockhash:latestBlockHash,
         lastValidBlockHeight: latestBlockHash.lastValidBlockHeight,
-        signature: txid,
+        signature:txid
       });
-      setOrderStatus(`Succeeded in placing DCA order. Transaction ID: ${txid}`);
+      setOrderStatus(`Succeed to place DCA order. Transaction ID:${txid}`);
+
     } catch (error) {
       console.error('Error placing DCA order:', error);
       setOrderStatus('Failed to place DCA order. Please try again.');
@@ -127,18 +117,17 @@ const DCA = () => {
     }
   };
 
-  const equivalentUsdc = amount ? (amount * solToUsdc).toFixed(2) : 0;
+  const equivalentUsdc = (amount * solToUsdc).toFixed(2);
 
   return (
-    <div className="dca-page">
-      <div className="dca-page-section">
-        <iframe
-          title="DCA Trading IFrame"
-          width="100%"
-          height="600"
-          src={iframeSrc}
-          allowFullScreen
-        ></iframe>
+    <div className = 'dca-page'>
+      <div className='dca-page-section'>
+        <iframe 
+          title='DCA Trading IFrame'
+          width="100%" 
+          height="600" 
+          src={iframeSrc}>
+        </iframe>
       </div>
       <div className="dca-page-chart">
         {orderStatus && <p>{orderStatus}</p>}
@@ -152,7 +141,7 @@ const DCA = () => {
                 onSelectToken={(token) => handleSelectToken(token, 'from')}
                 showDropdown={showFromDropdown}
                 setShowDropdown={setShowFromDropdown}
-                style={{ width: '200px' }}
+                style={{ width: '200px' }} // Adjusted width for the ticker bar
               />
               <input
                 type="number"
@@ -163,23 +152,19 @@ const DCA = () => {
                 min={0}
                 step={0.1}
                 required
-                style={{ marginLeft: '10px', width: '100px', padding: '10px', marginTop: '10px' }}
+                style={{ marginLeft: '10px', width: '100px',  padding: '10px', marginTop: '10px' }}
               />
             </div>
           </div>
           <div className="form-group">
-            <label>Equivalent in USDC:</label>
-            <span>{equivalentUsdc} USDC</span>
-          </div>
-          <div className="form-group">
-            <label htmlFor="to-token">To Buy</label>
+            <label htmlFor="to-token">To buy</label>
             <Dropdown
               tokens={tokens}
               selectedToken={toToken}
               onSelectToken={(token) => handleSelectToken(token, 'to')}
               showDropdown={showToDropdown}
               setShowDropdown={setShowToDropdown}
-              style={{ width: '200px' }}
+              style={{ width: '200px' }} // Adjusted width for the ticker bar
             />
           </div>
           <div className="form-group">
@@ -204,7 +189,7 @@ const DCA = () => {
                 <option value="3600">Hour</option>
                 <option value="86400">Day</option>
                 <option value="604800">Week</option>
-                <option value="2592000">Month</option>
+                <option value="77760000">Month</option>
               </select>
             </div>
           </div>

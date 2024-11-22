@@ -1,0 +1,10 @@
+/* Import all other stylesheets */
+@import './general.css';
+@import './header.css';
+@import './footer.css';
+@import './main-content.css';
+@import './cards.css';
+@import './token-swap.css';
+@import './charts.css';
+@import './notifications.css';
+@import './theme.css';  /* Added import for theme-specific styles */

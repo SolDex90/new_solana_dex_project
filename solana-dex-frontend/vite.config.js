@@ -1,13 +1,11 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import envCompatible from 'vite-plugin-env-compatible';
 import { nodePolyfills } from 'vite-plugin-node-polyfills';
 import path from 'path';
 
 export default defineConfig({
   plugins: [
     react(),
-    envCompatible(),
     nodePolyfills({
       globals: {
         Buffer: true,
@@ -19,32 +17,58 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      // Use more specific path resolution
+      '@solana/web3.js': path.resolve(__dirname, 'node_modules/@solana/web3.js/lib/index.browser.esm.js'),
+      'jayson/lib/client/browser': path.resolve(__dirname, 'node_modules/jayson/lib/client/browser/index.js'),
       'rpc-websockets': path.resolve(__dirname, 'node_modules/rpc-websockets'),
-      // Add these for Solana compatibility
+      'bn.js': path.resolve(__dirname, 'node_modules/bn.js/lib/bn.js'),
       'stream': 'stream-browserify',
       'crypto': 'crypto-browserify',
     },
+    mainFields: ['browser', 'module', 'main'],
+  },
+  define: {
+    'process.env.BROWSER': true,
+    'process.env.NODE_DEBUG': JSON.stringify(''),
+    global: 'globalThis',
   },
   optimizeDeps: {
-    include: ['rpc-websockets', 'buffer'],
+    include: [
+      '@solana/web3.js',
+      'jayson/lib/client/browser',
+      'rpc-websockets',
+      'buffer',
+      'bn.js',
+      'jayson',
+    ],
+    exclude: [
+      '@project-serum/anchor',
+      '@drift-labs/sdk'
+    ],
     esbuildOptions: {
       target: 'esnext',
       define: {
         global: 'globalThis',
       },
+      platform: 'browser',
     },
   },
   build: {
+    target: ['es2020'],
+    sourcemap: true,
     commonjsOptions: {
       transformMixedEsModules: true,
+      include: [
+        /node_modules/,
+        /node_modules\/jayson/,
+        /node_modules\/@solana\/web3.js/,
+      ],
+      requireReturnsDefault: 'auto',
     },
     rollupOptions: {
+      external: ['@project-serum/anchor', '@drift-labs/sdk'],
       output: {
         manualChunks: undefined,
       },
     },
-    target: 'esnext',
-    sourcemap: true,
   },
 });

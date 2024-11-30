@@ -13,6 +13,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@coral-xyz/borsh": "^0.30.1",
     "@drift-labs/sdk": "^2.103.0-beta.1",
     "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
     "@fontsource/space-grotesk": "^5.1.0",

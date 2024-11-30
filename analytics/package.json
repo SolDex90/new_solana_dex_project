@@ -4,7 +4,7 @@
   "main": "index.js",
   "dependencies": {
     "@solana/web3.js": "^1.73.0",
-    "mongodb": "^4.12.1",
-    "dotenv": "^16.0.3"
+    "dotenv": "^16.0.3",
+    "mongodb": "^4.17.2"
   }
 }

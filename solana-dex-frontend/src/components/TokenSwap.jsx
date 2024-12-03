@@ -25,7 +25,7 @@ const TokenSwap = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [transactionStatus, setTransactionStatus] = useState('');
-  const [slippage, setSlippage] = useState(0.5);
+  const [slippage, setSlippage] = useState(0.5); // default slippage tolerance
   const [isSlippageModalOpen, setIsSlippageModalOpen] = useState(false);
   const wallet = useWallet();
 
@@ -35,12 +35,14 @@ const TokenSwap = () => {
     const fetchTokens = async () => {
       try {
         const response = await axios.get(`${API_BASE_URL}/api/tokens`);
-        const tokenData = Array.isArray(response.data) ? response.data : response.data.tokens;
+        console.log('Tokens API response:', response.data);
 
+        // Check if the response is an array or object
+        const tokenData = Array.isArray(response.data) ? response.data : response.data.tokens;
+        
         if (!Array.isArray(tokenData)) {
           throw new Error('Expected an array of tokens but received something else');
         }
-
         setTokens(tokenData);
       } catch (error) {
         console.error('Error fetching tokens:', error);
@@ -55,13 +57,17 @@ const TokenSwap = () => {
     setLoading(true);
     setError(null);
     try {
-      const jupiterResponse = await axios.get(`https://price.jup.ag/v6/price?ids=${tokenIds.join(',')}`);
-      const jupiterPrices = Object.keys(jupiterResponse.data.data).reduce((acc, key) => {
-        acc[jupiterResponse.data.data[key].mintSymbol] = jupiterResponse.data.data[key].price;
-        return acc;
-      }, {});
+      const jupiterResponse = await axios.get(`https://api.jup.ag/price/v2?ids=${tokenIds.join(',')}`);
+      
+      // Extract prices from the response
+      const prices = {};
+      for (const tokenId of tokenIds) {
+          const token = tokens.find(t => t.address === tokenId);
+          prices[token.symbol] = jupiterResponse.data.data[tokenId]?.price || 'Price not available';
+      }
+      console.log(prices);
 
-      setPrices(jupiterPrices);
+      setPrices(prices);
     } catch (error) {
       console.error('Error fetching prices from Jupiter API:', error);
       setError('Failed to fetch prices');
@@ -71,10 +77,13 @@ const TokenSwap = () => {
   };
 
   useEffect(() => {
-    if (fromToken && toToken) {
-      fetchPrices([fromToken, toToken]);
+    if (fromToken && toToken && tokens.length > 0) {
+      const token1 = tokens.find(t => t.symbol === fromToken);
+      const token2 = tokens.find(t => t.symbol === toToken);
+      fetchPrices([token1? token1.address : null, token2? token2.address : null]);
+
     }
-  }, [fromToken, toToken]);
+  }, [fromToken, toToken, tokens]);
 
   useEffect(() => {
     if (fromAmount && prices[fromToken] && prices[toToken]) {
@@ -89,12 +98,14 @@ const TokenSwap = () => {
 
   const handleSelectToken = (token, type) => {
     if (type === 'from') {
+      console.log("token->", token);
       setFromToken(token);
     } else {
       setToToken(token);
     }
     setShowFromDropdown(false);
     setShowToDropdown(false);
+    console.log(`Selected ${type} Token:`, token);
   };
 
   const handleFlip = () => {
@@ -105,6 +116,7 @@ const TokenSwap = () => {
   };
 
   const handleSwap = async () => {
+    console.log(connection);
     setTransactionStatus('Initiating transaction...');
     const walletAddress = wallet.publicKey;
     try {
@@ -114,26 +126,27 @@ const TokenSwap = () => {
         fromAmount,
         toAmount,
         walletAddress,
-        slippage,
+        slippage
       });
-
+      
       setTransactionStatus('Signing transaction...');
       const swapTransaction = res.data.swapResult;
-      const swapTransactionBuf = Buffer.from(swapTransaction, 'base64');
+      const swapTransactionBuf = Buffer.from(swapTransaction,'base64');
       const transaction = VersionedTransaction.deserialize(swapTransactionBuf);
       const signTransaction = await wallet.signTransaction(transaction);
       setTransactionStatus('Sending signed transaction to Solana Network');
       const latestBlockhash = await connection.getLatestBlockhash();
       const txid = await connection.sendRawTransaction(signTransaction.serialize());
-
+      
       setTransactionStatus('Confirming...');
       await connection.confirmTransaction({
-        blockhash: latestBlockhash.blockhash,
-        lastValidBlockHeight: latestBlockhash.lastValidBlockHeight,
-        signature: txid,
+        blockhash:latestBlockhash,
+        lastValidBlockHeight:latestBlockhash.lastValidBlockHeight,
+        signature:txid
       });
 
-      setTransactionStatus(`Transaction succeeded! Transaction ID: ${txid}`);
+      setTransactionStatus(`Transaction succeed! Transaction ID: ${txid}`);  
+      console.log(`https://solscan.io/tx/${txid}`);
     } catch (error) {
       console.error('Error during transaction:', error);
       setTransactionStatus('Transaction failed. Please try again.');
@@ -149,9 +162,10 @@ const TokenSwap = () => {
   return (
     <div className="token-swap-container">
       <div className="header">
-        <FaSync className="refresh-icon" onClick={handleRefresh} />
+        {/* <FaSync className="refresh-icon" onClick={handleRefresh} />
+        <Slippage slippage={slippage} setIsSlippageModalOpen={setIsSlippageModalOpen} /> */}
       </div>
-      <div className="token-swap-body">
+      <div className='token-swap-body'>
         <div className="token-swap">
           {loading && <p>Loading...</p>}
           {error && <p className="error">{error}</p>}
@@ -175,8 +189,13 @@ const TokenSwap = () => {
               </div>
             </div>
             <div className="flip-button-container">
-              <SwapButton onClick={handleFlip} />
+              {/* <SwapButton onClick={handleFlip} /> */}
+              <div onClick={handleFlip}>
+                <img src={toggle}/>
+              </div> 
             </div>
+            
+
             <div className="token-swap-input">
               <label>You're Buying:</label>
               <div className="input-group">
@@ -187,11 +206,17 @@ const TokenSwap = () => {
                   showDropdown={showToDropdown}
                   setShowDropdown={setShowToDropdown}
                 />
-                <AmountInput value={toAmount} readOnly placeholder="0.0" />
+                <AmountInput
+                  value={toAmount}
+                  readOnly
+                  placeholder="0.0"
+                />
               </div>
             </div>
           </div>
-          <button onClick={handleSwap}>Swap</button>
+          <div  className='handle-swap-btn'>
+            <button onClick={handleSwap}>Swap</button>
+          </div>
           <SlippageModal
             isOpen={isSlippageModalOpen}
             onRequestClose={() => setIsSlippageModalOpen(false)}
@@ -199,6 +224,35 @@ const TokenSwap = () => {
             setSlippage={setSlippage}
           />
           <PriceDisplay fromToken={fromToken} toToken={toToken} prices={prices} />
+        </div>
+        <div class="settings-container">
+          <div class="settings-item">
+              <label class="setting-label">
+                  MEV Protection
+                  <span class="info-icon">i</span>
+              </label>
+              <label class="switch">
+                  <input type="checkbox"/>
+                  <span class="slider round"></span>
+              </label>
+          </div>
+          
+          <div class="settings-item">
+              <label class="setting-label">
+                  Slippage Settings
+                  <span class="info-icon">i</span>
+              </label>
+              <div class="slippage-options">
+                <Slippage slippage={slippage} setIsSlippageModalOpen={setIsSlippageModalOpen} />
+              </div>
+          </div>
+
+          <div class="settings-item">
+              <label class="setting-label">Max Slippage:</label>
+              <input type="text" class="slippage-input" value="3%" readonly/>
+          </div>
+
+          <button class="save-btn">Save Settings</button>
         </div>
       </div>
     </div>

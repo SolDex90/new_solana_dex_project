@@ -12,4 +12,4 @@ export const TOKEN_VAULT_SEED = "TOKEN_VAULT_SEED";
 export const PRESALE_SEED = "PRESALE_SEED";
 export const USER_INFO_SEED = "USER_INFO_SEED";
 
-export const tokenMintAddress = "9aXG6LBZWhSapmjQDfuZzBp67Nd3TDbdrJKi1yDZVDCp";
+export const tokenMintAddress = "CxnjwHeSky653wBHgzCJc8Ts7dfH2QrGXEXEitbMiNYC";

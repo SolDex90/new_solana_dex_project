@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import '../styles/presale.css';
+/*
 import {
   Program,
   AnchorProvider,
@@ -8,6 +9,8 @@ import {
   // getProvider,
   BN
 } from "@project-serum/anchor";
+*/
+import { Program,BN } from "@coral-xyz/anchor";
 import {
   ConnectionProvider,
   WalletProvider,
@@ -15,6 +18,7 @@ import {
   useAnchorWallet,
   useWallet,
 } from "@solana/wallet-adapter-react";
+
 import {
   clusterApiUrl,
   Keypair,
@@ -70,8 +74,9 @@ const YieldFarmingPage = () => {
   // });
 
   useEffect(() => {
-    init();
-  }, []);
+    if(!publicKey)
+      init();
+  }, [publicKey]);
 
   const getProvider = () => {
     const provider = new AnchorProvider(
@@ -83,23 +88,23 @@ const YieldFarmingPage = () => {
   };
 
   const init = async() => {
-    let provider;
-    try {
-      provider = getProvider();
-    } catch {
-      if(wallet != undefined) {
-        setProvider(provider);
-      } else {
-        const keypair = Keypair.generate();
-        provider = new AnchorProvider(connection, {
-          publicKey: keypair.publicKey,
-          signAllTransactions: (txs) => Promise.resolve(txs),
-          signTransaction: (tx) => Promise.resolve(tx),
-        }, {});
-        setProvider(provider);
-      }
-    }
-    const program = new Program(IDL, PROGRAM_ID, provider);
+    // let provider;
+    // try {
+    //   provider = getProvider();
+    // } catch {
+    //   if(wallet != undefined) {
+    //     // setProvider(provider);
+    //   } else {
+    //     const keypair = Keypair.generate();
+    //     provider = new AnchorProvider(connection, {
+    //       publicKey: keypair.publicKey,
+    //       signAllTransactions: (txs) => Promise.resolve(txs),
+    //       signTransaction: (tx) => Promise.resolve(tx),
+    //     }, {});
+    //     // setProvider(provider);
+    //   }
+    // }
+    const program = new Program(IDL, PROGRAM_ID, {connection});
     const [presale, presaleBump] = await PublicKey.findProgramAddress(
       [
         Buffer.from(PRESALE_SEED)
@@ -190,8 +195,7 @@ const YieldFarmingPage = () => {
     try {
       if(!publicKey) return;
       
-      const provider = getProvider();
-      const program = new Program(IDL, PROGRAM_ID, provider);
+      const program = new Program(IDL, PROGRAM_ID, {connection});
       let amount = 0;
       if(saleType) {
         // public sale
@@ -238,24 +242,33 @@ const YieldFarmingPage = () => {
         program.programId
       );
 
-      const tx = await program.rpc.tokenSale(
-        new BN(amount), 
-        period,{
-          accounts: {
-            user: publicKey,
-            userInfo,
-            presale,
-            vault,
-            tokenMint,
-            tokenAccount:userTokenAccount,
-            tokenVaultAccount: tokenVault,
-            tokenProgram:TOKEN_PROGRAM_ID,
-            associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
-            systemProgram: SystemProgram.programId
-          },
-        }
+      const transaction = await program.methods
+      .tokenSale(new BN(amount),period)
+      .accounts({
+        user: publicKey,
+        userInfo,
+        presale,
+        vault,
+        tokenMint,
+        tokenAccount:userTokenAccount,
+        tokenVaultAccount: tokenVault,
+        tokenProgram:TOKEN_PROGRAM_ID,
+        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+        systemProgram: SystemProgram.programId
+      })
+      .transaction();
+      transaction.feePayer = publicKey;
+      transaction.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
+      const response = await connection.simulateTransaction(transaction);
+      console.log("response->", response);
+      console.log("transaction->", transaction);
+
+
+      const transactionSignature = await sendTransaction(
+        transaction,
+        connection
       );
-      console.log("tx->", tx);
+      console.log("transactionSignature->", transactionSignature);
     } catch (error) {
       console.log(error);
     }
@@ -345,7 +358,7 @@ const YieldFarmingPage = () => {
         </div>
 
         {!saleType && <label>Token Pice {tokenPrice}SOL</label>}
-        <button className='presale-btn' onClick={handleBuyToken}>Buy Token</button>
+        <button className='presale-btn' onClick={() => handleBuyToken()}>Buy Token</button>
         
       </div>
       <div className="staking-info">

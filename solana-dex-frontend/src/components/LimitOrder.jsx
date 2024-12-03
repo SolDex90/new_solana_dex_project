@@ -66,12 +66,21 @@ const LimitOrder = () => {
   useEffect(() => {
     const fetchPrices = async () => {
       try {
-        const response = await axios.get(`https://price.jup.ag/v6/price?ids=${fromToken}&vsToken=${toToken}`);
-        const pricesData = response.data?.data;
+        const token1 = tokens.find(t => t.symbol === fromToken);
+        const token2 = tokens.find(t => t.symbol === toToken);
+        const tokenIds = [token1? token1.address : null, token2? token2.address : null];
+
+        const jupiterResponse = await axios.get(`https://api.jup.ag/price/v2?ids=${tokenIds.join(',')}`);
+        // Extract prices from the response
+        const pricesData = {};
+        for (const tokenId of tokenIds) {
+            const token = tokens.find(t => t.address === tokenId);
+            pricesData[token.symbol] = jupiterResponse.data.data[tokenId]?.price || 'Price not available';
+        }
 
         if (pricesData) {
-          const fromTokenPrice = pricesData[fromToken]?.price;
-          const toTokenPrice = toToken === 'USDC' ? 1 : pricesData[toToken]?.price; // Set USDC price to $1 if not available
+          const fromTokenPrice = pricesData[fromToken];
+          const toTokenPrice = toToken === 'USDC' ? 1 : pricesData[toToken]; // Set USDC price to $1 if not available
 
           if (fromTokenPrice && toTokenPrice) {
             setPrices({
@@ -100,8 +109,10 @@ const LimitOrder = () => {
         setOrderStatus('Failed to fetch prices');
       }
     };
-    fetchPrices();
-  }, [fromToken, toToken, price]);
+    if(tokens.length > 0) {
+      fetchPrices();
+    }
+  }, [fromToken, toToken, price, tokens]);
 
   useEffect(() => {
     // Update iframeSrc when fromToken or toToken changes

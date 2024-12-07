@@ -225,34 +225,34 @@ const TokenSwap = () => {
           />
           <PriceDisplay fromToken={fromToken} toToken={toToken} prices={prices} />
         </div>
-        <div class="settings-container">
-          <div class="settings-item">
-              <label class="setting-label">
+        <div className="settings-container">
+          <div className="settings-item">
+              <label className="setting-label">
                   MEV Protection
-                  <span class="info-icon">i</span>
+                  <span className="info-icon">i</span>
               </label>
-              <label class="switch">
+              <label className="switch">
                   <input type="checkbox"/>
-                  <span class="slider round"></span>
+                  <span className="slider round"></span>
               </label>
           </div>
           
-          <div class="settings-item">
-              <label class="setting-label">
+          <div className="settings-item">
+              <label className="setting-label">
                   Slippage Settings
-                  <span class="info-icon">i</span>
+                  <span className="info-icon">i</span>
               </label>
-              <div class="slippage-options">
+              <div className="slippage-options">
                 <Slippage slippage={slippage} setIsSlippageModalOpen={setIsSlippageModalOpen} />
               </div>
           </div>
 
-          <div class="settings-item">
-              <label class="setting-label">Max Slippage:</label>
-              <input type="text" class="slippage-input" value="3%" readonly/>
+          <div className="settings-item">
+              <label className="setting-label">Max Slippage:</label>
+              <input type="text" className="slippage-input" value="3%" readOnly/>
           </div>
 
-          <button class="save-btn">Save Settings</button>
+          <button className="save-btn">Save Settings</button>
         </div>
       </div>
     </div>

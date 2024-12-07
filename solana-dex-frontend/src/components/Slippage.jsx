@@ -3,8 +3,8 @@ import { FaCog } from 'react-icons/fa';
 
 const Slippage = ({ slippage, setIsSlippageModalOpen }) => (
   <div>
-    <button class="btn dynamic">Dynamic</button>
-    <button class="btn fixed active" onClick={() => setIsSlippageModalOpen(true)}>Fixed</button>
+    <button className="btn dynamic">Dynamic</button>
+    <button className="btn fixed active" onClick={() => setIsSlippageModalOpen(true)}>Fixed</button>
 
   </div>
   // <div className="slippage-container">

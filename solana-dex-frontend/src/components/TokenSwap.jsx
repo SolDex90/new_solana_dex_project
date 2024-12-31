@@ -17,6 +17,11 @@ const TokenSwap = () => {
   const [tokens, setTokens] = useState([]);
   const [fromToken, setFromToken] = useState('SOL');
   const [toToken, setToToken] = useState('USDC');
+  const [fromTokenAddress, setFromTokenAddress] = useState('');
+  const [toTokenAddress, setToTokenAddress] = useState('');
+  const [Decimals, setDecimals] = useState('');
+  const [fromTokenDecimals, setFromTokenDecimals] = useState(0);
+  const [toTokenDecimals, setToTokenDecimals] = useState(0);
   const [fromAmount, setFromAmount] = useState('');
   const [toAmount, setToAmount] = useState('');
   const [showFromDropdown, setShowFromDropdown] = useState(false);
@@ -35,21 +40,32 @@ const TokenSwap = () => {
     const fetchTokens = async () => {
       try {
         const response = await axios.get(`${API_BASE_URL}/api/tokens`);
-        console.log('Tokens API response:', response.data);
-
-        // Check if the response is an array or object
-        const tokenData = Array.isArray(response.data) ? response.data : response.data.tokens;
-        
+        const tokenData = response.data;
+  
         if (!Array.isArray(tokenData)) {
           throw new Error('Expected an array of tokens but received something else');
         }
+  
         setTokens(tokenData);
+  
+        const solToken = tokenData.find((t) => t.symbol === 'SOL');
+        const usdcToken = tokenData.find((t) => t.symbol === 'USDC');
+  
+        if (solToken) {
+          setFromTokenAddress(solToken.address);
+          setFromTokenDecimals(solToken.decimals);
+        }
+  
+        if (usdcToken) {
+          setToTokenAddress(usdcToken.address);
+          setToTokenDecimals(usdcToken.decimals);
+        }
       } catch (error) {
         console.error('Error fetching tokens:', error);
         setError('Failed to fetch tokens');
       }
     };
-
+  
     fetchTokens();
   }, [API_BASE_URL]);
 
@@ -96,21 +112,30 @@ const TokenSwap = () => {
     }
   }, [fromAmount, prices, fromToken, toToken]);
 
-  const handleSelectToken = (token, type) => {
-    if (type === 'from') {
-      console.log("token->", token);
-      setFromToken(token);
-    } else {
-      setToToken(token);
+  const handleSelectToken = async (tokenSymbol, type) => {
+    const token = tokens.find((t) => t.symbol === tokenSymbol);
+    if (token) {
+      if (type === 'from') {
+        setFromToken(token.symbol);
+        setFromTokenAddress(token.address);
+        setFromTokenDecimals(token.decimals); 
+      } else {
+        setToToken(token.symbol);
+        setToTokenAddress(token.address);
+        setToTokenDecimals(token.decimals); 
+      }
     }
     setShowFromDropdown(false);
     setShowToDropdown(false);
-    console.log(`Selected ${type} Token:`, token);
   };
 
   const handleFlip = () => {
     setFromToken(toToken);
     setToToken(fromToken);
+    setFromTokenAddress(toTokenAddress);
+    setToTokenAddress(fromTokenAddress);
+    setFromTokenDecimals(toTokenDecimals); 
+    setToTokenDecimals(fromTokenDecimals);
     setFromAmount(toAmount);
     setToAmount(fromAmount);
   };
@@ -119,36 +144,48 @@ const TokenSwap = () => {
     console.log(connection);
     setTransactionStatus('Initiating transaction...');
     const walletAddress = wallet.publicKey;
+  
     try {
-      const res = await axios.post(`${API_BASE_URL}/api/swap`, {
-        fromToken,
-        toToken,
+      
+      if (!fromTokenAddress || !toTokenAddress || !fromTokenDecimals) {
+        throw new Error('Token information is missing. Please reselect the tokens.');
+      }
+  
+      const payload = {
+        fromToken: fromTokenAddress,
+        toToken: toTokenAddress,
+        decimals: fromTokenDecimals,
         fromAmount,
         toAmount,
         walletAddress,
-        slippage
-      });
-      
+        slippage,
+      };
+      console.log('Swap Payload:', payload);
+  
+      const res = await axios.post(`${API_BASE_URL}/api/swap`, payload);
+      console.log('Swap Response:', res.data);
+  
       setTransactionStatus('Signing transaction...');
       const swapTransaction = res.data.swapResult;
-      const swapTransactionBuf = Buffer.from(swapTransaction,'base64');
+      const swapTransactionBuf = Buffer.from(swapTransaction, 'base64');
       const transaction = VersionedTransaction.deserialize(swapTransactionBuf);
       const signTransaction = await wallet.signTransaction(transaction);
       setTransactionStatus('Sending signed transaction to Solana Network');
       const latestBlockhash = await connection.getLatestBlockhash();
       const txid = await connection.sendRawTransaction(signTransaction.serialize());
-      
+  
       setTransactionStatus('Confirming...');
       await connection.confirmTransaction({
-        blockhash:latestBlockhash,
-        lastValidBlockHeight:latestBlockhash.lastValidBlockHeight,
-        signature:txid
+        blockhash: latestBlockhash,
+        lastValidBlockHeight: latestBlockhash.lastValidBlockHeight,
+        signature: txid,
       });
-
-      setTransactionStatus(`Transaction succeed! Transaction ID: ${txid}`);  
+  
+      setTransactionStatus(`Transaction succeed! Transaction ID: ${txid}`);
       console.log(`https://solscan.io/tx/${txid}`);
     } catch (error) {
       console.error('Error during transaction:', error);
+      console.error('Response:', error.response);
       setTransactionStatus('Transaction failed. Please try again.');
     }
   };

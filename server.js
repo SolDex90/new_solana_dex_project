@@ -28,21 +28,22 @@ client.connect();
 console.log('db connected');
 const database = client.db('solana_dex');
 
-const getMintAddress = async(symbol)=>{
-  try{
-    const collection = database.collection('mint_addresses');
-    const result = await collection.findOne({ symbol: symbol }, { projection: { address: 1, decimal: 1 } });
-    if(result){
-      return {address:result.address, decimal:parseInt(result.decimal,10)};
+const fetchMintAddressFromJupiter = async (symbol) => {
+  try {
+    const response = await axios.get('https://tokens.jup.ag/tokens?tags=verified');
+    const token = response.data.find(t => t.symbol === symbol);
+
+    if (!token) {
+      throw new Error(`Token ${symbol} not found in Jupiter API`);
     }
-    else{
-      return 'no mint address';
-    }
+
+    return { address: token.address, decimal: token.decimals };
+  } catch (error) {
+    console.error('Error fetching token from Jupiter API:', error);
+    throw new Error('Failed to fetch token from Jupiter API');
   }
-  catch(error){
-    console.error("Error occurd getting mint address", error);
-  }
-}
+};
+
 
 app.use(cors());
 app.use(express.json());
@@ -57,53 +58,59 @@ app.get('/api/tokens', async (req, res) => {
   }
 });
 
-const performSwap = async (fromToken, toToken, fromAmount, toAmount, slippage, walletAddress) => {
+const performSwap = async (fromToken, toToken, decimals, fromAmount, toAmount, slippage, walletAddress) => {
   try {
-    const inputMintTokenData = await getMintAddress(fromToken);
-    const inputMint = inputMintTokenData.address;
-    const decimal = inputMintTokenData.decimal;  
-    const outputMintTokenData = await getMintAddress(toToken);
-    const outputMint = outputMintTokenData.address;
-    const res = await axios.get(process.env.JUPITER_SWAP_QUOTE_API_URL,{
-      params:{
-        inputMint:inputMint,
-        outputMint:outputMint,
+    
+    const inputMint = fromToken;
+    const decimal = decimals;
+    const outputMint = toToken;
+
+    
+    const quoteResponse = await axios.get(process.env.JUPITER_SWAP_QUOTE_API_URL, {
+      params: {
+        inputMint: inputMint,
+        outputMint: outputMint,
         amount: fromAmount * Math.pow(10, decimal),
-        slippageBps:slippage*100,
+        slippageBps: slippage * 100,
       }
     });
 
-    const quoteRes = res.data;
-    const swapTransaction = await axios.post(process.env.JUPITER_SWAP_API_URL,{
-      quoteResponse:quoteRes,
+    const quoteRes = quoteResponse.data;
+    console.log('Jupiter API Response:', quoteRes);
+
+    
+    const swapTransaction = await axios.post(process.env.JUPITER_SWAP_API_URL, {
+      quoteResponse: quoteRes,
       userPublicKey: walletAddress,
-      wrapAndUnwrapSol:true
+      wrapAndUnwrapSol: true
     });
+
     const swapResult = swapTransaction.data.swapTransaction;
-    //console.log('SWAP COMPLETED::', swapResult);
+    console.log('Swap Result:', swapResult);
     return swapResult;
   } catch (error) {
     console.error('Error in performSwap:', error);
-    throw new Error('Swap execution failed');
+    throw new Error(`Swap execution failed: ${error.message}`);
   }
 };
 
 app.post('/api/swap', async (req, res) => {
   try {
-    const { fromToken, toToken, fromAmount, toAmount, slippage, walletAddress } = req.body;
+    const { fromToken, toToken, decimals, fromAmount, toAmount, slippage, walletAddress } = req.body;
 
-    if (!fromToken || !toToken || !fromAmount || !toAmount || !slippage || !walletAddress) {
+    if (!fromToken || !toToken || !fromAmount || !decimals || !toAmount || !slippage || !walletAddress) {
       return res.status(400).json({ message: 'Invalid input parameters' });
     }
 
-    const swapResult = await performSwap(fromToken, toToken, fromAmount, toAmount, slippage, walletAddress);
+    const swapResult = await performSwap(fromToken, toToken, decimals, fromAmount, toAmount, slippage, walletAddress);
 
     res.json({ message: 'Swap successful', swapResult });
   } catch (error) {
-    ////console.error('Error during swap:', error);
+    console.error('Error during swap:', error);
     res.status(500).json({ error: 'Swap failed', details: error.message });
   }
 });
+
 async function placeLimitOrder(fromToken, toToken, price, amount, walletAddress, totalUSDC, sendingBase) {
   try {
     const inputMintTokenData = await getMintAddress(toToken);

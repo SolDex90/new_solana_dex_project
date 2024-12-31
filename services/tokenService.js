@@ -27,23 +27,21 @@ async function fetchWithRetry(url, options = {}, retries = 3) {
   }
 }
 
-async function fetchFromBirdeye() {
-  // Replace with your actual API key if required by BirdEye
-  const apiKey = '7707fff5284b4debbdc6487845ea9218';
-  const headers = {
-    'X-API-KEY': apiKey,
-    'Content-Type': 'application/json'
-  };
-  
-  const data = await fetchWithRetry('https://public-api.birdeye.so/defi/tokenlist', { headers });
-  
-  if (!data || !data.data || !Array.isArray(data.data.tokens)) {
-    console.error('Invalid data from BirdEye API:', data);
-    throw new Error('Failed to fetch valid data from BirdEye API');
+async function fetchFromJupiter() {
+  try {
+    const response = await fetchWithRetry('https://tokens.jup.ag/tokens?tags=verified');
+    const tokens = response;
+
+    if (!Array.isArray(tokens)) {
+      throw new Error('Invalid data from Jupiter API: Expected an array of tokens');
+    }
+
+    console.log('Jupiter Token Data:', tokens);
+    return tokens;
+  } catch (error) {
+    console.error('Error fetching tokens from Jupiter API:', error);
+    throw new Error('Failed to fetch tokens from Jupiter API');
   }
-  
-  console.log('BirdEye Data:', data);
-  return data.data.tokens;
 }
 
 async function fetchFromSolanaBlockchain() {
@@ -55,35 +53,25 @@ async function fetchFromSolanaBlockchain() {
 
 async function combineAndDeduplicateData() {
   try {
-    // Only fetching from BirdEye and blockchain now
-    const birdEyeTokens = await fetchFromBirdeye();
-    const blockchainTokens = await fetchFromSolanaBlockchain();
+    // Fetch tokens from Jupiter API
+    const jupiterTokens = await fetchFromJupiter();
+    console.log('Jupiter Tokens:', jupiterTokens);
 
-    console.log('BirdEye Tokens:', birdEyeTokens);
-    console.log('Blockchain Tokens:', blockchainTokens);
-
-    // Convert BirdEye tokens to a uniform format
-    const birdEyeTokensArray = birdEyeTokens.map(token => ({
+    // Convert Jupiter tokens to a uniform format
+    const jupiterTokensArray = jupiterTokens.map(token => ({
       address: token.address,
       symbol: token.symbol,
-      price: token.price // Ensure this field is correct for price
+      decimals: token.decimals,
+      name: token.name,
+      logoURI: token.logoURI,
+      price: null // You can fetch the price separately if needed
     }));
 
-    // Merge all tokens
-    const allTokens = [...birdEyeTokensArray, ...blockchainTokens];
-
-    // Deduplicate by address
-    const uniqueTokens = allTokens.reduce((acc, token) => {
-      if (!acc.find(t => t.address === token.address)) {
-        acc.push(token);
-      }
-      return acc;
-    }, []);
-
-    return uniqueTokens;
+    // Return the Jupiter tokens directly
+    return jupiterTokensArray;
   } catch (error) {
     console.error('Error in combineAndDeduplicateData:', error);
-    throw new Error('Failed to combine and deduplicate data');
+    throw new Error('Failed to fetch and process tokens from Jupiter API');
   }
 }
 

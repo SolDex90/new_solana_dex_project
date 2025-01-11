@@ -276,6 +276,97 @@ td{
 .limit-order-button:hover {
   background-color: #3054d1;
 }
+@media screen and (max-width: 768px) {
+  .limit-order-page {
+    flex-direction: column;
+    margin: 10px;
+  }
 
+  .limit-order-container {
+    width: 90%;
+    margin-top: 20px;
+  }
+
+  .limit-order-price-chart-container {
+    width: 90%;
+    height: 50vh;
+  }
+
+  .limit-order-input-group input,
+  .limit-order-input-group .dropdown-container {
+    width: 100%;
+    margin: 5px 0;
+  }
+
+  .limit-orders-hisory {
+    width: 95%;
+    margin: 15px;
+  }
+
+  .order-table {
+    overflow-x: auto;
+  }
+
+  .tab-container {
+    flex-wrap: wrap;
+  }
+
+  .tab-item {
+    flex: 0 0 50%;
+  }
+}
+
+/* Balance and action buttons styles */
+.balance-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 5px 0;
+  font-size: 14px;
+  color: #b0b0b0;
+}
+
+.balance-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.balance-btn {
+  padding: 4px 8px;
+  background: linear-gradient(to right, #00C0FF, #003FB7);
+  border: none;
+  border-radius: 4px;
+  color: white;
+  cursor: pointer;
+  font-size: 12px;
+  transition: opacity 0.2s;
+}
+
+.balance-btn:hover {
+  opacity: 0.8;
+}
+
+/* Token select button styles */
+.token-select-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: linear-gradient(to right, #00C0FF, #003FB7);
+  border: none;
+  border-radius: 4px;
+  color: white;
+  cursor: pointer;
+}
+
+.token-select-button img {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+}
+
+.token-select-button .dropdown-arrow {
+  margin-left: auto;
+}
 
 

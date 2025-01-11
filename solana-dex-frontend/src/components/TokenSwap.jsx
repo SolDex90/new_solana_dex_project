@@ -9,9 +9,11 @@ import PriceDisplay from './PriceDisplay';
 import SlippageModal from './SlippageModal';
 import '../styles/token-swap.css';
 import { useWallet } from '@solana/wallet-adapter-react';
-import { VersionedTransaction, Connection } from '@solana/web3.js';
+import { VersionedTransaction, Connection ,PublicKey } from '@solana/web3.js';
+import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import toggle from '../images/toggle.png';
 import { connection } from '../config';
+import TokenSelectModal from './TokenSelectModal';
 
 const TokenSwap = () => {
   const [tokens, setTokens] = useState([]);
@@ -32,9 +34,15 @@ const TokenSwap = () => {
   const [transactionStatus, setTransactionStatus] = useState('');
   const [slippage, setSlippage] = useState(0.5); // default slippage tolerance
   const [isSlippageModalOpen, setIsSlippageModalOpen] = useState(false);
+  const [fromBalance, setFromBalance] = useState('0'); // Example balance
+  const [toBalance, setToBalance] = useState('0'); // Example balance
+  const [isTokenSelectModalOpen, setIsTokenSelectModalOpen] = useState(false);
+  const [selectingFor, setSelectingFor] = useState('from'); // 'from' or 'to'
   const wallet = useWallet();
 
   const API_BASE_URL = import.meta.env.VITE_APP_API_BASE_URL || 'http://localhost:3000';
+  const END_POINT = import.meta.env.VITE_APP_RPC_END_POINT || 'https://api.mainnet-beta.solana.com';
+  const WRAPPED_SOL_ADDRESS = 'So11111111111111111111111111111111111111112';
 
   useEffect(() => {
     const fetchTokens = async () => {
@@ -48,18 +56,18 @@ const TokenSwap = () => {
   
         setTokens(tokenData);
   
-        const solToken = tokenData.find((t) => t.symbol === 'SOL');
-        const usdcToken = tokenData.find((t) => t.symbol === 'USDC');
-  
-        if (solToken) {
-          setFromTokenAddress(solToken.address);
-          setFromTokenDecimals(solToken.decimals);
-        }
-  
-        if (usdcToken) {
-          setToTokenAddress(usdcToken.address);
-          setToTokenDecimals(usdcToken.decimals);
-        }
+      const solToken = tokenData.find((t) => t.symbol === 'SOL');
+      const usdcToken = tokenData.find((t) => t.symbol === 'USDC');
+
+      if (solToken) {
+        setFromTokenAddress(WRAPPED_SOL_ADDRESS); // Use wrapped SOL address for native SOL
+        setFromTokenDecimals(9); // Native SOL has 9 decimals
+      }
+
+      if (usdcToken) {
+        setToTokenAddress(usdcToken.address); // SPL token address
+        setToTokenDecimals(usdcToken.decimals); // SPL token decimals
+      }
       } catch (error) {
         console.error('Error fetching tokens:', error);
         setError('Failed to fetch tokens');
@@ -68,6 +76,38 @@ const TokenSwap = () => {
   
     fetchTokens();
   }, [API_BASE_URL]);
+
+  const fetchTokenBalance = async (tokenAddress, walletAddress) => {
+    try {
+      const connection = new Connection(END_POINT); 
+      const publicKey = new PublicKey(walletAddress);
+
+    // If the token is native SOL, fetch the native balance
+    if (tokenAddress === WRAPPED_SOL_ADDRESS) {
+      const balance = await connection.getBalance(publicKey);
+      return balance / 1e9; // Convert lamports to SOL
+    }
+
+    // For SPL tokens, fetch the token balance
+    const tokenPublicKey = new PublicKey(tokenAddress);
+    const tokenAccounts = await connection.getParsedTokenAccountsByOwner(publicKey, {
+      programId: TOKEN_PROGRAM_ID,
+    });
+
+    const tokenAccount = tokenAccounts.value.find(account => 
+      account.account.data.parsed.info.mint === tokenPublicKey.toBase58()
+    );
+
+    if (tokenAccount) {
+      return tokenAccount.account.data.parsed.info.tokenAmount.uiAmount;
+    } else {
+      return 0;
+    }
+  } catch (error) {
+    console.error('Error fetching token balance:', error);
+    return 0;
+  }
+};
 
   const fetchPrices = async (tokenIds) => {
     setLoading(true);
@@ -93,6 +133,17 @@ const TokenSwap = () => {
   };
 
   useEffect(() => {
+    const fetchBalance = async () => {
+      if (fromTokenAddress && wallet.publicKey) {
+        const balance = await fetchTokenBalance(fromTokenAddress, wallet.publicKey.toBase58());
+        setFromBalance(balance);
+      }
+    };
+
+    fetchBalance();
+  }, [fromTokenAddress, wallet.publicKey]);
+
+  useEffect(() => {
     if (fromToken && toToken && tokens.length > 0) {
       const token1 = tokens.find(t => t.symbol === fromToken);
       const token2 = tokens.find(t => t.symbol === toToken);
@@ -112,8 +163,7 @@ const TokenSwap = () => {
     }
   }, [fromAmount, prices, fromToken, toToken]);
 
-  const handleSelectToken = async (tokenSymbol, type) => {
-    const token = tokens.find((t) => t.symbol === tokenSymbol);
+  const handleSelectToken = async (token, type) => {
     if (token) {
       if (type === 'from') {
         setFromToken(token.symbol);
@@ -125,8 +175,12 @@ const TokenSwap = () => {
         setToTokenDecimals(token.decimals); 
       }
     }
-    setShowFromDropdown(false);
-    setShowToDropdown(false);
+    setIsTokenSelectModalOpen(false);
+  };
+
+  const openTokenSelectModal = (type) => {
+    setSelectingFor(type);
+    setIsTokenSelectModalOpen(true);
   };
 
   const handleFlip = () => {
@@ -159,6 +213,8 @@ const TokenSwap = () => {
         toAmount,
         walletAddress,
         slippage,
+        walletAddress: wallet.publicKey.toString(),
+        platformFeeBps: 20,
       };
       console.log('Swap Payload:', payload);
   
@@ -196,6 +252,19 @@ const TokenSwap = () => {
     }
   };
 
+  const handleHalf = () => {
+    if (fromBalance) {
+      const halfBalance = (parseFloat(fromBalance) / 2).toString();
+      setFromAmount(halfBalance); // Update the input field with half the balance
+    }
+  };
+  
+  const handleMax = () => {
+    if (fromBalance) {
+      setFromAmount(fromBalance.toString()); // Update the input field with the full balance
+    }
+  };
+
   return (
     <div className="token-swap-container">
       <div className="header">
@@ -205,19 +274,42 @@ const TokenSwap = () => {
       <div className='token-swap-body'>
         <div className="token-swap">
           {loading && <p>Loading...</p>}
-          {error && <p className="error">{error}</p>}
           {transactionStatus && <p>{transactionStatus}</p>}
           <div className="token-swap-inputs">
             <div className="token-swap-input">
               <label>You're Selling:</label>
+              <div className="balance-info">
+              <span>Balance: {fromBalance} {fromToken}</span>
+              <div className="balance-actions">
+                <button onClick={handleHalf} className="balance-btn">
+                  <i className="fas fa-divide"></i> Half
+                </button>
+                <button onClick={handleMax} className="balance-btn">
+                  <i className="fas fa-arrow-up"></i> Max
+                </button>
+              </div>
+            </div>
               <div className="input-group">
-                <Dropdown
-                  tokens={tokens}
-                  selectedToken={fromToken}
-                  onSelectToken={(token) => handleSelectToken(token, 'from')}
-                  showDropdown={showFromDropdown}
-                  setShowDropdown={setShowFromDropdown}
-                />
+              <button 
+                  className="token-select-button dropdown-selected" 
+                  onClick={() => {
+                    setSelectingFor('from');
+                    setIsTokenSelectModalOpen(true);
+                  }}
+                >
+                  {fromToken ? (
+                    <>
+                      <img 
+                        src={tokens.find(t => t.symbol === fromToken)?.logoURI} 
+                        className="token-icon"
+                      />
+                      <span>{fromToken}</span>
+                    </>
+                  ) : (
+                    'Select Token'
+                  )}
+                  <span className="dropdown-arrow">▼</span>
+                </button>
                 <AmountInput
                   value={fromAmount}
                   onChange={(e) => setFromAmount(e.target.value)}
@@ -231,18 +323,29 @@ const TokenSwap = () => {
                 <img src={toggle}/>
               </div> 
             </div>
-            
-
             <div className="token-swap-input">
               <label>You're Buying:</label>
               <div className="input-group">
-                <Dropdown
-                  tokens={tokens}
-                  selectedToken={toToken}
-                  onSelectToken={(token) => handleSelectToken(token, 'to')}
-                  showDropdown={showToDropdown}
-                  setShowDropdown={setShowToDropdown}
-                />
+              <button 
+                  className="token-select-button" 
+                  onClick={() => {
+                    setSelectingFor('to');
+                    setIsTokenSelectModalOpen(true);
+                  }}
+                >
+                  {toToken ? (
+                    <>
+                      <img 
+                        src={tokens.find(t => t.symbol === toToken)?.logoURI} 
+                        className="token-icon"
+                      />
+                      <span>{toToken}</span>
+                    </>
+                  ) : (
+                    'Select Token'
+                  )}
+                  <span className="dropdown-arrow">▼</span>
+                </button>
                 <AmountInput
                   value={toAmount}
                   readOnly
@@ -259,6 +362,12 @@ const TokenSwap = () => {
             onRequestClose={() => setIsSlippageModalOpen(false)}
             slippage={slippage}
             setSlippage={setSlippage}
+          />
+          <TokenSelectModal
+            isOpen={isTokenSelectModalOpen}
+            tokens={tokens}
+            onSelectToken={(token) => handleSelectToken(token, selectingFor)}
+            onClose={() => setIsTokenSelectModalOpen(false)}
           />
           <PriceDisplay fromToken={fromToken} toToken={toToken} prices={prices} />
         </div>

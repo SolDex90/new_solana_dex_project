@@ -39,7 +39,7 @@ const Header = () => {
               </Link>
             </h1>
           </div>
-          <nav>
+          {/*<nav>
             <ul>
               <li>
                 <Link to="/trade" className={`main-link ${isTradePage ? 'active' : ''}`}>
@@ -73,7 +73,7 @@ const Header = () => {
                 </Link>
               </li>
             </ul>
-          </nav>
+          </nav>*/}
           <div className="header-right">
             {/* <WalletMultiButton/> */}
             {connected ? (
@@ -109,7 +109,7 @@ const Header = () => {
                       Limit
                     </Link>
                   </li>
-                  <li>
+                  {/*<li>
                     <Link to="/dca" className={location.pathname === '/dca' ? 'active' : ''}>
                       DCA
                     </Link>
@@ -126,7 +126,7 @@ const Header = () => {
                     >
                       CRPT Presale
                     </Link>
-                  </li>
+                  </li>*/}
                 </ul>
               </nav>
             </div>

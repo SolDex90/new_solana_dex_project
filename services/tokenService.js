@@ -55,7 +55,6 @@ async function combineAndDeduplicateData() {
   try {
     // Fetch tokens from Jupiter API
     const jupiterTokens = await fetchFromJupiter();
-    console.log('Jupiter Tokens:', jupiterTokens);
 
     // Convert Jupiter tokens to a uniform format
     const jupiterTokensArray = jupiterTokens.map(token => ({
@@ -64,7 +63,6 @@ async function combineAndDeduplicateData() {
       decimals: token.decimals,
       name: token.name,
       logoURI: token.logoURI,
-      price: null // You can fetch the price separately if needed
     }));
 
     // Return the Jupiter tokens directly
